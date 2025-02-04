@@ -21,7 +21,7 @@ def create_scatter_plot(data):
     p = figure(height=350, title="Project Portfolio Visualization", toolbar_location=None, tools="hover", tooltips="@projects: Business Novelty: @business_novelty, Customer Novelty: @customer_novelty, Impact: @impact")
 
 
-    p.circle(x="business_novelty", y="customer_novelty", size="impact", color=HighContrast3[0], alpha=0.6, source=source)
+    p.scatter(x="business_novelty", y="customer_novelty", size="impact", color=HighContrast3[0], alpha=0.6, source=source)
 
 
     p.xaxis.axis_label = "Business Novelty"

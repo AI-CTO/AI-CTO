@@ -1,4 +1,5 @@
 /* static/styles.css */
+
 body {
     font-family: Arial, sans-serif;
     margin: 0;
@@ -11,6 +12,16 @@ header {
     padding: 1rem 0;
     text-align: center;
 }
+/* Apply thin, italic styling to the title */
+header h1 {
+    font-family: 'Poppins', sans-serif;
+    font-size: 2.5rem;  /* Large, modern look */
+    font-weight: 200;   /* Thin font weight */
+    font-style: italic; /* Italicized for elegance */
+    letter-spacing: 1px; /* Slight spacing for a sleek effect */
+    margin: 0;
+}
+
 main {
     padding: 2rem;
     text-align: center;
@@ -23,4 +34,86 @@ footer {
     position: fixed;
     bottom: 0;
     width: 100%;
+}
+
+/* Tab navigation styling */
+.tabs {
+    list-style: none;
+    display: flex;
+    padding: 0;
+    margin: 0;
+    background: #333;
+    overflow: hidden;
+}
+
+/* Apply the same font style to the tab links */
+.tabs .tab-link {
+    font-family: 'Poppins', sans-serif;   /* Use the same font */
+    font-weight: 100;                     /* Thin font */
+    font-style: italic;                   /* Italicize */
+    letter-spacing: 1px;                  /* Slight spacing for readability */
+    padding: 10px 20px;                   /* Keep padding for the tab */
+    cursor: pointer;
+    color: white;
+    background: #444;
+    flex-grow: 1;
+    text-align: center;
+    transition: background 0.3s;
+}
+
+
+.tabs .tab-link:hover {
+    background: #555;
+}
+
+.tabs .tab-link.active {
+    background: #6496cb;
+}
+
+/* Tab content styling */
+.tab-content {
+    display: none;
+    padding: 20px;
+    border: 1px solid #ddd;
+    background: #f9f9f9;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+/* Modernize the text input field */
+input[type="text"] {
+    width: 100%; /* Make input field take full width of its container */
+    padding: 12px 20px; /* Add padding for a more spacious feel */
+    font-size: 1rem; /* Set a nice readable font size */
+    border: 2px solid #ddd; /* Subtle border for modern look */
+    border-radius: 8px; /* Rounded corners */
+    box-sizing: border-box; /* Ensure padding doesn't affect width */
+    transition: border 0.3s ease, box-shadow 0.3s ease; /* Smooth transition on focus */
+    margin-bottom: 20px; /* Spacing below the input field */
+}
+
+/* Input field on focus (when the user clicks on it) */
+input[type="text"]:focus {
+    border-color: #007bff; /* Change border color on focus */
+    outline: none; /* Remove default focus outline */
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5); /* Add a subtle glow effect */
+}
+
+/* Modernize the submit button */
+button {
+    background-color: #73aeed; /* Blue background */
+    color: white; /* White text */
+    padding: 12px 20px; /* Add padding to make it more clickable */
+    border: none; /* Remove the default border */
+    border-radius: 8px; /* Rounded corners for consistency */
+    font-size: 1rem; /* Same font size as input */
+    cursor: pointer; /* Make the button clickable */
+    transition: background-color 0.3s ease; /* Smooth background color transition */
+}
+
+/* Button hover effect */
+button:hover {
+    background-color: #6097d2; /* Darker shade of blue when hovered */
 }
