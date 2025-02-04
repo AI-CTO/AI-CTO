@@ -20,7 +20,7 @@ This project focuses on developing a web-based tool that provides a comprehensiv
 
 - [Sprint Backlog](https://github.com/users/ErikHuuskonen/projects/1)
 
-- [Documentation](/Documentation.md)
+- [Documentation](https://github.com/AI-CTO/AI-CTO/tree/release/documentation)
 
 
 # Definition of Done:
