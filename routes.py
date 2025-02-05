@@ -18,6 +18,10 @@ def setup_routes(app):
                 return jsonify({"error": "Missing required fields"}), 400
 
             response_json = get_openai_completion(description)
+            if response_json is None:
+                return jsonify({"error": "Invalid response format from OpenAI API"}), 500
+
+            # Extract data from the response JSON
             project_name = response_json["project_name"]
             business_novelty = int(response_json["business_novelty"])
             customer_novelty = int(response_json["customer_novelty"])
@@ -25,6 +29,7 @@ def setup_routes(app):
             business_rationale = response_json["rationale_behind_business_novelty"]
             customer_rationale = response_json["rationale_behind_customer_novelty"]
             impact_rationale = response_json["rationale_behind_impact"]
+            project_type = response_json["type"]
 
             new_project = Project(
                 description=project_name,
@@ -32,29 +37,16 @@ def setup_routes(app):
                 returned_y_value=customer_novelty,
                 x_value_justification=business_rationale,
                 y_value_justification=customer_rationale,
-                type="idea",
+                type=project_type,
             )
-
-            print(new_project)
 
             db.session.add(new_project)
             db.session.commit()
-            print(f"Added new project: {new_project.id}, {new_project.description}")
 
-            return render_template(
-                "index.html",
-                project_name=project_name,
-                business_novelty=business_novelty,
-                customer_novelty=customer_novelty,
-                impact=impact,
-                business_rationale=business_rationale,
-                customer_rationale=customer_rationale,
-                impact_rationale=impact_rationale,
-            )
+            return render_template("index.html", project_name=project_name, business_novelty=business_novelty, customer_novelty=customer_novelty, impact=impact, business_rationale=business_rationale, customer_rationale=customer_rationale, impact_rationale=impact_rationale)
 
         except Exception as e:
-            return jsonify({"error": "An error occurred", "details": str(e)}), 500
-
+            return jsonify({"error": "An error occurred while processing the project.", "details": str(e)}), 500
     @app.route("/quote")
     def quote_page():
         return render_template("quote.html")
