@@ -1,61 +1,28 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@1,100&display=swap" rel="stylesheet">
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Project Tool</title>
-    <link rel="stylesheet" href="/static/styles.css">
-    <script src="https://cdn.bokeh.org/bokeh/release/bokeh-2.3.3.min.js"></script>
-    <script defer src="/static/tab_script.js"></script>
-</head>
-<body>
-    <header>
-        <h1>AICTO: Project Portfolio Visualization Tool</h1>
-        <nav>
-            <ul class="tabs">
-                <li class="tab-link active" data-tab="home">Home</li>
-                <li class="tab-link" data-tab="visualization">Visualization</li>
-                <li class="tab-link" data-tab="projects">Previous Projects</li>
-            </ul>
-        </nav>
-    </header>
+{% extends "layout.html" %}
 
-    <main>
-        <!-- Home Tab Content -->
-        <div id="home" class="tab-content active">
-            <p>Welcome to the AI Project Portfolio Visualization Tool. Start exploring and evaluating AI projects here.</p>
+{% block title %}AI Project Tool{% endblock %}
 
-            <form action="/process_project" method="post">
-                <label for="description">Enter your project idea here:</label>
-                <input type="text" id="description" name="description" placeholder="Enter some text" required style="margin-bottom: 20px;">
-                <button type="submit" class="button">Submit</button>
-            </form>
+{% block content %}
+<div id="home" class="tab-content active">
+    <p>Welcome to the AI Project Portfolio Visualization Tool. Start exploring and evaluating AI projects here.</p>
 
-            {% if project_name and business_novelty and customer_novelty and impact %}
-            <p>Project Name: {{ project_name }}</p>
-            <p>Business Novelty: {{ business_novelty }}</p>
-            <p>Customer Novelty: {{ customer_novelty }}</p>
-            <p>Impact: {{ impact }}</p>
-            <p>Rationale for business novelty: {{ business_rationale }}</p>
-            <p>Rationale for customer novelty: {{ customer_rationale }}</p>
-            <p>Rationale for impact: {{ impact_rationale }}</p>
-            {% else %}
-                <p>No project data available.</p>
-            {% endif %}
-        </div>
+    <form action="/process_project" method="post">
+        <label for="description">Enter your project idea here:</label>
+        <input type="text" id="description" name="description" placeholder="Enter some text" required style="margin-bottom: 20px;">
+        <button type="submit" class="button">Submit</button>
+    </form>
 
-        <!-- Visualization Tab Content -->
-        <div id="visualization" class="tab-content">
-            <iframe src="/visualize" width="100%" height="500px"></iframe>
-        </div>
-
-        <!-- Previous Projects Tab Content -->
-        <div id="projects" class="tab-content">
-            <iframe src="/previous_projects" width="100%" height="500px"></iframe>
-        </div>
-    </main>
-
-    <footer></footer>
-</body>
-</html>
+    {% if project_name and business_novelty and customer_novelty and impact %}
+    <p>Project Name: {{ project_name }}</p>
+    <p>Business Novelty: {{ business_novelty }}</p>
+    <p>Customer Novelty: {{ customer_novelty }}</p>
+    <p>Impact: {{ impact }}</p>
+    <p>Rationale for business novelty: {{ business_rationale }}</p>
+    <p>Rationale for customer novelty: {{ customer_rationale }}</p>
+    <p>Rationale for impact: {{ impact_rationale }}</p>
+    {% else %}
+        <p>No project data available.</p>
+    {% endif %}
+</div>
+</div>
+{% endblock %}
