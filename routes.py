@@ -25,7 +25,7 @@ def setup_routes(app):
             project_name = response_json["project_name"]
             business_novelty = int(response_json["business_novelty"])
             customer_novelty = int(response_json["customer_novelty"])
-            impact = int(response_json["impact"])
+            project_impact = int(response_json["impact"])
             business_rationale = response_json["rationale_behind_business_novelty"]
             customer_rationale = response_json["rationale_behind_customer_novelty"]
             impact_rationale = response_json["rationale_behind_impact"]
@@ -38,12 +38,13 @@ def setup_routes(app):
                 x_value_justification=business_rationale,
                 y_value_justification=customer_rationale,
                 type=project_type,
+                impact=project_impact,
             )
 
             db.session.add(new_project)
             db.session.commit()
 
-            return render_template("index.html", project_name=project_name, business_novelty=business_novelty, customer_novelty=customer_novelty, impact=impact, business_rationale=business_rationale, customer_rationale=customer_rationale, impact_rationale=impact_rationale)
+            return render_template("index.html", project_name=project_name, business_novelty=business_novelty, customer_novelty=customer_novelty, impact=project_impact, business_rationale=business_rationale, customer_rationale=customer_rationale, impact_rationale=impact_rationale)
 
         except Exception as e:
             return jsonify({"error": "An error occurred while processing the project.", "details": str(e)}), 500
@@ -120,7 +121,7 @@ def setup_routes(app):
             project_names = [project.description for project in projects]
             business_novelty = [project.returned_x_value for project in projects]
             customer_novelty = [project.returned_y_value for project in projects]
-            impact = [30 for project in projects]
+            impact = [project.impact for project in projects] 
 
             data = {
                 "projects": project_names,
@@ -128,7 +129,7 @@ def setup_routes(app):
                 "customer_novelty": customer_novelty,
                 "impact": impact
             }
-        
+
             script, div = create_scatter_plot(data)
             return render_template("visualization.html", script=script, div=div)
         
