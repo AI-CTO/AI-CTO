@@ -58,12 +58,13 @@ def setup_routes(app):
             project_name = response_json["project_name"]
             business_novelty = int(response_json["business_novelty"])
             customer_novelty = int(response_json["customer_novelty"])
-            impact = int(response_json["impact"])
+            project_impact = int(response_json["impact"])
             business_rationale = response_json["rationale_behind_business_novelty"]
             customer_rationale = response_json["rationale_behind_customer_novelty"]
             impact_rationale = response_json["rationale_behind_impact"]
             project_type = response_json["type"]
 
+<<<<<<< HEAD
             if project:
                 project.description = project_name
                 project.summary = new_summary
@@ -85,9 +86,21 @@ def setup_routes(app):
                     type=project_type,
                 )
                 db.session.add(project)
+=======
+            new_project = Project(
+                description=project_name,
+                returned_x_value=business_novelty,
+                returned_y_value=customer_novelty,
+                x_value_justification=business_rationale,
+                y_value_justification=customer_rationale,
+                type=project_type,
+                impact=project_impact,
+            )
+>>>>>>> a474dda (added impact variable for database schema)
 
             db.session.commit()
 
+<<<<<<< HEAD
             return render_template(
                 "index.html",
                 project_name=project.description,
@@ -98,6 +111,9 @@ def setup_routes(app):
                 customer_rationale=project.y_value_justification,
                 impact_rationale=impact_rationale,
             )
+=======
+            return render_template("index.html", project_name=project_name, business_novelty=business_novelty, customer_novelty=customer_novelty, impact=project_impact, business_rationale=business_rationale, customer_rationale=customer_rationale, impact_rationale=impact_rationale)
+>>>>>>> a474dda (added impact variable for database schema)
 
         except Exception as e:
             return (
@@ -183,7 +199,7 @@ def setup_routes(app):
             project_names = [project.description for project in projects]
             business_novelty = [project.returned_x_value for project in projects]
             customer_novelty = [project.returned_y_value for project in projects]
-            impact = [30 for project in projects]
+            impact = [project.impact for project in projects] 
 
             data = {
                 "projects": project_names,
