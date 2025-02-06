@@ -117,3 +117,34 @@ button {
 button:hover {
     background-color: #6097d2; /* Darker shade of blue when hovered */
 }
+/* Tab navigation styling */
+.tabs {
+    list-style: none;
+    display: flex;
+    padding: 0;
+    margin: 0;
+    background: #333;
+    overflow: hidden;
+}
+
+.tabs li {
+    flex-grow: 1;
+}
+
+.tabs a {
+    display: block;
+    padding: 10px 20px;
+    text-align: center;
+    color: white;
+    background: #444;
+    text-decoration: none;
+    transition: background 0.3s;
+}
+
+.tabs a:hover {
+    background: #555;
+}
+
+.tabs a.active {
+    background: #6496cb;
+}
