@@ -33,9 +33,22 @@ def setup_routes(app):
             prompt_input = f"{existing_summary}\n\n{description}"
 
             response_json = get_openai_completion(prompt_input)
-            if response_json is None:
+            if response_json["project_name"] == "Not applicable":
                 return (
-                    jsonify({"error": "Invalid response format from OpenAI API"}),
+                    jsonify(
+                        {
+                            "error": "Invalid input, please improve or add to context to your prompt."
+                        }
+                    ),
+                    500,
+                )
+            elif response_json is None:
+                return (
+                    jsonify(
+                        {
+                            "error": "Invalid input, there was an error in the OpenAi response."
+                        }
+                    ),
                     500,
                 )
 
