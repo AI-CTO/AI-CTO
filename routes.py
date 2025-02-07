@@ -13,15 +13,35 @@ def setup_routes(app):
     @app.route("/process_project", methods=["POST"])
     def process_project():
         try:
+            project_id = request.form.get("id")
             description = request.form.get("description")
+
             if not description:
                 return jsonify({"error": "Missing required fields"}), 400
 
-            response_json = get_openai_completion(description)
-            if response_json is None:
-                return jsonify({"error": "Invalid response format from OpenAI API"}), 500
+            existing_summary = None
+            project = None
 
-            # Extract data from the response JSON
+            if project_id:
+                project = Project.query.get(project_id)
+                if project:
+                    existing_summary = project.summary
+
+            if not existing_summary:
+                existing_summary = "This is the beginning of the project's summary."
+
+            prompt_input = f"{existing_summary}\n\n{description}"
+
+            response_json = get_openai_completion(prompt_input)
+            if response_json is None:
+                return (
+                    jsonify({"error": "Invalid response format from OpenAI API"}),
+                    500,
+                )
+
+            print("OpenAI Response:", response_json)
+
+            new_summary = response_json.get("summary")
             project_name = response_json["project_name"]
             business_novelty = int(response_json["business_novelty"])
             customer_novelty = int(response_json["customer_novelty"])
@@ -31,22 +51,52 @@ def setup_routes(app):
             impact_rationale = response_json["rationale_behind_impact"]
             project_type = response_json["type"]
 
-            new_project = Project(
-                description=project_name,
-                returned_x_value=business_novelty,
-                returned_y_value=customer_novelty,
-                x_value_justification=business_rationale,
-                y_value_justification=customer_rationale,
-                type=project_type,
-            )
+            if project:
+                project.description = project_name
+                project.summary = new_summary
+                project.returned_x_value = business_novelty
+                project.returned_y_value = customer_novelty
+                project.impact = impact
+                project.x_value_justification = business_rationale
+                project.y_value_justification = customer_rationale
+                project.type = project_type
+            else:
+                project = Project(
+                    description=project_name,
+                    summary=new_summary,
+                    returned_x_value=business_novelty,
+                    returned_y_value=customer_novelty,
+                    impact=impact,
+                    x_value_justification=business_rationale,
+                    y_value_justification=customer_rationale,
+                    type=project_type,
+                )
+                db.session.add(project)
 
-            db.session.add(new_project)
             db.session.commit()
 
-            return render_template("index.html", project_name=project_name, business_novelty=business_novelty, customer_novelty=customer_novelty, impact=impact, business_rationale=business_rationale, customer_rationale=customer_rationale, impact_rationale=impact_rationale)
+            return render_template(
+                "index.html",
+                project_name=project.description,
+                business_novelty=project.returned_x_value,
+                customer_novelty=project.returned_y_value,
+                impact=project.impact,
+                business_rationale=project.x_value_justification,
+                customer_rationale=project.y_value_justification,
+                impact_rationale=impact_rationale,
+            )
 
         except Exception as e:
-            return jsonify({"error": "An error occurred while processing the project.", "details": str(e)}), 500
+            return (
+                jsonify(
+                    {
+                        "error": "An error occurred while processing the project.",
+                        "details": str(e),
+                    }
+                ),
+                500,
+            )
+
     @app.route("/quote")
     def quote_page():
         return render_template("quote.html")
@@ -116,7 +166,7 @@ def setup_routes(app):
 
         try:
             projects = Project.query.all()
-            
+
             project_names = [project.description for project in projects]
             business_novelty = [project.returned_x_value for project in projects]
             customer_novelty = [project.returned_y_value for project in projects]
@@ -126,14 +176,22 @@ def setup_routes(app):
                 "projects": project_names,
                 "business_novelty": business_novelty,
                 "customer_novelty": customer_novelty,
-                "impact": impact
+                "impact": impact,
             }
-        
+
             script, div = create_scatter_plot(data)
             return render_template("visualization.html", script=script, div=div)
-        
+
         except Exception as e:
-            return jsonify({"error": "An error occurred while fetching data for visualization", "details": str(e)}), 500
+            return (
+                jsonify(
+                    {
+                        "error": "An error occurred while fetching data for visualization",
+                        "details": str(e),
+                    }
+                ),
+                500,
+            )
 
     @app.route("/previous_projects")
     def previous_projects():
