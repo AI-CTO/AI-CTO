@@ -28,15 +28,10 @@ class Project(db.Model):
     impact = db.Column(db.Float, nullable=False)
     x_value_justification = db.Column(db.Text, nullable=False)
     y_value_justification = db.Column(db.Text, nullable=False)
-<<<<<<< HEAD
     summary = db.Column(db.Text, nullable=True)
     type = db.Column(
         db.Enum("existing", "idea", name="project_type_enum"), nullable=False
     )
-=======
-    type = db.Column(db.Enum("existing", "idea", name="project_type_enum"), nullable=False)
-    impact = db.Column(db.Float, nullable=False)
->>>>>>> a474dda (added impact variable for database schema)
 
     def to_dict(self):
         return {
