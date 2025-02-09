@@ -1,28 +1,96 @@
-{% extends "layout.html" %}
-
-{% block title %}AI Project Tool{% endblock %}
-
-{% block content %}
+{% extends "layout.html" %} {% block title %}AI Project Tool{% endblock %} {%
+block content %}
 <div id="home" class="tab-content active">
-    <p>Welcome to the AI Project Portfolio Visualization Tool. Start exploring and evaluating AI projects here.</p>
+  <p>
+    Welcome to the AI Project Portfolio Visualization Tool. Start exploring and
+    evaluating AI projects here.
+  </p>
 
-    <form action="/process_project" method="post">
-        <label for="description">Enter your project idea here:</label>
-        <input type="text" id="description" name="description" placeholder="Enter some text" required style="margin-bottom: 20px;">
-        <button type="submit" class="button">Submit</button>
-    </form>
+  <form id="project-form">
+    <label for="description">Enter your project idea here:</label>
+    <input
+      type="text"
+      id="description"
+      name="description"
+      placeholder="Enter some text"
+      required
+      style="margin-bottom: 20px"
+    />
+    <button type="submit" class="button">Submit</button>
+  </form>
 
-    {% if project_name and business_novelty and customer_novelty and impact %}
-    <p>Project Name: {{ project_name }}</p>
-    <p>Business Novelty: {{ business_novelty }}</p>
-    <p>Customer Novelty: {{ customer_novelty }}</p>
-    <p>Impact: {{ impact }}</p>
-    <p>Rationale for business novelty: {{ business_rationale }}</p>
-    <p>Rationale for customer novelty: {{ customer_rationale }}</p>
-    <p>Rationale for impact: {{ impact_rationale }}</p>
-    {% else %}
-        <p>No project data available.</p>
-    {% endif %}
+  <div id="project-results" style="display: none; margin-top: 20px">
+    <h2>Project Results</h2>
+    <p><strong>Project Name:</strong> <span id="project-name"></span></p>
+    <p>
+      <strong>Business Novelty:</strong> <span id="business-novelty"></span>
+    </p>
+    <p>
+      <strong>Customer Novelty:</strong> <span id="customer-novelty"></span>
+    </p>
+    <p><strong>Impact:</strong> <span id="impact"></span></p>
+    <p>
+      <strong>Rationale for Business Novelty:</strong>
+      <span id="business-rationale"></span>
+    </p>
+    <p>
+      <strong>Rationale for Customer Novelty:</strong>
+      <span id="customer-rationale"></span>
+    </p>
+    <p>
+      <strong>Rationale for Impact:</strong> <span id="impact-rationale"></span>
+    </p>
+  </div>
+
+  <p id="error-message" style="color: red; display: none"></p>
 </div>
-</div>
+
+<script>
+  document
+    .getElementById("project-form")
+    .addEventListener("submit", function (event) {
+      event.preventDefault();
+
+      const description = document.getElementById("description").value;
+      const errorMessage = document.getElementById("error-message");
+      const resultsDiv = document.getElementById("project-results");
+
+      fetch("/process_project", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: new URLSearchParams({ description: description }),
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.error) {
+            errorMessage.textContent = data.error;
+            errorMessage.style.display = "block";
+            resultsDiv.style.display = "none";
+          } else {
+            document.getElementById("project-name").textContent =
+              data.project_name;
+            document.getElementById("business-novelty").textContent =
+              data.business_novelty;
+            document.getElementById("customer-novelty").textContent =
+              data.customer_novelty;
+            document.getElementById("impact").textContent = data.impact;
+            document.getElementById("business-rationale").textContent =
+              data.business_rationale;
+            document.getElementById("customer-rationale").textContent =
+              data.customer_rationale;
+            document.getElementById("impact-rationale").textContent =
+              data.impact_rationale;
+
+            resultsDiv.style.display = "block";
+            errorMessage.style.display = "none";
+          }
+        })
+        .catch((error) => {
+          console.error("Error processing project:", error);
+          errorMessage.textContent = "An error occurred. Please try again.";
+          errorMessage.style.display = "block";
+          resultsDiv.style.display = "none";
+        });
+    });
+</script>
 {% endblock %}

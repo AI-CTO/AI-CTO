@@ -1,76 +1,85 @@
-{% extends "layout.html" %}
+{% extends "layout.html" %} {% block title %}Update Project{% endblock %} {%
+block content %}
+<header>
+  <h1>Update Project</h1>
+</header>
 
-{% block title %}Update Project{% endblock %}
+{% if error %}
+<p style="color: red">{{ error }}</p>
+{% else %}
+<div style="display: flex; gap: 20px">
+  <div style="flex: 1">
+    <h2>Current Details</h2>
+    <p><strong>Name:</strong> {{ project.description }}</p>
+    <p><strong>Summary:</strong> {{ project.summary }}</p>
+    <p><strong>Business Novelty:</strong> {{ project.returned_x_value }}</p>
+    <p><strong>Customer Novelty:</strong> {{ project.returned_y_value }}</p>
+    <p><strong>Impact:</strong> {{ project.impact }}</p>
 
-{% block content %}
-<div id="projects-container">
-    <script>
-        window.onload = function() {
-            fetch('/get_projects')
-                .then(response => response.json()) 
-                .then(data => {
-                    if (data.projects) {
-                        const container = document.getElementById('projects-container');
-                        container.innerHTML = ""; 
+    <h3>Impact Rationales:</h3>
+    <p>
+      <strong>Business Rationale:</strong> {{ project.x_value_justification }}
+    </p>
+    <p>
+      <strong>Customer Rationale:</strong> {{ project.y_value_justification }}
+    </p>
+    <p><strong>Impact Rationale:</strong> {{ project.impact_rationale }}</p>
 
-                        data.projects.forEach(project => {
-                            const projectDiv = document.createElement('div');
-                            projectDiv.classList.add('project'); 
+    <h3>Update Project</h3>
+    <form id="update-form">
+      <input type="hidden" id="project-id" value="{{ project.id }}" />
+      <input
+        type="text"
+        id="new-description"
+        placeholder="Update project description"
+      />
+      <button type="button" id="update-btn" onclick="updateProject()">
+        Update
+      </button>
+      <p id="update-status" style="color: green; display: none">
+        Project updated successfully!
+      </p>
+    </form>
+  </div>
 
-                            projectDiv.innerHTML = `
-                                <h3>${project.description}</h3>
-                                <input type="text" id="new-description-${project.id}" placeholder="Update your idea here">
-                                <button onclick="updateProject(${project.id})">Update</button>
-                                <p id="update-status-${project.id}" class="update-status" style="color: green; display: none;">
-                                    Project updated successfully!
-                                </p>
-                            `;
+  <div style="flex: 1; text-align: center">
+    <h2>Project Visualization</h2>
+    <div style="display: flex; justify-content: center">
+      {{ script|safe }} {{ div|safe }}
+    </div>
+  </div>
+</div>
 
-                            container.appendChild(projectDiv);
-                        });
-                    } else {
-                        console.error("No projects found.");
-                    }
-                })
-                .catch(error => {
-                    console.error("Error fetching projects:", error);
-                    document.getElementById('projects-container').innerHTML = `
-                        <p>Error loading projects. Please try again later.</p>
-                    `;
-                });
-        };
+<script>
+  function updateProject() {
+    const projectId = document.getElementById("project-id").value;
+    const updateButton = document.getElementById("update-btn");
+    const newDescription = document.getElementById("new-description").value;
 
-   
-    function updateProject(projectId) {
-    const newDescription = document.getElementById(`new-description-${projectId}`).value;
+    updateButton.disabled = true;
+    updateButton.textContent = "Updating...";
 
     fetch("/process_project", {
-        method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: new URLSearchParams({ id: projectId, description: newDescription })
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: new URLSearchParams({ id: projectId, description: newDescription }),
     })
-    .then(response => response.text())  
-    .then(updatedHtml => {
-        const tempDiv = document.createElement("div");
-        tempDiv.innerHTML = updatedHtml;
-
-        const updatedTitle = tempDiv.querySelector(`#project-title-${projectId}`);
-        
-        if (updatedTitle) {
-            document.getElementById(`project-title-${projectId}`).innerText = updatedTitle.innerText;
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.error) {
+          alert(data.error);
+        } else {
+          setTimeout(() => location.reload(), 1000);
         }
-
-        const statusMessage = document.getElementById(`update-status-${projectId}`);
-        statusMessage.style.display = "block";
-        statusMessage.textContent = "Project updated successfully!";
-        
-        setTimeout(() => {
-            statusMessage.style.display = "none";
-        }, 3000);
-    })
-    .catch(error => console.error("Error updating project:", error));
-}
-
-    </script>
-</div>
-{% endblock %}
+      })
+      .catch((error) => {
+        console.error("Error updating project:", error);
+        alert("Error updating project. Please try again.");
+      })
+      .finally(() => {
+        updateButton.disabled = false;
+        updateButton.textContent = "Update";
+      });
+  }
+</script>
+{% endif %} {% endblock %}
