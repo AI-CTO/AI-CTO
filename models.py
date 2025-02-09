@@ -43,4 +43,5 @@ class Project(db.Model):
             "x_value_justification": self.x_value_justification,
             "y_value_justification": self.y_value_justification,
             "type": self.type,
+            "impact": self.impact, 
         }
