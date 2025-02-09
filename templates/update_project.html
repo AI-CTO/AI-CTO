@@ -8,6 +8,7 @@ block content %}
 <p style="color: red">{{ error }}</p>
 {% else %}
 <div style="display: flex; gap: 20px">
+  <!-- Left: Project Details & Update Form -->
   <div style="flex: 1">
     <h2>Current Details</h2>
     <p><strong>Name:</strong> {{ project.description }}</p>
@@ -26,22 +27,21 @@ block content %}
     <p><strong>Impact Rationale:</strong> {{ project.impact_rationale }}</p>
 
     <h3>Update Project</h3>
-    <form id="update-form">
+    <form id="update-form" onsubmit="event.preventDefault(); updateProject();">
       <input type="hidden" id="project-id" value="{{ project.id }}" />
       <input
         type="text"
         id="new-description"
         placeholder="Update project description"
       />
-      <button type="button" id="update-btn" onclick="updateProject()">
-        Update
-      </button>
+      <button type="submit" id="update-btn">Update</button>
       <p id="update-status" style="color: green; display: none">
         Project updated successfully!
       </p>
     </form>
   </div>
 
+  <!-- Right: Visualization -->
   <div style="flex: 1; text-align: center">
     <h2>Project Visualization</h2>
     <div style="display: flex; justify-content: center">
@@ -54,7 +54,9 @@ block content %}
   function updateProject() {
     const projectId = document.getElementById("project-id").value;
     const updateButton = document.getElementById("update-btn");
-    const newDescription = document.getElementById("new-description").value;
+    const newDescription = document.getElementById("new-description");
+
+    if (!newDescription.value.trim()) return;
 
     updateButton.disabled = true;
     updateButton.textContent = "Updating...";
@@ -62,13 +64,17 @@ block content %}
     fetch("/process_project", {
       method: "POST",
       headers: { "Content-Type": "application/x-www-form-urlencoded" },
-      body: new URLSearchParams({ id: projectId, description: newDescription }),
+      body: new URLSearchParams({
+        id: projectId,
+        description: newDescription.value,
+      }),
     })
       .then((response) => response.json())
       .then((data) => {
         if (data.error) {
           alert(data.error);
         } else {
+          newDescription.value = "";
           setTimeout(() => location.reload(), 1000);
         }
       })
@@ -81,5 +87,14 @@ block content %}
         updateButton.textContent = "Update";
       });
   }
+
+  document
+    .getElementById("new-description")
+    .addEventListener("keypress", function (event) {
+      if (event.key === "Enter") {
+        event.preventDefault();
+        updateProject();
+      }
+    });
 </script>
 {% endif %} {% endblock %}
