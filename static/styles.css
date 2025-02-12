@@ -66,9 +66,12 @@ footer {
     background: #555;
 }
 
-.tabs .tab-link.active {
+.tabs a.active {
     background: #6496cb;
+    color: white;
+    font-weight: bold;
 }
+
 
 /* Tab content styling */
 .tab-content {
