@@ -257,6 +257,7 @@ def setup_routes(app):
             "business_novelty": [project.returned_x_value],
             "customer_novelty": [project.returned_y_value],
             "impact": [project.impact],
+            "type": [project.type],
         }
 
         script, div = create_scatter_plot(data)

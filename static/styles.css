@@ -1,150 +1,135 @@
-/* static/styles.css */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap');
 
+/* Global styles */
 body {
-    font-family: Arial, sans-serif;
+    font-family: 'Inter', sans-serif;
     margin: 0;
     padding: 0;
     line-height: 1.6;
+    background: #f9f9f9;
+    color: #333;
+    overflow-x: hidden;
 }
+
 header {
-    background: #333;
-    color: #fff;
-    padding: 1rem 0;
+    background: #ffffff;
+    color: #333;
+    padding: 1.5rem 0;
     text-align: center;
+    border-bottom: 1px solid #e0e0e0;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.05);
 }
-/* Apply thin, italic styling to the title */
+
 header h1 {
-    font-family: 'Poppins', sans-serif;
-    font-size: 2.5rem;  /* Large, modern look */
-    font-weight: 200;   /* Thin font weight */
-    font-style: italic; /* Italicized for elegance */
-    letter-spacing: 1px; /* Slight spacing for a sleek effect */
+    font-size: 2.5rem;
+    font-weight: 600;
     margin: 0;
 }
 
 main {
-    padding: 2rem;
+    padding: 4rem 2rem;
+    max-width: 800px;
+    margin: 0 auto;
     text-align: center;
-}
-footer {
-    background: #333;
-    color: #fff;
-    text-align: center;
-    padding: 0.5rem 0;
-    position: fixed;
-    bottom: 0;
-    width: 100%;
 }
 
-/* Tab navigation styling */
+footer {
+    background: #ffffff;
+    color: #666;
+    text-align: center;
+    padding: 1rem 0;
+    border-top: 1px solid #e0e0e0;
+}
+
+/* Minimal tab navigation */
 .tabs {
     list-style: none;
     display: flex;
+    justify-content: space-evenly;
     padding: 0;
-    margin: 0;
-    background: #333;
+    margin: 2rem 0;
+    background: #f0f0f0;
+    border-radius: 8px;
     overflow: hidden;
 }
 
-/* Apply the same font style to the tab links */
 .tabs .tab-link {
-    font-family: 'Poppins', sans-serif;   /* Use the same font */
-    font-weight: 100;                     /* Thin font */
-    font-style: italic;                   /* Italicize */
-    letter-spacing: 1px;                  /* Slight spacing for readability */
-    padding: 10px 20px;                   /* Keep padding for the tab */
+    font-weight: 400;
+    padding: 12px 24px;
     cursor: pointer;
-    color: white;
-    background: #444;
+    color: #666;
+    background: transparent;
     flex-grow: 1;
     text-align: center;
-    transition: background 0.3s;
+    transition: color 0.3s ease, background 0.3s ease;
 }
 
-
 .tabs .tab-link:hover {
-    background: #555;
+    background: #e0e0e0;
+    color: #333;
 }
 
 .tabs .tab-link.active {
-    background: #6496cb;
+    background: #d4f1f4;
+    color: #0077b6;
+    font-weight: 600;
 }
 
-/* Tab content styling */
+/* Tab content */
 .tab-content {
     display: none;
     padding: 20px;
-    border: 1px solid #ddd;
-    background: #f9f9f9;
+    background: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.05);
+    margin-top: 20px;
 }
 
 .tab-content.active {
     display: block;
 }
 
-/* Modernize the text input field */
+/* Clean input fields */
 input[type="text"] {
-    width: 100%; /* Make input field take full width of its container */
-    padding: 12px 20px; /* Add padding for a more spacious feel */
-    font-size: 1rem; /* Set a nice readable font size */
-    border: 2px solid #ddd; /* Subtle border for modern look */
-    border-radius: 8px; /* Rounded corners */
-    box-sizing: border-box; /* Ensure padding doesn't affect width */
-    transition: border 0.3s ease, box-shadow 0.3s ease; /* Smooth transition on focus */
-    margin-bottom: 20px; /* Spacing below the input field */
+    width: 100%;
+    padding: 12px 16px;
+    font-size: 1rem;
+    color: #333;
+    background: #ffffff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-sizing: border-box;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    margin-bottom: 20px;
 }
 
-/* Input field on focus (when the user clicks on it) */
 input[type="text"]:focus {
-    border-color: #007bff; /* Change border color on focus */
-    outline: none; /* Remove default focus outline */
-    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5); /* Add a subtle glow effect */
+    border-color: #0077b6;
+    outline: none;
+    box-shadow: 0 0 5px rgba(0, 119, 182, 0.3);
 }
 
-/* Modernize the submit button */
+/* Simple button styles */
 button {
-    background-color: #73aeed; /* Blue background */
-    color: white; /* White text */
-    padding: 12px 20px; /* Add padding to make it more clickable */
-    border: none; /* Remove the default border */
-    border-radius: 8px; /* Rounded corners for consistency */
-    font-size: 1rem; /* Same font size as input */
-    cursor: pointer; /* Make the button clickable */
-    transition: background-color 0.3s ease; /* Smooth background color transition */
-}
-
-/* Button hover effect */
-button:hover {
-    background-color: #6097d2; /* Darker shade of blue when hovered */
-}
-/* Tab navigation styling */
-.tabs {
-    list-style: none;
-    display: flex;
-    padding: 0;
-    margin: 0;
-    background: #333;
-    overflow: hidden;
-}
-
-.tabs li {
-    flex-grow: 1;
-}
-
-.tabs a {
-    display: block;
-    padding: 10px 20px;
-    text-align: center;
+    background-color: #0077b6;
     color: white;
-    background: #444;
-    text-decoration: none;
-    transition: background 0.3s;
+    padding: 12px 24px;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
 }
 
-.tabs a:hover {
-    background: #555;
+button:hover {
+    background-color: #005f8e;
+    transform: translateY(-2px);
 }
 
-.tabs a.active {
-    background: #6496cb;
+button:active {
+    background-color: #004f76;
+    transform: translateY(0);
 }
