@@ -22,7 +22,7 @@ def create_scatter_plot(data):
     })
 
     p = figure(
-        height=500, width=500,
+        height=420, width=420,
         title="Project Portfolio Visualization",
         toolbar_location=None,
         match_aspect=True,

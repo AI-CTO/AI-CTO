@@ -1,6 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap');
-
-/* Global styles */
+/* Global Styles */
 body {
     font-family: 'Inter', sans-serif;
     margin: 0;
@@ -14,7 +12,7 @@ body {
 header {
     background: #ffffff;
     color: #333;
-    padding: 1.5rem 0;
+    padding: 0.1rem 0;
     text-align: center;
     border-bottom: 1px solid #e0e0e0;
     position: sticky;
@@ -67,18 +65,20 @@ footer {
     transition: color 0.3s ease, background 0.3s ease;
 }
 
+/* Hover effect for tabs */
 .tabs .tab-link:hover {
     background: #e0e0e0;
     color: #333;
 }
 
+/* Style for active tab */
 .tabs .tab-link.active {
-    background: #d4f1f4;
-    color: #0077b6;
+    background: #cdcebf; /* Light blue background for active tab */
+    color: #515354; /* Darker blue color for active tab text */
     font-weight: 600;
 }
 
-/* Tab content */
+/* Tab content (if used) */
 .tab-content {
     display: none;
     padding: 20px;
@@ -114,7 +114,7 @@ input[type="text"]:focus {
 
 /* Simple button styles */
 button {
-    background-color: #0077b6;
+    background-color: #cdcebf;
     color: white;
     padding: 12px 24px;
     border: none;
