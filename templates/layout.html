@@ -12,27 +12,17 @@
     {% block extra_scripts %}{% endblock %}
   </head>
   <body>
+    <script src="{{ url_for('static', filename='tab_script.js') }}"></script>
+
     <header>
       <h1>AI-CTO: Project Portfolio Visualization Tool</h1>
       <nav>
         <ul class="tabs">
-          <li><a href="{{ url_for('index') }}" class="tab-link">Home</a></li>
-          <li>
-            <a href="{{ url_for('visualize') }}" class="tab-link"
-              >Visualization</a
-            >
-          </li>
-          <li>
-            <a href="{{ url_for('previous_projects') }}" class="tab-link"
-              >Previous Projects</a
-            >
-          </li>
-          <li>
-            <a href="{{ url_for('update_project') }}" class="tab-link"
-              >Update Project</a
-            >
-          </li>
-        </ul>
+          <li><a href="{{ url_for('index') }}" class="tab-link" data-tab="home">Home</a></li>
+          <li><a href="{{ url_for('visualize') }}" class="tab-link" data-tab="visualize">Visualization</a></li>
+          <li><a href="{{ url_for('previous_projects') }}" class="tab-link" data-tab="previous-projects">Previous Projects</a></li>
+          <li><a href="{{ url_for('update_project') }}" class="tab-link" data-tab="update-project">Update Project</a></li>
+      </ul>
       </nav>
     </header>
 
