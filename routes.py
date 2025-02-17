@@ -13,11 +13,48 @@ def setup_routes(app):
     @app.route("/process_project", methods=["POST"])
     def process_project():
         try:
+            project_id = request.form.get("id")
             description = request.form.get("description")
+
             if not description:
                 return jsonify({"error": "Missing required fields"}), 400
 
-            response_json = get_openai_completion(description)
+            existing_summary = None
+            project = None
+
+            if project_id:
+                project = Project.query.get(project_id)
+                if project:
+                    existing_summary = project.summary
+
+            if not existing_summary:
+                existing_summary = "This is the beginning of the project's summary."
+
+            prompt_input = f"{existing_summary}\n\n{description}"
+
+            response_json = get_openai_completion(prompt_input)
+            if response_json["project_name"] == "Not applicable":
+                return (
+                    jsonify(
+                        {
+                            "error": "Invalid input, please improve or add to context to your prompt."
+                        }
+                    ),
+                    500,
+                )
+            elif response_json is None:
+                return (
+                    jsonify(
+                        {
+                            "error": "Invalid input, there was an error in the OpenAi response."
+                        }
+                    ),
+                    500,
+                )
+
+            # print("OpenAI Response:", response_json)
+
+            new_summary = response_json.get("summary")
             project_name = response_json["project_name"]
             business_novelty = int(response_json["business_novelty"])
             customer_novelty = int(response_json["customer_novelty"])
@@ -25,35 +62,58 @@ def setup_routes(app):
             business_rationale = response_json["rationale_behind_business_novelty"]
             customer_rationale = response_json["rationale_behind_customer_novelty"]
             impact_rationale = response_json["rationale_behind_impact"]
+            project_type = response_json["type"]
 
-            new_project = Project(
-                description=project_name,
-                returned_x_value=business_novelty,
-                returned_y_value=customer_novelty,
-                x_value_justification=business_rationale,
-                y_value_justification=customer_rationale,
-                type="idea",
-            )
+            if project:
+                project.description = project_name
+                project.summary = new_summary
+                project.returned_x_value = business_novelty
+                project.returned_y_value = customer_novelty
+                project.impact = impact
+                project.x_value_justification = business_rationale
+                project.y_value_justification = customer_rationale
+                project.type = project_type
+            else:
+                project = Project(
+                    description=project_name,
+                    summary=new_summary,
+                    returned_x_value=business_novelty,
+                    returned_y_value=customer_novelty,
+                    impact=impact,
+                    x_value_justification=business_rationale,
+                    y_value_justification=customer_rationale,
+                    type=project_type,
+                )
+                db.session.add(project)
 
-            print(new_project)
-
-            db.session.add(new_project)
             db.session.commit()
-            print(f"Added new project: {new_project.id}, {new_project.description}")
 
-            return render_template(
-                "index.html",
-                project_name=project_name,
-                business_novelty=business_novelty,
-                customer_novelty=customer_novelty,
-                impact=impact,
-                business_rationale=business_rationale,
-                customer_rationale=customer_rationale,
-                impact_rationale=impact_rationale,
+            return (
+                jsonify(
+                    {
+                        "message": "Project updated successfully",
+                        "project_name": project.description,
+                        "business_novelty": project.returned_x_value,
+                        "customer_novelty": project.returned_y_value,
+                        "impact": project.impact,
+                        "business_rationale": project.x_value_justification,
+                        "customer_rationale": project.y_value_justification,
+                        "impact_rationale": impact_rationale,
+                    }
+                ),
+                200,
             )
 
         except Exception as e:
-            return jsonify({"error": "An error occurred", "details": str(e)}), 500
+            return (
+                jsonify(
+                    {
+                        "error": "An error occurred while processing the project.",
+                        "details": str(e),
+                    }
+                ),
+                500,
+            )
 
     @app.route("/quote")
     def quote_page():
@@ -103,6 +163,31 @@ def setup_routes(app):
                 500,
             )
 
+    @app.route("/get_project", methods=["GET"])
+    def get_project():
+        try:
+            project_id = request.args.get("id", type=int)
+            if not project_id:
+                return jsonify({"error": "Project ID is required"}), 400
+
+            project = Project.query.get(project_id)
+            if not project:
+                return jsonify({"error": "Project not found"}), 404
+
+            data = {
+                "projects": [project.description],
+                "business_novelty": [project.returned_x_value],
+                "customer_novelty": [project.returned_y_value],
+                "impact": [project.impact],
+            }
+
+            script, div = create_scatter_plot(data)
+
+            return jsonify({**project.to_dict(), "script": script, "div": div}), 200
+
+        except Exception as e:
+            return jsonify({"error": "Failed to fetch project", "details": str(e)}), 500
+
     @app.route("/delete_project/<int:project_id>", methods=["DELETE"])
     def delete_project(project_id):
         try:
@@ -124,25 +209,59 @@ def setup_routes(app):
 
         try:
             projects = Project.query.all()
-            
+
             project_names = [project.description for project in projects]
             business_novelty = [project.returned_x_value for project in projects]
             customer_novelty = [project.returned_y_value for project in projects]
-            impact = [30 for project in projects]
+            impact = [project.impact for project in projects]
 
             data = {
                 "projects": project_names,
                 "business_novelty": business_novelty,
                 "customer_novelty": customer_novelty,
-                "impact": impact
+                "impact": impact,
             }
-        
+
             script, div = create_scatter_plot(data)
             return render_template("visualization.html", script=script, div=div)
-        
+
         except Exception as e:
-            return jsonify({"error": "An error occurred while fetching data for visualization", "details": str(e)}), 500
+            return (
+                jsonify(
+                    {
+                        "error": "An error occurred while fetching data for visualization",
+                        "details": str(e),
+                    }
+                ),
+                500,
+            )
 
     @app.route("/previous_projects")
     def previous_projects():
         return render_template("previous_projects.html")
+
+    @app.route("/update_project")
+    def update_project():
+        project_id = request.args.get("id", type=int)
+        if not project_id:
+            return render_template(
+                "update_project.html", error="Project ID is required"
+            )
+
+        project = Project.query.get(project_id)
+        if not project:
+            return render_template("update_project.html", error="Project not found")
+
+        data = {
+            "projects": [project.description],
+            "business_novelty": [project.returned_x_value],
+            "customer_novelty": [project.returned_y_value],
+            "impact": [project.impact],
+            "type": [project.type],
+        }
+
+        script, div = create_scatter_plot(data)
+
+        return render_template(
+            "update_project.html", project=project, script=script, div=div
+        )

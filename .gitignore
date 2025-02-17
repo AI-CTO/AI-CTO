@@ -4,4 +4,4 @@ instance/
 *.png
 *.log
 venv
-
+Dockerfile

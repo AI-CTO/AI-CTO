@@ -1,28 +1,12 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Project Tool</title>
+{% extends "layout.html" %}
 
-    <link rel="stylesheet" href="https://cdn.bokeh.org/bokeh/release/bokeh-3.0.0.min.css" type="text/css" />
+{% block title %}AI Project Tool{% endblock %}
 
-    <script type="text/javascript" src="https://cdn.bokeh.org/bokeh/release/bokeh-3.0.0.min.js"></script>
-    
-    <link rel="stylesheet" href="/static/styles.css">
-    
+{% block content %}
 
-    {{ script|safe }}  
-</head>
-<body>
-    <header>
-        <h1>AI Project Portfolio Visualization Tool</h1>
-    </header>
-    <main>
-        <h2>Visualization</h2>
 
-        {{ div|safe }}  <!-- Embed Bokeh div -->
-    </main>
-    <footer></footer>
-</body>
-</html>
+<div style="display: flex; justify-content: center;">
+    {{ script|safe }}
+    {{ div|safe }}
+</div>
+{% endblock %}

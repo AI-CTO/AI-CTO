@@ -1,0 +1,99 @@
+{% extends "layout.html" %} {% block title %}Update Project{% endblock %} {%
+block content %}
+<header>
+  <h1>Update Project</h1>
+</header>
+
+{% if error %}
+<p style="color: red">{{ error }}</p>
+{% else %}
+<div style="display: flex; gap: 20px">
+  <!-- Left: Project Details & Update Form -->
+  <div style="flex: 1">
+    <h2>Current Details</h2>
+    <p><strong>Name:</strong> {{ project.description }}</p>
+    <p><strong>Summary:</strong> {{ project.summary }}</p>
+    <p><strong>Business Novelty:</strong> {{ project.returned_x_value }}</p>
+    <p><strong>Customer Novelty:</strong> {{ project.returned_y_value }}</p>
+    <p><strong>Impact:</strong> {{ project.impact }}</p>
+
+    <h3>Impact Rationales:</h3>
+    <p>
+      <strong>Business Rationale:</strong> {{ project.x_value_justification }}
+    </p>
+    <p>
+      <strong>Customer Rationale:</strong> {{ project.y_value_justification }}
+    </p>
+
+    <h3>Update Project</h3>
+    <form id="update-form" onsubmit="event.preventDefault(); updateProject();">
+      <input type="hidden" id="project-id" value="{{ project.id }}" />
+      <input
+        type="text"
+        id="new-description"
+        placeholder="Update project description"
+      />
+      <button type="submit" id="update-btn">Update</button>
+      <p id="update-status" style="color: green; display: none">
+        Project updated successfully!
+      </p>
+    </form>
+  </div>
+
+  <!-- Right: Visualization -->
+  <div style="flex: 1; text-align: center">
+    <h2>Project Visualization</h2>
+    <div style="display: flex; justify-content: center">
+      {{ script|safe }} {{ div|safe }}
+    </div>
+  </div>
+</div>
+
+<script>
+  function updateProject() {
+    const projectId = document.getElementById("project-id").value;
+    const updateButton = document.getElementById("update-btn");
+    const newDescription = document.getElementById("new-description");
+
+    if (!newDescription.value.trim()) return;
+
+    updateButton.disabled = true;
+    updateButton.textContent = "Updating...";
+
+    fetch("/process_project", {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: new URLSearchParams({
+        id: projectId,
+        description: newDescription.value,
+      }),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.error) {
+          alert(data.error);
+        } else {
+          newDescription.value = "";
+          setTimeout(() => location.reload(), 1000);
+        }
+      })
+      .catch((error) => {
+        console.error("Error updating project:", error);
+        alert("Error updating project. Please try again.");
+      })
+      .finally(() => {
+        updateButton.disabled = false;
+        updateButton.textContent = "Update";
+      });
+  }
+
+  document
+    .getElementById("new-description")
+    .addEventListener("keypress", function (event) {
+      if (event.key === "Enter") {
+        event.preventDefault();
+        updateProject();
+      }
+    });
+</script>
+{% endif %} {% endblock %}
