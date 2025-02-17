@@ -1,18 +1,26 @@
 document.addEventListener("DOMContentLoaded", function () {
     const tabs = document.querySelectorAll(".tab-link");
-    const contents = document.querySelectorAll(".tab-content");
 
+    // Initially highlight the tab based on the current page
     tabs.forEach(tab => {
-        tab.addEventListener("click", function () {
-            let tabId = this.getAttribute("data-tab");
+        if (window.location.pathname === tab.getAttribute("href")) {
+            tab.classList.add("active");
+        }
+    });
 
-            // Remove active class from all tabs and contents
+    // Add click event to change active tab
+    tabs.forEach(tab => {
+        tab.addEventListener("click", function (event) {
+            event.preventDefault(); // Prevent the default link behavior
+
+            // Remove active class from all tabs
             tabs.forEach(t => t.classList.remove("active"));
-            contents.forEach(c => c.classList.remove("active"));
 
-            // Add active class to clicked tab and corresponding content
+            // Add active class to clicked tab
             this.classList.add("active");
-            document.getElementById(tabId).classList.add("active");
+
+            // Optionally, you can navigate to the link after adding the active class
+            window.location.href = this.getAttribute("href");
         });
     });
 });
