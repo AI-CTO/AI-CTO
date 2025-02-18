@@ -2,6 +2,8 @@ from openai import OpenAI
 import uuid
 import json
 
+#vaatimuksia: nettisivuilla nappi ennen tekstisyötettä, intput kenttä, response kenttä. Paikka, johon ladata luotu bmc:n sisältö.
+
 class IdeaGenerator:
     def __init__(self, client: OpenAI):
         """
