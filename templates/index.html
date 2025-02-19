@@ -2,8 +2,8 @@
 block content %}
 <div id="home" class="tab-content active">
   <p>
-    Welcome to the AI Project Portfolio Visualization Tool. Start exploring and
-    evaluating AI projects here.
+    Welcome to the AI Project Portfolio Visualization Tool. Describe your
+    project idea and interact with the assistant to refine it.
   </p>
 
   <form id="project-form">
@@ -12,85 +12,122 @@ block content %}
       type="text"
       id="description"
       name="description"
-      placeholder="Enter some text"
+      placeholder="Describe your project..."
       required
-      style="margin-bottom: 20px"
+      style="margin-bottom: 10px; width: 100%"
     />
-    <button type="submit" class="button">Submit</button>
+    <button type="submit" class="button">Start Conversation</button>
   </form>
 
-  <div id="project-results" style="display: none; margin-top: 20px">
-    <h2>Project Results</h2>
-    <p><strong>Project Name:</strong> <span id="project-name"></span></p>
-    <p>
-      <strong>Business Novelty:</strong> <span id="business-novelty"></span>
-    </p>
-    <p>
-      <strong>Customer Novelty:</strong> <span id="customer-novelty"></span>
-    </p>
-    <p><strong>Impact:</strong> <span id="impact"></span></p>
-    <p>
-      <strong>Rationale for Business Novelty:</strong>
-      <span id="business-rationale"></span>
-    </p>
-    <p>
-      <strong>Rationale for Customer Novelty:</strong>
-      <span id="customer-rationale"></span>
-    </p>
-    <p>
-      <strong>Rationale for Impact:</strong> <span id="impact-rationale"></span>
-    </p>
+  <div id="chat-container" style="display: none; margin-top: 20px">
+    <h2>Conversation</h2>
+    <div
+      id="chat-box"
+      style="
+        border: 1px solid #ddd;
+        padding: 10px;
+        height: 300px;
+        overflow-y: auto;
+      "
+    >
+      <p>
+        <strong>Assistant:</strong> Let's start! Describe your project idea.
+      </p>
+    </div>
+    <form id="chat-form" style="margin-top: 10px">
+      <input
+        type="text"
+        id="user-input"
+        placeholder="Type your message..."
+        required
+        style="width: 80%; padding: 5px"
+      />
+      <button type="submit" class="button">Send</button>
+    </form>
   </div>
 
   <p id="error-message" style="color: red; display: none"></p>
 </div>
 
 <script>
+  let threadId = null;
+
   document
     .getElementById("project-form")
     .addEventListener("submit", function (event) {
       event.preventDefault();
-
-      const description = document.getElementById("description").value;
-      const errorMessage = document.getElementById("error-message");
-      const resultsDiv = document.getElementById("project-results");
-
-      fetch("/process_project", {
-        method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: new URLSearchParams({ description: description }),
-      })
-        .then((response) => response.json())
-        .then((data) => {
-          if (data.error) {
-            errorMessage.textContent = data.error;
-            errorMessage.style.display = "block";
-            resultsDiv.style.display = "none";
-          } else {
-            document.getElementById("project-name").textContent =
-              data.project_name;
-            document.getElementById("business-novelty").textContent =
-              data.business_novelty;
-            document.getElementById("customer-novelty").textContent =
-              data.customer_novelty;
-            document.getElementById("impact").textContent = data.impact;
-            document.getElementById("business-rationale").textContent =
-              data.business_rationale;
-            document.getElementById("customer-rationale").textContent =
-              data.customer_rationale;
-            document.getElementById("impact-rationale").textContent =
-              data.impact_rationale;
-
-            resultsDiv.style.display = "block";
-            errorMessage.style.display = "none";
-          }
-        })
-        .catch((error) => {
-          console.error("Error processing project:", error);
-          errorMessage.textContent = "An error occurred. Please try again.";
-          errorMessage.style.display = "block";
-          resultsDiv.style.display = "none";
-        });
+      startConversation();
     });
+
+  document
+    .getElementById("chat-form")
+    .addEventListener("submit", function (event) {
+      event.preventDefault();
+      sendMessage();
+    });
+
+  function startConversation() {
+    const description = document.getElementById("description").value;
+    const errorMessage = document.getElementById("error-message");
+    const chatContainer = document.getElementById("chat-container");
+    const chatBox = document.getElementById("chat-box");
+
+    fetch("/process_project", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" }, 
+      body: JSON.stringify({ description: description }),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.error) {
+          errorMessage.textContent = data.error;
+          errorMessage.style.display = "block";
+        } else {
+          threadId = data.thread_id;
+          chatContainer.style.display = "block";
+          chatBox.innerHTML += `<p><strong>Assistant:</strong> ${data.assistant_response}</p>`;
+          chatBox.scrollTop = chatBox.scrollHeight;
+        }
+      })
+      .catch((error) => {
+        console.error("Error starting conversation:", error);
+        errorMessage.textContent = "An error occurred. Please try again.";
+        errorMessage.style.display = "block";
+      });
+  }
+
+  function sendMessage() {
+    const userInput = document.getElementById("user-input").value;
+    const chatBox = document.getElementById("chat-box");
+
+    if (!threadId) {
+      alert("Start a project first!");
+      return;
+    }
+
+    chatBox.innerHTML += `<p><strong>You:</strong> ${userInput}</p>`;
+    document.getElementById("user-input").value = "";
+    chatBox.scrollTop = chatBox.scrollHeight;
+
+    fetch("/continue_project", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ thread_id: threadId, user_message: userInput }),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.error) {
+          chatBox.innerHTML += `<p style="color: red;"><strong>Error:</strong> ${data.error}</p>`;
+        } else {
+          chatBox.innerHTML += `<p><strong>Assistant:</strong> ${data.assistant_response}</p>`;
+        }
+        chatBox.scrollTop = chatBox.scrollHeight;
+      })
+      .catch((error) => {
+        console.error("Error continuing conversation:", error);
+        chatBox.innerHTML += `<p style="color: red;"><strong>Error:</strong> Unable to get response.</p>`;
+      });
+  }
 </script>
+
 {% endblock %}

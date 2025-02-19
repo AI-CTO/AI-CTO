@@ -1,8 +1,12 @@
+import time
+
 from flask import jsonify, render_template, request
+from openai import OpenAI
 
 from bokeh_visualization import create_scatter_plot
 from models import Project, User, db
 from services.openai_service import get_openai_completion
+from services.test_api_assist import IdeaGenerator
 
 
 def setup_routes(app):
@@ -13,98 +17,67 @@ def setup_routes(app):
     @app.route("/process_project", methods=["POST"])
     def process_project():
         try:
-            project_id = request.form.get("id")
-            description = request.form.get("description")
+            client = OpenAI()
+            generator = IdeaGenerator(client)
 
-            if not description:
-                return jsonify({"error": "Missing required fields"}), 400
+            user_input = request.json.get("description")
+            print("This is the user input", user_input)
+            thread_id = request.json.get("thread_id")
 
-            existing_summary = None
-            project = None
+            if not user_input:
+                return jsonify({"error": "Description is required"}), 400
 
-            if project_id:
-                project = Project.query.get(project_id)
-                if project:
-                    existing_summary = project.summary
+            if not thread_id:
+                thread_id = generator.create_thread()
 
-            if not existing_summary:
-                existing_summary = "This is the beginning of the project's summary."
+            client.beta.threads.messages.create(
+                thread_id=thread_id, role="user", content=user_input
+            )
 
-            prompt_input = f"{existing_summary}\n\n{description}"
+            run = client.beta.threads.runs.create(
+                thread_id=thread_id, assistant_id=generator.assistant_id
+            )
 
-            response_json = get_openai_completion(prompt_input)
-            if response_json["project_name"] == "Not applicable":
-                return (
-                    jsonify(
-                        {
-                            "error": "Invalid input, please improve or add to context to your prompt."
-                        }
-                    ),
-                    500,
+            while True:
+                run_status = client.beta.threads.runs.retrieve(
+                    run_id=run.id, thread_id=thread_id  
                 )
-            elif response_json is None:
-                return (
-                    jsonify(
-                        {
-                            "error": "Invalid input, there was an error in the OpenAi response."
-                        }
-                    ),
-                    500,
-                )
+                if run_status.status == "completed":
+                    break
+                time.sleep(1)
 
-            # print("OpenAI Response:", response_json)
-
-            new_summary = response_json.get("summary")
-            project_name = response_json["project_name"]
-            business_novelty = int(response_json["business_novelty"])
-            customer_novelty = int(response_json["customer_novelty"])
-            impact = int(response_json["impact"])
-            business_rationale = response_json["rationale_behind_business_novelty"]
-            customer_rationale = response_json["rationale_behind_customer_novelty"]
-            impact_rationale = response_json["rationale_behind_impact"]
-            project_type = response_json["type"]
-
-            if project:
-                project.description = project_name
-                project.summary = new_summary
-                project.returned_x_value = business_novelty
-                project.returned_y_value = customer_novelty
-                project.impact = impact
-                project.x_value_justification = business_rationale
-                project.y_value_justification = customer_rationale
-                project.type = project_type
+            messages = client.beta.threads.messages.list(thread_id=thread_id)
+            if messages.data:
+                assistant_response = messages.data[0].content
             else:
-                project = Project(
-                    description=project_name,
-                    summary=new_summary,
-                    returned_x_value=business_novelty,
-                    returned_y_value=customer_novelty,
-                    impact=impact,
-                    x_value_justification=business_rationale,
-                    y_value_justification=customer_rationale,
-                    type=project_type,
-                )
-                db.session.add(project)
+                assistant_response = "No response available."
+            assistant_response = (
+                messages.data[0].content if messages.data else "No response available."
+            )
 
+            project_name = assistant_response.get("project_name", "Unnamed Project")
+            x_value = assistant_response.get("business_novelty", 0)
+            y_value = assistant_response.get("customer_novelty", 0)
+
+            project = Project(
+                name=project_name, x_value=x_value, y_value=y_value, thread_id=thread_id
+            )
+            db.session.add(project)
             db.session.commit()
 
             return (
                 jsonify(
                     {
-                        "message": "Project updated successfully",
-                        "project_name": project.description,
-                        "business_novelty": project.returned_x_value,
-                        "customer_novelty": project.returned_y_value,
-                        "impact": project.impact,
-                        "business_rationale": project.x_value_justification,
-                        "customer_rationale": project.y_value_justification,
-                        "impact_rationale": impact_rationale,
+                        "message": "Conversation started",
+                        "thread_id": thread_id,
+                        "assistant_response": assistant_response,
                     }
                 ),
                 200,
             )
 
         except Exception as e:
+            print(str(e))
             return (
                 jsonify(
                     {
@@ -114,15 +87,38 @@ def setup_routes(app):
                 ),
                 500,
             )
+        
+    @app.route("/continue_project", methods=["POST"])
+    def continue_project():
+        try:
+            client = OpenAI()
+            generator = IdeaGenerator(client)
+            thread_id = request.json.get("thread_id")
+            user_message = request.json.get("user_message")
 
-    @app.route("/quote")
-    def quote_page():
-        return render_template("quote.html")
+            if not thread_id or not user_message:
+                return jsonify({"error": "Both thread_id and user_message are required"}), 400
 
-    @app.route("/quote/data", methods=["GET"])
-    def quote_of_the_day():
-        quote = get_openai_completion("Give me an inspirational quote of the day")
-        return jsonify({"quote": quote})
+            client.beta.threads.messages.create(thread_id=thread_id, role="user", content=user_message)
+
+            run = client.beta.threads.runs.create(thread_id=thread_id, assistant_id=generator.assistant_id)
+
+            while True:
+                run_status = client.beta.threads.runs.retrieve(run_id=run.id, thread_id=thread_id)
+                if run_status.status == "completed":
+                    break
+                time.sleep(1)
+
+            messages = client.beta.threads.messages.list(thread_id=thread_id)
+            assistant_response = messages.data[0].content if messages.data else "No response."
+
+            return jsonify({
+                "assistant_response": assistant_response
+            }), 200
+
+        except Exception as e:
+            return jsonify({"error": "An error occurred.", "details": str(e)}), 500
+
 
     @app.route("/add_user", methods=["POST"])
     def add_user():
@@ -134,23 +130,6 @@ def setup_routes(app):
             return jsonify({"message": "User added!", "user": new_user.to_dict()}), 201
         except Exception as e:
             return jsonify({"error": "Failed to add user", "details": str(e)}), 500
-
-    @app.route("/add_project", methods=["POST"])
-    def add_project():
-        try:
-            data = request.get_json()
-            new_project = Project(**data)
-            print(new_project)
-            db.session.add(new_project)
-            db.session.commit()
-            return (
-                jsonify(
-                    {"message": "Project added!", "project": new_project.to_dict()}
-                ),
-                201,
-            )
-        except Exception as e:
-            return jsonify({"error": "Failed to add project", "details": str(e)}), 500
 
     @app.route("/get_projects", methods=["GET"])
     def get_projects():
@@ -166,7 +145,7 @@ def setup_routes(app):
     @app.route("/get_project", methods=["GET"])
     def get_project():
         try:
-            project_id = request.args.get("id", type=int)
+            project_id = request.args.get("id", type=str)
             if not project_id:
                 return jsonify({"error": "Project ID is required"}), 400
 
@@ -175,10 +154,10 @@ def setup_routes(app):
                 return jsonify({"error": "Project not found"}), 404
 
             data = {
-                "projects": [project.description],
-                "business_novelty": [project.returned_x_value],
-                "customer_novelty": [project.returned_y_value],
-                "impact": [project.impact],
+                "projects": [project.name],
+                "x_value": [project.x_value],
+                "y_value": [project.y_value],
+                "timestamp": [project.timestamp],
             }
 
             script, div = create_scatter_plot(data)
