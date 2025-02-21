@@ -1,331 +1,299 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<robot generator="Robot 7.2 (Python 3.11.2 on darwin)" generated="2025-02-05T22:33:10.643537" rpa="false" schemaversion="5">
-<suite id="s1" name="Tests" source="/Users/erikstandard/Desktop/AI-CTO/tests">
-<suite id="s1-s1" name="Robot" source="/Users/erikstandard/Desktop/AI-CTO/tests/robot">
-<suite id="s1-s1-s1" name="Inputs" source="/Users/erikstandard/Desktop/AI-CTO/tests/robot/inputs.robot">
+<robot generator="Robot 7.2 (Python 3.10.12 on linux)" generated="2025-02-21T14:14:53.726847" rpa="false" schemaversion="5">
+<suite id="s1" name="Tests" source="/home/yampi/koulu/Ohjelmistoprojekti/AI-CTO/tests">
+<suite id="s1-s1" name="Robot" source="/home/yampi/koulu/Ohjelmistoprojekti/AI-CTO/tests/robot">
+<suite id="s1-s1-s1" name="Inputs" source="/home/yampi/koulu/Ohjelmistoprojekti/AI-CTO/tests/robot/inputs.robot">
 <test id="s1-s1-s1-t1" name="User can input text to text-input field" line="6">
 <kw name="Open And Configure Browser" owner="resource">
-<kw name="Get Chrome Driver" owner="webdriver_manager_keywords">
-<msg time="2025-02-05T22:33:10.789301" level="INFO">====== WebDriver manager ======</msg>
-<msg time="2025-02-05T22:33:11.314965" level="INFO">Get LATEST chromedriver version for google-chrome</msg>
-<msg time="2025-02-05T22:33:11.629500" level="INFO">Get LATEST chromedriver version for google-chrome</msg>
-<msg time="2025-02-05T22:33:11.734374" level="INFO">Driver [/Users/erikstandard/.wdm/drivers/chromedriver/mac64/132.0.6834.159/chromedriver-mac-arm64/chromedriver] found in cache</msg>
-<msg time="2025-02-05T22:33:11.735181" level="INFO">${driver_path} = /Users/erikstandard/.wdm/drivers/chromedriver/mac64/132.0.6834.159/chromedriver-mac-arm64/chromedriver</msg>
+<kw name="Get Chrome Driver">
+<msg time="2025-02-21T14:14:54.017269" level="FAIL">No keyword with name 'Get Chrome Driver' found.</msg>
 <var>${driver_path}</var>
-<status status="PASS" start="2025-02-05T22:33:10.789210" elapsed="0.946057"/>
+<status status="FAIL" start="2025-02-21T14:14:54.017226" elapsed="0.000087">No keyword with name 'Get Chrome Driver' found.</status>
 </kw>
 <kw name="Log" owner="BuiltIn">
-<msg time="2025-02-05T22:33:11.736729" level="INFO">Using ChromeDriver at /Users/erikstandard/.wdm/drivers/chromedriver/mac64/132.0.6834.159/chromedriver-mac-arm64/chromedriver</msg>
 <arg>Using ChromeDriver at ${driver_path}</arg>
 <doc>Logs the given message with the given level.</doc>
-<status status="PASS" start="2025-02-05T22:33:11.736058" elapsed="0.000739"/>
+<status status="NOT RUN" start="2025-02-21T14:14:54.017434" elapsed="0.000024"/>
 </kw>
 <kw name="Open Browser" owner="SeleniumLibrary">
-<msg time="2025-02-05T22:33:11.737570" level="WARN">exexcutable_path is being deprecated. Please use service to configure the driver's executable_path as per documentation.</msg>
-<msg time="2025-02-05T22:33:11.737803" level="INFO">Opening browser 'chrome' to base url 'http://127.0.0.1:5000'.</msg>
 <arg>${HOME_URL}</arg>
 <arg>${BROWSER}</arg>
 <arg>executable_path=${driver_path}</arg>
 <doc>Opens a new browser instance to the optional ``url``.</doc>
-<status status="PASS" start="2025-02-05T22:33:11.737025" elapsed="2.165719"/>
+<status status="NOT RUN" start="2025-02-21T14:14:54.017547" elapsed="0.000020"/>
 </kw>
-<status status="PASS" start="2025-02-05T22:33:10.788884" elapsed="3.115739"/>
+<status status="FAIL" start="2025-02-21T14:14:54.015561" elapsed="0.002089">No keyword with name 'Get Chrome Driver' found.</status>
 </kw>
 <kw name="Go To" owner="SeleniumLibrary">
-<msg time="2025-02-05T22:33:13.906142" level="INFO">Opening url 'http://127.0.0.1:5000'</msg>
 <arg>${HOME_URL}</arg>
 <doc>Navigates the current browser window to the provided ``url``.</doc>
-<status status="PASS" start="2025-02-05T22:33:13.905291" elapsed="0.038394"/>
+<status status="NOT RUN" start="2025-02-21T14:14:54.017793" elapsed="0.000024"/>
 </kw>
 <kw name="Page Should Contain" owner="SeleniumLibrary">
-<msg time="2025-02-05T22:33:13.957955" level="INFO">Current page contains text 'Project Portfolio Visualization Tool'.</msg>
 <arg>Project Portfolio Visualization Tool</arg>
 <doc>Verifies that current page contains ``text``.</doc>
-<status status="PASS" start="2025-02-05T22:33:13.943861" elapsed="0.014148"/>
+<status status="NOT RUN" start="2025-02-21T14:14:54.017972" elapsed="0.000025"/>
 </kw>
 <kw name="Input Text" owner="SeleniumLibrary">
-<msg time="2025-02-05T22:33:13.958476" level="INFO">Typing text 'AirBNB for humans and cats' into text field 'id=description'.</msg>
 <arg>id=description</arg>
 <arg>AirBNB for humans and cats</arg>
 <doc>Types the given ``text`` into the text field identified by ``locator``.</doc>
-<status status="PASS" start="2025-02-05T22:33:13.958133" elapsed="0.149106"/>
+<status status="NOT RUN" start="2025-02-21T14:14:54.018115" elapsed="0.000029"/>
 </kw>
 <kw name="Click Button" owner="SeleniumLibrary">
-<msg time="2025-02-05T22:33:14.107978" level="INFO">Clicking button 'css:button[type="submit"]'.</msg>
 <arg>css:button[type="submit"]</arg>
 <doc>Clicks the button identified by ``locator``.</doc>
-<status status="PASS" start="2025-02-05T22:33:14.107778" elapsed="3.043956"/>
+<status status="NOT RUN" start="2025-02-21T14:14:54.018297" elapsed="0.000032"/>
 </kw>
 <kw name="Sleep" owner="BuiltIn">
-<msg time="2025-02-05T22:33:27.153734" level="INFO">Slept 10 seconds.</msg>
 <arg>10</arg>
 <doc>Pauses the test executed for the given time.</doc>
-<status status="PASS" start="2025-02-05T22:33:17.152079" elapsed="10.002179"/>
+<status status="NOT RUN" start="2025-02-21T14:14:54.018512" elapsed="0.000028"/>
 </kw>
 <kw name="Page Should Contain" owner="SeleniumLibrary">
-<msg time="2025-02-05T22:33:27.174928" level="INFO">Current page contains text 'Project Name: AirBNB for humans and cats'.</msg>
 <arg>Project Name: AirBNB for humans and cats</arg>
 <doc>Verifies that current page contains ``text``.</doc>
-<status status="PASS" start="2025-02-05T22:33:27.154890" elapsed="0.020194"/>
+<status status="NOT RUN" start="2025-02-21T14:14:54.018656" elapsed="0.000039"/>
 </kw>
-<status status="PASS" start="2025-02-05T22:33:10.788608" elapsed="16.386883"/>
+<status status="FAIL" start="2025-02-21T14:14:54.014815" elapsed="0.004075">No keyword with name 'Get Chrome Driver' found.</status>
 </test>
-<status status="PASS" start="2025-02-05T22:33:10.654888" elapsed="16.521266"/>
+<status status="FAIL" start="2025-02-21T14:14:53.754508" elapsed="0.264734"/>
 </suite>
-<suite id="s1-s1-s2" name="Pages" source="/Users/erikstandard/Desktop/AI-CTO/tests/robot/pages.robot">
-<test id="s1-s1-s2-t1" name="Testaa Etusivu" line="5">
+<suite id="s1-s1-s2" name="Pages" source="/home/yampi/koulu/Ohjelmistoprojekti/AI-CTO/tests/robot/pages.robot">
+<test id="s1-s1-s2-t1" name="Test Home Page" line="5">
 <kw name="Open And Configure Browser" owner="resource">
-<kw name="Get Chrome Driver" owner="webdriver_manager_keywords">
-<msg time="2025-02-05T22:33:27.181874" level="INFO">====== WebDriver manager ======</msg>
-<msg time="2025-02-05T22:33:27.387282" level="INFO">Get LATEST chromedriver version for google-chrome</msg>
-<msg time="2025-02-05T22:33:27.756198" level="INFO">Get LATEST chromedriver version for google-chrome</msg>
-<msg time="2025-02-05T22:33:27.896032" level="INFO">Driver [/Users/erikstandard/.wdm/drivers/chromedriver/mac64/132.0.6834.159/chromedriver-mac-arm64/chromedriver] found in cache</msg>
-<msg time="2025-02-05T22:33:27.896295" level="INFO">${driver_path} = /Users/erikstandard/.wdm/drivers/chromedriver/mac64/132.0.6834.159/chromedriver-mac-arm64/chromedriver</msg>
+<kw name="Get Chrome Driver">
+<msg time="2025-02-21T14:14:54.024174" level="FAIL">No keyword with name 'Get Chrome Driver' found.</msg>
 <var>${driver_path}</var>
-<status status="PASS" start="2025-02-05T22:33:27.181559" elapsed="0.714763"/>
+<status status="FAIL" start="2025-02-21T14:14:54.024115" elapsed="0.000109">No keyword with name 'Get Chrome Driver' found.</status>
 </kw>
 <kw name="Log" owner="BuiltIn">
-<msg time="2025-02-05T22:33:27.896733" level="INFO">Using ChromeDriver at /Users/erikstandard/.wdm/drivers/chromedriver/mac64/132.0.6834.159/chromedriver-mac-arm64/chromedriver</msg>
 <arg>Using ChromeDriver at ${driver_path}</arg>
 <doc>Logs the given message with the given level.</doc>
-<status status="PASS" start="2025-02-05T22:33:27.896552" elapsed="0.000207"/>
+<status status="NOT RUN" start="2025-02-21T14:14:54.024368" elapsed="0.000025"/>
 </kw>
 <kw name="Open Browser" owner="SeleniumLibrary">
-<msg time="2025-02-05T22:33:27.897081" level="WARN">exexcutable_path is being deprecated. Please use service to configure the driver's executable_path as per documentation.</msg>
-<msg time="2025-02-05T22:33:27.897169" level="INFO">Opening browser 'chrome' to base url 'http://127.0.0.1:5000'.</msg>
 <arg>${HOME_URL}</arg>
 <arg>${BROWSER}</arg>
 <arg>executable_path=${driver_path}</arg>
 <doc>Opens a new browser instance to the optional ``url``.</doc>
-<status status="PASS" start="2025-02-05T22:33:27.896854" elapsed="1.354357"/>
+<status status="NOT RUN" start="2025-02-21T14:14:54.024484" elapsed="0.000037"/>
 </kw>
-<status status="PASS" start="2025-02-05T22:33:27.180856" elapsed="2.070783"/>
-</kw>
-<status status="PASS" start="2025-02-05T22:33:27.180319" elapsed="2.072038"/>
-</test>
-<test id="s1-s1-s2-t2" name="User can see main page" line="9">
-<kw name="Open And Configure Browser" owner="resource">
-<kw name="Get Chrome Driver" owner="webdriver_manager_keywords">
-<msg time="2025-02-05T22:33:29.253474" level="INFO">====== WebDriver manager ======</msg>
-<msg time="2025-02-05T22:33:29.434480" level="INFO">Get LATEST chromedriver version for google-chrome</msg>
-<msg time="2025-02-05T22:33:29.543564" level="INFO">Get LATEST chromedriver version for google-chrome</msg>
-<msg time="2025-02-05T22:33:29.654657" level="INFO">Driver [/Users/erikstandard/.wdm/drivers/chromedriver/mac64/132.0.6834.159/chromedriver-mac-arm64/chromedriver] found in cache</msg>
-<msg time="2025-02-05T22:33:29.655224" level="INFO">${driver_path} = /Users/erikstandard/.wdm/drivers/chromedriver/mac64/132.0.6834.159/chromedriver-mac-arm64/chromedriver</msg>
-<var>${driver_path}</var>
-<status status="PASS" start="2025-02-05T22:33:29.253306" elapsed="0.401975"/>
-</kw>
-<kw name="Log" owner="BuiltIn">
-<msg time="2025-02-05T22:33:29.656456" level="INFO">Using ChromeDriver at /Users/erikstandard/.wdm/drivers/chromedriver/mac64/132.0.6834.159/chromedriver-mac-arm64/chromedriver</msg>
-<arg>Using ChromeDriver at ${driver_path}</arg>
-<doc>Logs the given message with the given level.</doc>
-<status status="PASS" start="2025-02-05T22:33:29.655887" elapsed="0.000642"/>
-</kw>
-<kw name="Open Browser" owner="SeleniumLibrary">
-<msg time="2025-02-05T22:33:29.657550" level="WARN">exexcutable_path is being deprecated. Please use service to configure the driver's executable_path as per documentation.</msg>
-<msg time="2025-02-05T22:33:29.657772" level="INFO">Opening browser 'chrome' to base url 'http://127.0.0.1:5000'.</msg>
-<arg>${HOME_URL}</arg>
-<arg>${BROWSER}</arg>
-<arg>executable_path=${driver_path}</arg>
-<doc>Opens a new browser instance to the optional ``url``.</doc>
-<status status="PASS" start="2025-02-05T22:33:29.656991" elapsed="1.142481"/>
-</kw>
-<status status="PASS" start="2025-02-05T22:33:29.253053" elapsed="1.547084"/>
+<status status="FAIL" start="2025-02-21T14:14:54.022510" elapsed="0.002104">No keyword with name 'Get Chrome Driver' found.</status>
 </kw>
 <kw name="Go To" owner="SeleniumLibrary">
-<msg time="2025-02-05T22:33:30.800623" level="INFO">Opening url 'http://127.0.0.1:5000'</msg>
 <arg>${HOME_URL}</arg>
 <doc>Navigates the current browser window to the provided ``url``.</doc>
-<status status="PASS" start="2025-02-05T22:33:30.800402" elapsed="0.037219"/>
+<status status="NOT RUN" start="2025-02-21T14:14:54.024867" elapsed="0.000031"/>
 </kw>
 <kw name="Page Should Contain" owner="SeleniumLibrary">
-<msg time="2025-02-05T22:33:30.844182" level="INFO">Current page contains text 'AI Project Portfolio Visualization Tool'.</msg>
-<arg>AI Project Portfolio Visualization Tool</arg>
+<arg>AICTO: Project Portfolio Visualization Tool</arg>
 <doc>Verifies that current page contains ``text``.</doc>
-<status status="PASS" start="2025-02-05T22:33:30.837788" elapsed="0.006438"/>
+<status status="NOT RUN" start="2025-02-21T14:14:54.025015" elapsed="0.000022"/>
 </kw>
-<status status="PASS" start="2025-02-05T22:33:29.252640" elapsed="1.591736"/>
+<status status="FAIL" start="2025-02-21T14:14:54.022061" elapsed="0.003204">No keyword with name 'Get Chrome Driver' found.</status>
 </test>
-<test id="s1-s1-s2-t3" name="User can see Visualization page" line="14">
+<test id="s1-s1-s2-t2" name="User can see main page" line="10">
 <kw name="Open And Configure Browser" owner="resource">
-<kw name="Get Chrome Driver" owner="webdriver_manager_keywords">
-<msg time="2025-02-05T22:33:30.845191" level="INFO">====== WebDriver manager ======</msg>
-<msg time="2025-02-05T22:33:31.024604" level="INFO">Get LATEST chromedriver version for google-chrome</msg>
-<msg time="2025-02-05T22:33:31.150385" level="INFO">Get LATEST chromedriver version for google-chrome</msg>
-<msg time="2025-02-05T22:33:31.278852" level="INFO">Driver [/Users/erikstandard/.wdm/drivers/chromedriver/mac64/132.0.6834.159/chromedriver-mac-arm64/chromedriver] found in cache</msg>
-<msg time="2025-02-05T22:33:31.279619" level="INFO">${driver_path} = /Users/erikstandard/.wdm/drivers/chromedriver/mac64/132.0.6834.159/chromedriver-mac-arm64/chromedriver</msg>
+<kw name="Get Chrome Driver">
+<msg time="2025-02-21T14:14:54.027404" level="FAIL">No keyword with name 'Get Chrome Driver' found.</msg>
 <var>${driver_path}</var>
-<status status="PASS" start="2025-02-05T22:33:30.844984" elapsed="0.434698"/>
+<status status="FAIL" start="2025-02-21T14:14:54.027335" elapsed="0.000123">No keyword with name 'Get Chrome Driver' found.</status>
 </kw>
 <kw name="Log" owner="BuiltIn">
-<msg time="2025-02-05T22:33:31.280825" level="INFO">Using ChromeDriver at /Users/erikstandard/.wdm/drivers/chromedriver/mac64/132.0.6834.159/chromedriver-mac-arm64/chromedriver</msg>
 <arg>Using ChromeDriver at ${driver_path}</arg>
 <doc>Logs the given message with the given level.</doc>
-<status status="PASS" start="2025-02-05T22:33:31.280310" elapsed="0.000584"/>
+<status status="NOT RUN" start="2025-02-21T14:14:54.027611" elapsed="0.000028"/>
 </kw>
 <kw name="Open Browser" owner="SeleniumLibrary">
-<msg time="2025-02-05T22:33:31.281902" level="WARN">exexcutable_path is being deprecated. Please use service to configure the driver's executable_path as per documentation.</msg>
-<msg time="2025-02-05T22:33:31.282211" level="INFO">Opening browser 'chrome' to base url 'http://127.0.0.1:5000'.</msg>
 <arg>${HOME_URL}</arg>
 <arg>${BROWSER}</arg>
 <arg>executable_path=${driver_path}</arg>
 <doc>Opens a new browser instance to the optional ``url``.</doc>
-<status status="PASS" start="2025-02-05T22:33:31.281170" elapsed="1.130027"/>
+<status status="NOT RUN" start="2025-02-21T14:14:54.027733" elapsed="0.000022"/>
 </kw>
-<status status="PASS" start="2025-02-05T22:33:30.844814" elapsed="1.566614"/>
+<status status="FAIL" start="2025-02-21T14:14:54.025841" elapsed="0.002007">No keyword with name 'Get Chrome Driver' found.</status>
 </kw>
 <kw name="Go To" owner="SeleniumLibrary">
-<msg time="2025-02-05T22:33:32.412349" level="INFO">Opening url 'http://127.0.0.1:5000'</msg>
 <arg>${HOME_URL}</arg>
 <doc>Navigates the current browser window to the provided ``url``.</doc>
-<status status="PASS" start="2025-02-05T22:33:32.412110" elapsed="0.033115"/>
+<status status="NOT RUN" start="2025-02-21T14:14:54.028070" elapsed="0.000032"/>
+</kw>
+<kw name="Page Should Contain" owner="SeleniumLibrary">
+<arg>AICTO: Project Portfolio Visualization Tool</arg>
+<doc>Verifies that current page contains ``text``.</doc>
+<status status="NOT RUN" start="2025-02-21T14:14:54.028284" elapsed="0.000042"/>
+</kw>
+<status status="FAIL" start="2025-02-21T14:14:54.025508" elapsed="0.003355">No keyword with name 'Get Chrome Driver' found.</status>
+</test>
+<test id="s1-s1-s2-t3" name="User can see Visualization page" line="15">
+<kw name="Open And Configure Browser" owner="resource">
+<kw name="Get Chrome Driver">
+<msg time="2025-02-21T14:14:54.033628" level="FAIL">No keyword with name 'Get Chrome Driver' found.</msg>
+<var>${driver_path}</var>
+<status status="FAIL" start="2025-02-21T14:14:54.033514" elapsed="0.000177">No keyword with name 'Get Chrome Driver' found.</status>
+</kw>
+<kw name="Log" owner="BuiltIn">
+<arg>Using ChromeDriver at ${driver_path}</arg>
+<doc>Logs the given message with the given level.</doc>
+<status status="NOT RUN" start="2025-02-21T14:14:54.033870" elapsed="0.000029"/>
+</kw>
+<kw name="Open Browser" owner="SeleniumLibrary">
+<arg>${HOME_URL}</arg>
+<arg>${BROWSER}</arg>
+<arg>executable_path=${driver_path}</arg>
+<doc>Opens a new browser instance to the optional ``url``.</doc>
+<status status="NOT RUN" start="2025-02-21T14:14:54.034002" elapsed="0.000021"/>
+</kw>
+<status status="FAIL" start="2025-02-21T14:14:54.031323" elapsed="0.002794">No keyword with name 'Get Chrome Driver' found.</status>
+</kw>
+<kw name="Go To" owner="SeleniumLibrary">
+<arg>${HOME_URL}</arg>
+<doc>Navigates the current browser window to the provided ``url``.</doc>
+<status status="NOT RUN" start="2025-02-21T14:14:54.034362" elapsed="0.000031"/>
 </kw>
 <kw name="Click Element" owner="SeleniumLibrary">
-<msg time="2025-02-05T22:33:32.445535" level="INFO">Clicking element '//li[@data-tab="visualization"]'.</msg>
-<arg>//li[@data-tab="visualization"]</arg>
+<arg>//a[text()='Visualization']</arg>
 <doc>Click the element identified by ``locator``.</doc>
-<status status="PASS" start="2025-02-05T22:33:32.445365" elapsed="0.038268"/>
+<status status="NOT RUN" start="2025-02-21T14:14:54.034533" elapsed="0.000024"/>
 </kw>
 <kw name="Page Should Contain" owner="SeleniumLibrary">
-<msg time="2025-02-05T22:33:32.489653" level="INFO">Current page contains text 'Visualization'.</msg>
 <arg>Visualization</arg>
 <doc>Verifies that current page contains ``text``.</doc>
-<status status="PASS" start="2025-02-05T22:33:32.483781" elapsed="0.005917"/>
+<status status="NOT RUN" start="2025-02-21T14:14:54.034877" elapsed="0.000062"/>
 </kw>
-<status status="PASS" start="2025-02-05T22:33:30.844556" elapsed="1.645270"/>
+<status status="FAIL" start="2025-02-21T14:14:54.029889" elapsed="0.005384">No keyword with name 'Get Chrome Driver' found.</status>
 </test>
-<test id="s1-s1-s2-t4" name="User can see My Projects page" line="20">
+<test id="s1-s1-s2-t4" name="User can see My Projects page" line="21">
 <kw name="Open And Configure Browser" owner="resource">
-<kw name="Get Chrome Driver" owner="webdriver_manager_keywords">
-<msg time="2025-02-05T22:33:32.490557" level="INFO">====== WebDriver manager ======</msg>
-<msg time="2025-02-05T22:33:32.616162" level="INFO">Get LATEST chromedriver version for google-chrome</msg>
-<msg time="2025-02-05T22:33:32.730336" level="INFO">Get LATEST chromedriver version for google-chrome</msg>
-<msg time="2025-02-05T22:33:32.859771" level="INFO">Driver [/Users/erikstandard/.wdm/drivers/chromedriver/mac64/132.0.6834.159/chromedriver-mac-arm64/chromedriver] found in cache</msg>
-<msg time="2025-02-05T22:33:32.860277" level="INFO">${driver_path} = /Users/erikstandard/.wdm/drivers/chromedriver/mac64/132.0.6834.159/chromedriver-mac-arm64/chromedriver</msg>
+<kw name="Get Chrome Driver">
+<msg time="2025-02-21T14:14:54.037921" level="FAIL">No keyword with name 'Get Chrome Driver' found.</msg>
 <var>${driver_path}</var>
-<status status="PASS" start="2025-02-05T22:33:32.490408" elapsed="0.369915"/>
+<status status="FAIL" start="2025-02-21T14:14:54.037828" elapsed="0.000145">No keyword with name 'Get Chrome Driver' found.</status>
 </kw>
 <kw name="Log" owner="BuiltIn">
-<msg time="2025-02-05T22:33:32.861161" level="INFO">Using ChromeDriver at /Users/erikstandard/.wdm/drivers/chromedriver/mac64/132.0.6834.159/chromedriver-mac-arm64/chromedriver</msg>
 <arg>Using ChromeDriver at ${driver_path}</arg>
 <doc>Logs the given message with the given level.</doc>
-<status status="PASS" start="2025-02-05T22:33:32.860792" elapsed="0.000415"/>
+<status status="NOT RUN" start="2025-02-21T14:14:54.038120" elapsed="0.000025"/>
 </kw>
 <kw name="Open Browser" owner="SeleniumLibrary">
-<msg time="2025-02-05T22:33:32.861740" level="WARN">exexcutable_path is being deprecated. Please use service to configure the driver's executable_path as per documentation.</msg>
-<msg time="2025-02-05T22:33:32.861889" level="INFO">Opening browser 'chrome' to base url 'http://127.0.0.1:5000'.</msg>
 <arg>${HOME_URL}</arg>
 <arg>${BROWSER}</arg>
 <arg>executable_path=${driver_path}</arg>
 <doc>Opens a new browser instance to the optional ``url``.</doc>
-<status status="PASS" start="2025-02-05T22:33:32.861366" elapsed="1.185594"/>
+<status status="NOT RUN" start="2025-02-21T14:14:54.038233" elapsed="0.000020"/>
 </kw>
-<status status="PASS" start="2025-02-05T22:33:32.490272" elapsed="1.557427"/>
+<status status="FAIL" start="2025-02-21T14:14:54.036206" elapsed="0.002132">No keyword with name 'Get Chrome Driver' found.</status>
 </kw>
 <kw name="Go To" owner="SeleniumLibrary">
-<msg time="2025-02-05T22:33:34.048164" level="INFO">Opening url 'http://127.0.0.1:5000'</msg>
 <arg>${HOME_URL}</arg>
 <doc>Navigates the current browser window to the provided ``url``.</doc>
-<status status="PASS" start="2025-02-05T22:33:34.047948" elapsed="0.033757"/>
+<status status="NOT RUN" start="2025-02-21T14:14:54.038530" elapsed="0.000027"/>
 </kw>
 <kw name="Click Element" owner="SeleniumLibrary">
-<msg time="2025-02-05T22:33:34.082016" level="INFO">Clicking element '//li[@data-tab="projects"]'.</msg>
-<arg>//li[@data-tab="projects"]</arg>
+<arg>//a[text()='Previous Projects']</arg>
 <doc>Click the element identified by ``locator``.</doc>
-<status status="PASS" start="2025-02-05T22:33:34.081843" elapsed="0.035431"/>
+<status status="NOT RUN" start="2025-02-21T14:14:54.038723" elapsed="0.000030"/>
 </kw>
 <kw name="Page Should Contain" owner="SeleniumLibrary">
-<msg time="2025-02-05T22:33:34.146535" level="INFO">Current page contains text 'My Projects'.</msg>
-<arg>My Projects</arg>
+<arg>Previous Projects</arg>
 <doc>Verifies that current page contains ``text``.</doc>
-<status status="PASS" start="2025-02-05T22:33:34.117518" elapsed="0.029073"/>
+<status status="NOT RUN" start="2025-02-21T14:14:54.038860" elapsed="0.000021"/>
 </kw>
-<status status="PASS" start="2025-02-05T22:33:32.490028" elapsed="1.656750"/>
+<status status="FAIL" start="2025-02-21T14:14:54.035677" elapsed="0.003382">No keyword with name 'Get Chrome Driver' found.</status>
 </test>
-<test id="s1-s1-s2-t5" name="User can go back to Home page" line="26">
+<test id="s1-s1-s2-t5" name="User can go back to Home page" line="27">
 <kw name="Open And Configure Browser" owner="resource">
-<kw name="Get Chrome Driver" owner="webdriver_manager_keywords">
-<msg time="2025-02-05T22:33:34.147602" level="INFO">====== WebDriver manager ======</msg>
-<msg time="2025-02-05T22:33:34.327943" level="INFO">Get LATEST chromedriver version for google-chrome</msg>
-<msg time="2025-02-05T22:33:34.469949" level="INFO">Get LATEST chromedriver version for google-chrome</msg>
-<msg time="2025-02-05T22:33:34.572677" level="INFO">Driver [/Users/erikstandard/.wdm/drivers/chromedriver/mac64/132.0.6834.159/chromedriver-mac-arm64/chromedriver] found in cache</msg>
-<msg time="2025-02-05T22:33:34.573412" level="INFO">${driver_path} = /Users/erikstandard/.wdm/drivers/chromedriver/mac64/132.0.6834.159/chromedriver-mac-arm64/chromedriver</msg>
+<kw name="Get Chrome Driver">
+<msg time="2025-02-21T14:14:54.041160" level="FAIL">No keyword with name 'Get Chrome Driver' found.</msg>
 <var>${driver_path}</var>
-<status status="PASS" start="2025-02-05T22:33:34.147378" elapsed="0.426093"/>
+<status status="FAIL" start="2025-02-21T14:14:54.041107" elapsed="0.000100">No keyword with name 'Get Chrome Driver' found.</status>
 </kw>
 <kw name="Log" owner="BuiltIn">
-<msg time="2025-02-05T22:33:34.574526" level="INFO">Using ChromeDriver at /Users/erikstandard/.wdm/drivers/chromedriver/mac64/132.0.6834.159/chromedriver-mac-arm64/chromedriver</msg>
 <arg>Using ChromeDriver at ${driver_path}</arg>
 <doc>Logs the given message with the given level.</doc>
-<status status="PASS" start="2025-02-05T22:33:34.574040" elapsed="0.000544"/>
+<status status="NOT RUN" start="2025-02-21T14:14:54.041334" elapsed="0.000023"/>
 </kw>
 <kw name="Open Browser" owner="SeleniumLibrary">
-<msg time="2025-02-05T22:33:34.575317" level="WARN">exexcutable_path is being deprecated. Please use service to configure the driver's executable_path as per documentation.</msg>
-<msg time="2025-02-05T22:33:34.575532" level="INFO">Opening browser 'chrome' to base url 'http://127.0.0.1:5000'.</msg>
 <arg>${HOME_URL}</arg>
 <arg>${BROWSER}</arg>
 <arg>executable_path=${driver_path}</arg>
 <doc>Opens a new browser instance to the optional ``url``.</doc>
-<status status="PASS" start="2025-02-05T22:33:34.574787" elapsed="1.106614"/>
+<status status="NOT RUN" start="2025-02-21T14:14:54.041461" elapsed="0.000021"/>
 </kw>
-<status status="PASS" start="2025-02-05T22:33:34.147223" elapsed="1.534406"/>
+<status status="FAIL" start="2025-02-21T14:14:54.039672" elapsed="0.001925">No keyword with name 'Get Chrome Driver' found.</status>
 </kw>
 <kw name="Go To" owner="SeleniumLibrary">
-<msg time="2025-02-05T22:33:35.682389" level="INFO">Opening url 'http://127.0.0.1:5000'</msg>
 <arg>${HOME_URL}</arg>
 <doc>Navigates the current browser window to the provided ``url``.</doc>
-<status status="PASS" start="2025-02-05T22:33:35.682011" elapsed="0.031582"/>
+<status status="NOT RUN" start="2025-02-21T14:14:54.041823" elapsed="0.000036"/>
 </kw>
 <kw name="Click Element" owner="SeleniumLibrary">
-<msg time="2025-02-05T22:33:35.714111" level="INFO">Clicking element '//li[@data-tab="projects"]'.</msg>
-<arg>//li[@data-tab="projects"]</arg>
+<arg>//a[text()='Previous Projects']</arg>
 <doc>Click the element identified by ``locator``.</doc>
-<status status="PASS" start="2025-02-05T22:33:35.713748" elapsed="0.032874"/>
+<status status="NOT RUN" start="2025-02-21T14:14:54.041993" elapsed="0.000035"/>
 </kw>
 <kw name="Page Should Contain" owner="SeleniumLibrary">
-<msg time="2025-02-05T22:33:35.774075" level="INFO">Current page contains text 'My Projects'.</msg>
-<arg>My Projects</arg>
+<arg>Previous Projects</arg>
 <doc>Verifies that current page contains ``text``.</doc>
-<status status="PASS" start="2025-02-05T22:33:35.746767" elapsed="0.027356"/>
+<status status="NOT RUN" start="2025-02-21T14:14:54.042280" elapsed="0.000046"/>
 </kw>
 <kw name="Click Element" owner="SeleniumLibrary">
-<msg time="2025-02-05T22:33:35.774342" level="INFO">Clicking element '//li[@data-tab="home"]'.</msg>
-<arg>//li[@data-tab="home"]</arg>
+<arg>//a[text()='Home']</arg>
 <doc>Click the element identified by ``locator``.</doc>
-<status status="PASS" start="2025-02-05T22:33:35.774243" elapsed="0.023165"/>
+<status status="NOT RUN" start="2025-02-21T14:14:54.042579" elapsed="0.000041"/>
 </kw>
 <kw name="Page Should Contain" owner="SeleniumLibrary">
-<msg time="2025-02-05T22:33:35.802916" level="INFO">Current page contains text 'Enter your project idea here:'.</msg>
-<arg>Enter your project idea here:</arg>
+<arg>AI Project Portfolio Visualization Tool</arg>
 <doc>Verifies that current page contains ``text``.</doc>
-<status status="PASS" start="2025-02-05T22:33:35.797539" elapsed="0.005421"/>
+<status status="NOT RUN" start="2025-02-21T14:14:54.042863" elapsed="0.000061"/>
 </kw>
-<status status="PASS" start="2025-02-05T22:33:34.146948" elapsed="1.656167"/>
+<kw name="Close Browser" owner="resource">
+<status status="NOT RUN" start="2025-02-21T14:14:54.043253" elapsed="0.000053"/>
+</kw>
+<status status="FAIL" start="2025-02-21T14:14:54.039292" elapsed="0.004339">No keyword with name 'Get Chrome Driver' found.</status>
 </test>
-<status status="PASS" start="2025-02-05T22:33:27.176785" elapsed="8.626575"/>
+<status status="FAIL" start="2025-02-21T14:14:54.019592" elapsed="0.024613"/>
 </suite>
-<status status="PASS" start="2025-02-05T22:33:10.654418" elapsed="25.149271"/>
+<status status="FAIL" start="2025-02-21T14:14:53.753642" elapsed="0.291448"/>
 </suite>
-<status status="PASS" start="2025-02-05T22:33:10.644707" elapsed="25.159176"/>
+<status status="FAIL" start="2025-02-21T14:14:53.727647" elapsed="0.318238"/>
 </suite>
 <statistics>
 <total>
-<stat pass="6" fail="0" skip="0">All Tests</stat>
+<stat pass="0" fail="6" skip="0">All Tests</stat>
 </total>
 <tag>
 </tag>
 <suite>
-<stat name="Tests" id="s1" pass="6" fail="0" skip="0">Tests</stat>
-<stat name="Robot" id="s1-s1" pass="6" fail="0" skip="0">Tests.Robot</stat>
-<stat name="Inputs" id="s1-s1-s1" pass="1" fail="0" skip="0">Tests.Robot.Inputs</stat>
-<stat name="Pages" id="s1-s1-s2" pass="5" fail="0" skip="0">Tests.Robot.Pages</stat>
+<stat name="Tests" id="s1" pass="0" fail="6" skip="0">Tests</stat>
+<stat name="Robot" id="s1-s1" pass="0" fail="6" skip="0">Tests.Robot</stat>
+<stat name="Inputs" id="s1-s1-s1" pass="0" fail="1" skip="0">Tests.Robot.Inputs</stat>
+<stat name="Pages" id="s1-s1-s2" pass="0" fail="5" skip="0">Tests.Robot.Pages</stat>
 </suite>
 </statistics>
 <errors>
-<msg time="2025-02-05T22:33:11.737570" level="WARN">exexcutable_path is being deprecated. Please use service to configure the driver's executable_path as per documentation.</msg>
-<msg time="2025-02-05T22:33:27.897081" level="WARN">exexcutable_path is being deprecated. Please use service to configure the driver's executable_path as per documentation.</msg>
-<msg time="2025-02-05T22:33:29.657550" level="WARN">exexcutable_path is being deprecated. Please use service to configure the driver's executable_path as per documentation.</msg>
-<msg time="2025-02-05T22:33:31.281902" level="WARN">exexcutable_path is being deprecated. Please use service to configure the driver's executable_path as per documentation.</msg>
-<msg time="2025-02-05T22:33:32.861740" level="WARN">exexcutable_path is being deprecated. Please use service to configure the driver's executable_path as per documentation.</msg>
-<msg time="2025-02-05T22:33:34.575317" level="WARN">exexcutable_path is being deprecated. Please use service to configure the driver's executable_path as per documentation.</msg>
+<msg time="2025-02-21T14:14:54.014065" level="ERROR">Error in file '/home/yampi/koulu/Ohjelmistoprojekti/AI-CTO/tests/robot/resource.robot' on line 3: Importing library '/home/yampi/koulu/Ohjelmistoprojekti/AI-CTO/tests/webdriver_manager_keywords.py' failed: ModuleNotFoundError: No module named 'webdriver_manager'
+Traceback (most recent call last):
+  File "/home/yampi/koulu/Ohjelmistoprojekti/AI-CTO/tests/webdriver_manager_keywords.py", line 2, in &lt;module&gt;
+    from webdriver_manager.chrome import ChromeDriverManager
+PYTHONPATH:
+  /home/yampi/koulu/Ohjelmistoprojekti/AI-CTO/tests
+  /home/yampi/.cache/pypoetry/virtualenvs/ai-cto-v37u_-mN-py3.10/bin
+  /usr/lib/python310.zip
+  /usr/lib/python3.10
+  /usr/lib/python3.10/lib-dynload
+  /home/yampi/.cache/pypoetry/virtualenvs/ai-cto-v37u_-mN-py3.10/lib/python3.10/site-packages</msg>
+<msg time="2025-02-21T14:14:54.021520" level="ERROR">Error in file '/home/yampi/koulu/Ohjelmistoprojekti/AI-CTO/tests/robot/resource.robot' on line 3: Importing library '/home/yampi/koulu/Ohjelmistoprojekti/AI-CTO/tests/webdriver_manager_keywords.py' failed: ModuleNotFoundError: No module named 'webdriver_manager'
+Traceback (most recent call last):
+  File "/home/yampi/koulu/Ohjelmistoprojekti/AI-CTO/tests/webdriver_manager_keywords.py", line 2, in &lt;module&gt;
+    from webdriver_manager.chrome import ChromeDriverManager
+PYTHONPATH:
+  /home/yampi/koulu/Ohjelmistoprojekti/AI-CTO/tests
+  /home/yampi/.cache/pypoetry/virtualenvs/ai-cto-v37u_-mN-py3.10/bin
+  /usr/lib/python310.zip
+  /usr/lib/python3.10
+  /usr/lib/python3.10/lib-dynload
+  /home/yampi/.cache/pypoetry/virtualenvs/ai-cto-v37u_-mN-py3.10/lib/python3.10/site-packages</msg>
 </errors>
 </robot>

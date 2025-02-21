@@ -1,7 +1,7 @@
 from flask import jsonify, render_template, request
 
-from bokeh_visualization import create_scatter_plot
-from models import Project, User, db
+from services.bokeh_visualization import create_scatter_plot
+from models.models import Project, User, db
 from services.openai_service import get_openai_completion
 
 
