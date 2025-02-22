@@ -143,7 +143,7 @@ class IdeaGenerator:
 
 
     def start_chat(self):
-        """Käynnistää interaktiivisen OpenAI-pohjaisen chatin käyttäjän kanssa, jossa täytetään BMC. hello"""
+        """Käynnistää interaktiivisen OpenAI-pohjaisen chatin käyttäjän kanssa, jossa täytetään BMC."""
         print("Let's begin filling in the BMC Canvas. Describe your idea in detail.")
         user_message = input("User: ")
         conversation = [
