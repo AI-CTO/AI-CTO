@@ -1,5 +1,7 @@
-{% extends "layout.html" %} {% block title %}AI Project Tool{% endblock %} {%
-block content %}
+{% extends "layout.html" %} 
+{% block title %}AI Project Tool{% endblock %} 
+{% block content %}
+
 <div id="home" class="tab-content active">
   <p>
     Welcome to the AI Project Portfolio Visualization Tool. Describe your
@@ -44,6 +46,22 @@ block content %}
       />
       <button type="submit" class="button">Send</button>
     </form>
+
+    <button
+      id="evaluate-btn"
+      class="button"
+      style="margin-top: 10px; display: none"
+    >
+      Evaluate Project
+    </button>
+  </div>
+
+  <div id="evaluation-result" style="display: none; margin-top: 20px">
+    <h2>Project Evaluation</h2>
+    <pre
+      id="evaluation-output"
+      style="background: #f8f8f8; padding: 10px"
+    ></pre>
   </div>
 
   <p id="error-message" style="color: red; display: none"></p>
@@ -66,6 +84,12 @@ block content %}
       sendMessage();
     });
 
+  document
+    .getElementById("evaluate-btn")
+    .addEventListener("click", function () {
+      evaluateProject();
+    });
+
   function startConversation() {
     const description = document.getElementById("description").value;
     const errorMessage = document.getElementById("error-message");
@@ -74,8 +98,8 @@ block content %}
 
     fetch("/process_project", {
       method: "POST",
-      headers: { "Content-Type": "application/json" }, 
-      body: JSON.stringify({ description: description }),
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ description: description, thread_id: threadId }),
     })
       .then((response) => response.json())
       .then((data) => {
@@ -85,6 +109,7 @@ block content %}
         } else {
           threadId = data.thread_id;
           chatContainer.style.display = "block";
+          document.getElementById("evaluate-btn").style.display = "block";
           chatBox.innerHTML += `<p><strong>Assistant:</strong> ${data.assistant_response}</p>`;
           chatBox.scrollTop = chatBox.scrollHeight;
         }
@@ -109,10 +134,10 @@ block content %}
     document.getElementById("user-input").value = "";
     chatBox.scrollTop = chatBox.scrollHeight;
 
-    fetch("/continue_project", {
+    fetch("/process_project", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ thread_id: threadId, user_message: userInput }),
+      body: JSON.stringify({ description: userInput, thread_id: threadId }),
     })
       .then((response) => response.json())
       .then((data) => {
@@ -126,6 +151,42 @@ block content %}
       .catch((error) => {
         console.error("Error continuing conversation:", error);
         chatBox.innerHTML += `<p style="color: red;"><strong>Error:</strong> Unable to get response.</p>`;
+      });
+  }
+
+  function evaluateProject() {
+    if (!threadId) {
+      alert("Start a project first!");
+      return;
+    }
+
+    const evaluateBtn = document.getElementById("evaluate-btn");
+    evaluateBtn.textContent = "Evaluating...";
+    evaluateBtn.disabled = true;
+
+    fetch("/evaluate_project", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ thread_id: threadId }),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        evaluateBtn.textContent = "Evaluate Project";
+        evaluateBtn.disabled = false;
+
+        if (data.error) {
+          alert("Error in evaluation: " + data.error);
+        } else {
+          document.getElementById("evaluation-result").style.display = "block";
+          document.getElementById("evaluation-output").textContent =
+            JSON.stringify(data.evaluation, null, 2);
+        }
+      })
+      .catch((error) => {
+        console.error("Error evaluating project:", error);
+        evaluateBtn.textContent = "Evaluate Project";
+        evaluateBtn.disabled = false;
+        alert("An error occurred while evaluating.");
       });
   }
 </script>
