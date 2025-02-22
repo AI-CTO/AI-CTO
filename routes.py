@@ -1,8 +1,12 @@
+import time
+
 from flask import jsonify, render_template, request
+from openai import OpenAI
 
 from bokeh_visualization import create_scatter_plot
 from models import Project, User, db
 from services.openai_service import get_openai_completion
+from services.test_api_assist import IdeaGenerator
 
 
 def setup_routes(app):
@@ -11,118 +15,204 @@ def setup_routes(app):
         return render_template("index.html")
 
     @app.route("/process_project", methods=["POST"])
-    def process_project():
+    def chat_project():
         try:
-            project_id = request.form.get("id")
-            description = request.form.get("description")
+            client = OpenAI()
+            generator = IdeaGenerator(client)
 
-            if not description:
-                return jsonify({"error": "Missing required fields"}), 400
+            user_input = request.json.get("description")
+            project_id = request.json.get("id")
 
-            existing_summary = None
-            project = None
+            if not user_input:
+                return jsonify({"error": "Description is required"}), 400
+
 
             if project_id:
                 project = Project.query.get(project_id)
                 if project:
-                    existing_summary = project.summary
-
-            if not existing_summary:
-                existing_summary = "This is the beginning of the project's summary."
-
-            prompt_input = f"{existing_summary}\n\n{description}"
-
-            response_json = get_openai_completion(prompt_input)
-            if response_json["project_name"] == "Not applicable":
-                return (
-                    jsonify(
-                        {
-                            "error": "Invalid input, please improve or add to context to your prompt."
-                        }
-                    ),
-                    500,
-                )
-            elif response_json is None:
-                return (
-                    jsonify(
-                        {
-                            "error": "Invalid input, there was an error in the OpenAi response."
-                        }
-                    ),
-                    500,
-                )
-
-            # print("OpenAI Response:", response_json)
-
-            new_summary = response_json.get("summary")
-            project_name = response_json["project_name"]
-            business_novelty = int(response_json["business_novelty"])
-            customer_novelty = int(response_json["customer_novelty"])
-            impact = int(response_json["impact"])
-            business_rationale = response_json["rationale_behind_business_novelty"]
-            customer_rationale = response_json["rationale_behind_customer_novelty"]
-            impact_rationale = response_json["rationale_behind_impact"]
-            project_type = response_json["type"]
-
-            if project:
-                project.description = project_name
-                project.summary = new_summary
-                project.returned_x_value = business_novelty
-                project.returned_y_value = customer_novelty
-                project.impact = impact
-                project.x_value_justification = business_rationale
-                project.y_value_justification = customer_rationale
-                project.type = project_type
+                    thread_id = project.thread_id
+                else:
+                    return jsonify({"error": "Project not found"}), 404
             else:
+                thread_id = generator.create_thread()
                 project = Project(
-                    description=project_name,
-                    summary=new_summary,
-                    returned_x_value=business_novelty,
-                    returned_y_value=customer_novelty,
-                    impact=impact,
-                    x_value_justification=business_rationale,
-                    y_value_justification=customer_rationale,
-                    type=project_type,
+                    name="Pending Evaluation",
+                    x_value=0,
+                    y_value=0,
+                    impact=0,
+                    thread_id=thread_id,
                 )
                 db.session.add(project)
+                db.session.commit()
+
+            client.beta.threads.messages.create(
+                thread_id=thread_id, role="user", content=user_input
+            )
+
+            run = client.beta.threads.runs.create(
+                thread_id=thread_id, assistant_id=generator.assistant_id
+            )
+
+            while True:
+                run_status = client.beta.threads.runs.retrieve(
+                    run_id=run.id, thread_id=thread_id
+                )
+                if run_status.status == "completed":
+                    break
+                time.sleep(1)
+
+            messages = client.beta.threads.messages.list(thread_id=thread_id)
+
+            assistant_response = ""
+
+            for message in messages.data:
+                if message.role == "assistant":
+                    for block in message.content:
+                        if hasattr(block, "text") and hasattr(block.text, "value"):
+                            assistant_response += block.text.value + " "
+                    break
+
+            assistant_response = assistant_response.strip() if assistant_response else "No response from the assistant."
+
+            print("📝 Assistant Response:", assistant_response)
+         
+            return jsonify(
+                {
+                    "message": "Chat updated",
+                    "thread_id": str(thread_id),
+                    "assistant_response": assistant_response,
+                }
+            ), 200
+
+        except Exception as e:
+            print(str(e))
+            return jsonify(
+                {
+                    "error": "An error occurred while processing the project.",
+                    "details": str(e),
+                }
+            ), 500
+
+    @app.route("/evaluate_project", methods=["POST"])
+    def evaluate_project():
+        try:
+            client = OpenAI()
+            generator = IdeaGenerator(client)
+            data = request.get_json()
+            thread_id = data.get("thread_id")
+
+            if not thread_id:
+                return jsonify({"error": "Missing thread_id"}), 400
+
+            generator.thread_id = thread_id
+            evaluation_result = generator.evaluate()
+
+            if not evaluation_result:
+                return jsonify({"error": "Evaluation failed"}), 500
+
+            print("Evaluation Result:", evaluation_result)
+
+            x_value = evaluation_result.get("x_value", 0)
+            y_value = evaluation_result.get("y_value", 0)
+            impact = evaluation_result.get("impact", 0)
+            name = evaluation_result.get("name", "Pending Evaluation")
+
+            project = Project.query.filter_by(thread_id=thread_id).first()
+
+            if not project:
+                print(f"No project found with thread_id: {thread_id}")
+                return jsonify({"error": "Project not found"}), 404
+
+            print("Before Update:", project.to_dict())
+
+            project.x_value = x_value
+            project.y_value = y_value
+            project.impact = impact
+            project.name = name
 
             db.session.commit()
 
-            return (
-                jsonify(
-                    {
-                        "message": "Project updated successfully",
-                        "project_name": project.description,
-                        "business_novelty": project.returned_x_value,
-                        "customer_novelty": project.returned_y_value,
-                        "impact": project.impact,
-                        "business_rationale": project.x_value_justification,
-                        "customer_rationale": project.y_value_justification,
-                        "impact_rationale": impact_rationale,
-                    }
-                ),
-                200,
-            )
+            updated_project = Project.query.filter_by(thread_id=thread_id).first()
+            print("After Update:", updated_project.to_dict())
+
+            return jsonify({"success": True, "evaluation": evaluation_result}), 200
 
         except Exception as e:
-            return (
-                jsonify(
-                    {
-                        "error": "An error occurred while processing the project.",
-                        "details": str(e),
-                    }
-                ),
-                500,
-            )
+            print("Error updating project:", str(e))
+            return jsonify({"error": str(e)}), 500
 
-    @app.route("/quote")
-    def quote_page():
-        return render_template("quote.html")
+    @app.route("/update_project", methods=["GET", "POST"])
+    def update_project():
+        if request.method == "GET":
+            project_id = request.args.get("id", type=int)
+            if not project_id:
+                return jsonify({"error": "Project ID is required"}), 400
 
-    @app.route("/quote/data", methods=["GET"])
-    def quote_of_the_day():
-        quote = get_openai_completion("Give me an inspirational quote of the day")
-        return jsonify({"quote": quote})
+            project = Project.query.get(project_id)
+            if not project:
+                return jsonify({"error": "Project not found"}), 404
+
+            return render_template("update_project.html", project=project)
+
+        elif request.method == "POST":
+            project_id = request.args.get("id", type=int)
+            if not project_id:
+                return jsonify({"error": "Project ID is required"}), 400
+
+            project = Project.query.get(project_id)
+            if not project:
+                return jsonify({"error": "Project not found"}), 404
+
+            data = request.get_json()
+            new_description = data.get("description")
+
+            if new_description:
+                project.name = new_description 
+                db.session.commit()
+
+            return jsonify({"message": "Project updated successfully"}), 200
+
+    
+    @app.route("/resume_project", methods=["POST"])
+    def resume_project():
+        data = request.get_json() 
+        project_id = data.get("id")
+
+        print("Received request data:", data) 
+
+        if not project_id:
+            return jsonify({"error": "Project ID is required"}), 400
+
+        try:
+            project_id = int(project_id)
+        except ValueError:
+            return jsonify({"error": "Invalid project ID format."}), 400
+
+        project = Project.query.get(project_id)
+
+        if not project:
+            return jsonify({"error": f"Project with ID {project_id} not found."}), 404
+
+        thread_id = project.thread_id
+
+        if not thread_id:
+            return jsonify({"error": "No thread_id provided for this project."}), 400
+
+        client = OpenAI()
+        generator = IdeaGenerator(client)
+
+        generator.thread_id = thread_id
+        result = generator.resume_conversation()
+
+        if "error" in result:
+            return jsonify({"error": result["error"]}), 400
+
+        return jsonify({
+            "thread_id": thread_id,
+            **result
+        }), 200
+
+
 
     @app.route("/add_user", methods=["POST"])
     def add_user():
@@ -134,23 +224,6 @@ def setup_routes(app):
             return jsonify({"message": "User added!", "user": new_user.to_dict()}), 201
         except Exception as e:
             return jsonify({"error": "Failed to add user", "details": str(e)}), 500
-
-    @app.route("/add_project", methods=["POST"])
-    def add_project():
-        try:
-            data = request.get_json()
-            new_project = Project(**data)
-            print(new_project)
-            db.session.add(new_project)
-            db.session.commit()
-            return (
-                jsonify(
-                    {"message": "Project added!", "project": new_project.to_dict()}
-                ),
-                201,
-            )
-        except Exception as e:
-            return jsonify({"error": "Failed to add project", "details": str(e)}), 500
 
     @app.route("/get_projects", methods=["GET"])
     def get_projects():
@@ -166,7 +239,7 @@ def setup_routes(app):
     @app.route("/get_project", methods=["GET"])
     def get_project():
         try:
-            project_id = request.args.get("id", type=int)
+            project_id = request.args.get("id", type=str)
             if not project_id:
                 return jsonify({"error": "Project ID is required"}), 400
 
@@ -175,10 +248,10 @@ def setup_routes(app):
                 return jsonify({"error": "Project not found"}), 404
 
             data = {
-                "projects": [project.description],
-                "business_novelty": [project.returned_x_value],
-                "customer_novelty": [project.returned_y_value],
-                "impact": [project.impact],
+                "projects": [project.name],
+                "x_value": [project.x_value],
+                "y_value": [project.y_value],
+                "timestamp": [project.timestamp],
             }
 
             script, div = create_scatter_plot(data)
@@ -239,29 +312,3 @@ def setup_routes(app):
     @app.route("/previous_projects")
     def previous_projects():
         return render_template("previous_projects.html")
-
-    @app.route("/update_project")
-    def update_project():
-        project_id = request.args.get("id", type=int)
-        if not project_id:
-            return render_template(
-                "update_project.html", error="Project ID is required"
-            )
-
-        project = Project.query.get(project_id)
-        if not project:
-            return render_template("update_project.html", error="Project not found")
-
-        data = {
-            "projects": [project.description],
-            "business_novelty": [project.returned_x_value],
-            "customer_novelty": [project.returned_y_value],
-            "impact": [project.impact],
-            "type": [project.type],
-        }
-
-        script, div = create_scatter_plot(data)
-
-        return render_template(
-            "update_project.html", project=project, script=script, div=div
-        )

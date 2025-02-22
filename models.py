@@ -1,3 +1,5 @@
+from datetime import datetime, timezone
+
 from flask_sqlalchemy import SQLAlchemy
 
 db = SQLAlchemy()
@@ -21,27 +23,26 @@ class User(db.Model):
 
 class Project(db.Model):
     __tablename__ = "projects"
-    id = db.Column(db.Integer, primary_key=True)
-    description = db.Column(db.String(255), nullable=False)
-    returned_x_value = db.Column(db.Float, nullable=False)
-    returned_y_value = db.Column(db.Float, nullable=False)
-    impact = db.Column(db.Float, nullable=False)
-    x_value_justification = db.Column(db.Text, nullable=False)
-    y_value_justification = db.Column(db.Text, nullable=False)
-    summary = db.Column(db.Text, nullable=True)
-    type = db.Column(
-        db.Enum("existing", "idea", name="project_type_enum"), nullable=False
+
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    x_value = db.Column(db.Numeric, nullable=False)
+    y_value = db.Column(db.Numeric, nullable=False)
+    impact = db.Column(db.Numeric, nullable=False)
+    name = db.Column(db.String(255), nullable=False)
+    thread_id = db.Column(db.String, nullable=False, unique=True)
+    timestamp = db.Column(
+        db.DateTime,
+        default=lambda: datetime.now(timezone.utc),
+        onupdate=lambda: datetime.now(timezone.utc),
     )
 
     def to_dict(self):
         return {
             "id": self.id,
-            "description": self.description,
-            "returned_x_value": self.returned_x_value,
-            "returned_y_value": self.returned_y_value,
+            "x_value": self.x_value,
+            "y_value": self.y_value,
             "impact": self.impact,
-            "x_value_justification": self.x_value_justification,
-            "y_value_justification": self.y_value_justification,
-            "type": self.type,
-            "impact": self.impact, 
+            "name": self.name,
+            "thread_id": self.thread_id,
+            "timestamp": self.timestamp.isoformat() if self.timestamp else None,
         }
