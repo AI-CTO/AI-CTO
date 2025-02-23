@@ -1,44 +1,36 @@
-```mermaid
 graph TD
-  subgraph Application
-    A[app.py]
-  end
-
-  subgraph Controller
-    B[routes.py]
-  end
-
   subgraph Model
-    C[models.py]
-    D[backend.py]:::redundant
-  end
-
-  subgraph Services
-    E[openai_service.py]
-  end
-
-  subgraph Utilities
-    F[db_utils.py]
-    G[bokeh_visualization.py]
+    A[models.py]
+    B[db_utils.py]
   end
 
   subgraph View
-    H[Templates]
+    C[Templates]
+    D[static/styles.css]
+    E[static/tab_script.js]
+  end
+
+  subgraph Controller
+    F[routes.py]
+  end
+
+  subgraph Services
+    G[openai_service.py]
+    H[bokeh_visualization.py]
+  end
+
+  subgraph Utilities
+    I[test_api_assist.py]
   end
 
   %% Dependencies
-  A --> B
-  A --> F
-  A --> C
-
-  B --> C
-  B --> E
-  B --> G
-  B --> H
-
+  F --> A
+  F --> B
   F --> C
+  F --> G
+  F --> H
+
+  A --> B
 
   %% Highlight redundancy
-  C -.->|DUPLICATE MODELS| D
-  style D fill:#ffe5e5,stroke:#ff0000,stroke-width:2px,stroke-dasharray:5
-```
+  style I fill:#e0f7fa,stroke:#00bcd4,stroke-width:2px
