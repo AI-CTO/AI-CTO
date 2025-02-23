@@ -1,4 +1,4 @@
-### **Architecture description**
+# **Architecture description**
 
 #### Structure
 
