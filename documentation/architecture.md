@@ -1,6 +1,6 @@
 # **Architecture description**
 
-#### Structure
+## Structure
 
 The architecture of this application follows the Model-View-Controller (MVC) pattern with additional service and utility layers. The **Model** represents the core business logic and data handling, with components such as `models.py` and `db_utils.py` to manage data interactions. The **View** layer includes the HTML templates and static assets like CSS and JavaScript to render the UI. The **Controller** manages application routes, defined in `routes.py`, that connect user input to the appropriate business logic. 
 
@@ -50,7 +50,7 @@ graph TD
 
 
 ```
-#### User Interface
+## User Interface
 
 The application provides several user interface views, each serving a distinct purpose in the system. The UI is composed of five main templates:
 
@@ -64,5 +64,21 @@ The application provides several user interface views, each serving a distinct p
 
 Each template is designed to allow seamless user interactions, with navigation elements provided via `layout.html` and content-specific functionality managed through the other templates. The user interface is clean and modular, ensuring an efficient and user-friendly experience across all pages.
 
+## **Logic**
+
+The logic of the application is primarily handled by various route handlers defined in `routes.py`, which interact with both the database and external services like OpenAI to process and manage project data. 
+
+### Key Logic Examples:
+
+1. **chat_project()** (`/process_project` route):
+   - This function is responsible for processing a new project by generating a thread with OpenAI, sending the project description to be evaluated, and then retrieving the assistant’s response. It handles both creating new projects and updating existing ones by utilizing methods like `create_thread()` and `messages.create()`. 
+
+2. **evaluate_project()** (`/evaluate_project` route):
+   - This method evaluates a project using OpenAI’s evaluation service. Once the evaluation is complete, it updates the project’s properties like `x_value`, `y_value`, and `impact` in the database. It makes use of the `evaluate()` function in the `IdeaGenerator` class.
+
+3. **update_project()** (`/update_project` route):
+   - Handles both displaying and updating project details. The `GET` method retrieves project data, while the `POST` method allows modification of project descriptions and other attributes.
+
+These examples illustrate how the application handles various project-related operations, such as processing user input, interacting with OpenAI for AI-based evaluations, and updating the database using SQLAlchemy ORM.
 
 
