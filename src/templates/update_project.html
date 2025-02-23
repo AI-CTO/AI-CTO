@@ -1,0 +1,171 @@
+{% extends "layout.html" %} {% block title %}Update Project{% endblock %} {%
+block content %}
+<header>
+  <h1>Update Project</h1>
+</header>
+
+{% if error %}
+<p style="color: red">{{ error }}</p>
+{% else %}
+<div style="display: flex; gap: 20px">
+  <!-- Left: Project Details & Evaluate Form -->
+  <div style="flex: 1">
+    <h2>Current Details</h2>
+    <p><strong>Name:</strong> {{ project.name }}</p>
+    <p><strong>Business Novelty:</strong> {{ project.x_value }}</p>
+    <p><strong>Customer Novelty:</strong> {{ project.y_value }}</p>
+    <p><strong>Impact:</strong> {{ project.impact }}</p>
+
+    <h3>Resume Conversation</h3>
+    <form
+      id="resume-conversation-form"
+      onsubmit="event.preventDefault(); resumeConversation();"
+    >
+      <button type="submit" id="resume-btn">Resume Conversation</button>
+      <p id="conversation-status" style="color: green; display: none">
+        Conversation resumed successfully!
+      </p>
+    </form>
+
+    <div id="chat-container" style="display: none; margin-top: 20px">
+      <h2>Conversation</h2>
+      <div
+        id="chat-box"
+        style="
+          border: 1px solid #ddd;
+          padding: 10px;
+          height: 300px;
+          overflow-y: auto;
+        "
+      >
+        <p>
+          <strong>Assistant:</strong> Let's start! Describe your project idea.
+        </p>
+      </div>
+      <form
+        id="chat-form"
+        style="margin-top: 10px"
+        onsubmit="event.preventDefault(); sendMessage();"
+      >
+        <input
+          type="text"
+          id="user-input"
+          placeholder="Type your message..."
+          required
+          style="width: 80%; padding: 5px"
+        />
+        <button type="submit" class="button">Send</button>
+      </form>
+      <button
+        id="evaluate-btn"
+        class="button"
+        style="margin-top: 10px; display: none"
+        onclick="evaluateProject()"
+      >
+        Evaluate Project
+      </button>
+      <p id="evaluate-status" style="color: green; display: none">
+        Project evaluated successfully!
+      </p>
+    </div>
+  </div>
+</div>
+
+<script>
+  let threadId = null;
+  const projectId = "{{ project.id }}";
+
+  function resumeConversation() {
+    const resumeButton = document.getElementById("resume-btn");
+    resumeButton.disabled = true;
+    resumeButton.textContent = "Resuming...";
+
+    fetch("/resume_project", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id: projectId }),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.error) {
+          alert(data.error);
+        } else {
+          threadId = data.thread_id;
+          document.getElementById("conversation-status").style.display =
+            "block";
+          document.getElementById("evaluate-btn").style.display = "block";
+          document.getElementById("chat-container").style.display = "block";
+        }
+      })
+      .catch((error) => {
+        console.error("Error resuming conversation:", error);
+        alert("Error resuming conversation. Please try again.");
+      })
+      .finally(() => {
+        resumeButton.disabled = false;
+        resumeButton.textContent = "Resume Conversation";
+      });
+  }
+
+  function sendMessage() {
+    const userMessage = document.getElementById("user-input").value;
+    if (!userMessage.trim()) return;
+
+    const chatBox = document.getElementById("chat-box");
+    chatBox.innerHTML += `<p><strong>You:</strong> ${userMessage}</p>`;
+
+    document.getElementById("user-input").value = ""; 
+
+    fetch("/process_project", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        description: userMessage,
+        id: projectId,
+      }),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.error) {
+          alert(data.error);
+        } else {
+          chatBox.innerHTML += `<p><strong>Assistant:</strong> ${data.assistant_response}</p>`;
+          chatBox.scrollTop = chatBox.scrollHeight;
+        }
+      })
+      .catch((error) => {
+        console.error("Error sending message:", error);
+        alert("Error sending message. Please try again.");
+      });
+  }
+
+  // Evaluate the project
+  function evaluateProject() {
+    const evaluateButton = document.getElementById("evaluate-btn");
+    evaluateButton.disabled = true;
+    evaluateButton.textContent = "Evaluating...";
+
+    fetch("/evaluate_project", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ thread_id: threadId }),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.error) {
+          alert(data.error);
+        } else {
+          document.getElementById("evaluate-status").style.display = "block";
+        }
+      })
+      .catch((error) => {
+        console.error("Error evaluating project:", error);
+        alert("Error evaluating project. Please try again.");
+      })
+      .finally(() => {
+        evaluateButton.disabled = false;
+        evaluateButton.textContent = "Evaluate Project";
+      });
+  }
+</script>
+{% endif %} {% endblock %}

@@ -1,0 +1,32 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quote of the Day</title>
+    <script>
+        window.onload = function() {
+            fetch('/quote/data')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.quote) {
+                        document.getElementById("quote").textContent = data.quote;
+                    } else {
+                        document.getElementById("quote").textContent = "Error fetching quote: " + data.error;
+                    }
+                })
+                .catch(error => {
+                    document.getElementById("quote").textContent = "Error: " + error;
+                });
+        };
+    </script>
+</head>
+<body>
+    <div style="text-align: center; padding: 20px;">
+        <h1>Quote of the Day</h1>
+        <p id="quote" style="margin-top: 20px; font-size: 18px; font-style: italic;"></p>
+        <p><a href="/">Back to Home</a></p>
+    </div>
+</body>
+</html>
