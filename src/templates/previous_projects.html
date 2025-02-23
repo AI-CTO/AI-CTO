@@ -20,11 +20,14 @@
 
           projectDiv.innerHTML = `
             <h3>${project.name}</h3>
+            <h3>${project.timestamp}</h3>
             <p><strong>Customer Novelty (x_value):</strong> ${project.x_value}</p>
             <p><strong>Business Novelty (y_value):</strong> ${project.y_value}</p>
             <p><strong>Impact:</strong> ${project.impact}</p>
             <button onclick="window.location.href='/update_project?id=${project.id}'">Edit</button>
-          `;
+            <button onclick="window.location.href='/delete_project?id=${project.id}'">Delete</button>
+          `
+          ;
 
           container.appendChild(projectDiv);
         });
