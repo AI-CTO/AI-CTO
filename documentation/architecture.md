@@ -47,3 +47,22 @@ graph TD
 
   %% Highlight redundancy
   style I fill:#e0f7fa,stroke:#00bcd4,stroke-width:2px
+
+
+```
+#### User Interface
+
+The application provides several user interface views, each serving a distinct purpose in the system. The UI is composed of five main templates:
+
+1. **index.html** – The main landing page of the application. This template contains a text input field, allowing the user to type, submit, and fine-tune a business idea. 
+   
+2. **previous_projects.html** – A page that displays a list of previous projects. It includes an option to edit individual projects.
+
+3. **update_project.html** – A form or interface for updating existing project information. This template allows users to modify details about a project to iteratively enhance assessment scores.
+
+4. **visualization.html** – A page dedicated to visualizing projects on scatter plots. 
+
+Each template is designed to allow seamless user interactions, with navigation elements provided via `layout.html` and content-specific functionality managed through the other templates. The user interface is clean and modular, ensuring an efficient and user-friendly experience across all pages.
+
+
+
