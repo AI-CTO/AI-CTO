@@ -5,8 +5,8 @@ from bokeh.models import ColumnDataSource
 
 def create_scatter_plot(data):
     projects = data["projects"]
-    x_values = data["x_value"]  
-    y_values = data["y_value"]  
+    x_values = data["business_novelty"]  
+    y_values = data["customer_novelty"]  
     categories = data.get("categories", ["Existing"] * len(projects))  
 
     source = ColumnDataSource(data={

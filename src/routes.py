@@ -146,13 +146,22 @@ def setup_routes(app):
         if request.method == "GET":
             project_id = request.args.get("id", type=int)
             if not project_id:
-                return jsonify({"error": "Project ID is required"}), 400
+                return render_template("update_project.html", error="Project ID is required")
 
             project = Project.query.get(project_id)
             if not project:
                 return jsonify({"error": "Project not found"}), 404
+            
+            data = {
+                "projects": [project.name],
+                "business_novelty": [float(project.x_value)],
+                "customer_novelty": [float(project.y_value)],
+                "impact": [float(project.impact)],
+            }
 
-            return render_template("update_project.html", project=project)
+            script, div = create_scatter_plot(data)
+
+            return render_template("update_project.html", project=project, script=script, div=div)
 
         elif request.method == "POST":
             project_id = request.args.get("id", type=int)
@@ -209,7 +218,8 @@ def setup_routes(app):
 
         return jsonify({
             "thread_id": thread_id,
-            **result
+            "message": result["message"],
+            #**result
         }), 200
 
 
@@ -283,10 +293,10 @@ def setup_routes(app):
         try:
             projects = Project.query.all()
 
-            project_names = [project.description for project in projects]
-            business_novelty = [project.returned_x_value for project in projects]
-            customer_novelty = [project.returned_y_value for project in projects]
-            impact = [project.impact for project in projects]
+            project_names = [project.name for project in projects]
+            business_novelty = [float(project.x_value) for project in projects]
+            customer_novelty = [float(project.y_value) for project in projects]
+            impact = [float(project.impact) for project in projects]
 
             data = {
                 "projects": project_names,
