@@ -5,8 +5,7 @@ from openai import OpenAI
 
 from services.bokeh_visualization import create_scatter_plot
 from models.models import Project, User, db
-from services.openai_service import get_openai_completion
-from services.test_api_assist import IdeaGenerator
+from services.api_assist import IdeaGenerator
 
 
 def setup_routes(app):
@@ -74,7 +73,7 @@ def setup_routes(app):
 
             assistant_response = assistant_response.strip() if assistant_response else "No response from the assistant."
 
-            print("📝 Assistant Response:", assistant_response)
+            #print("📝 Assistant Response:", assistant_response)
          
             return jsonify(
                 {
