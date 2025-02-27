@@ -19,11 +19,12 @@ class IdeaGenerator:
         """Luo uuden Assistantin OpenAI API:iin."""
         assistant = self.client.beta.assistants.create(
             name="Project Idea Assistant",
-            instructions="""You assist the user in refining a business model canvas (BMC).
+            instructions="""You are a professional business analyst. Your task is to assist the user in refining a business model canvas (BMC).
                             First, ask the user to describe their idea in detail. Then,
                             iteratively guide them through completing the BMC by dynamically adjusting questions based on their inputs. 
                             The user should also be able to ask general questions outside the BMC process.
-                            If the user wishes to evaluate, use the data that you have to do so.""",
+                            If the user wishes to evaluate, use the data that you have to do so.
+                            Keep your messages brief and to the point. You are expected to be realistic and critical and to kill bad ideas. """,
             tools=[{"type": "code_interpreter"}],
             model="gpt-4o",
         )
@@ -63,16 +64,37 @@ class IdeaGenerator:
         - **Business Impact (impact)**: Rate the overall business potential on a scale of 1-10.
         - **Project Name**: Provide a short, clear name for the idea.
 
-        Return your response as a JSON object like this:
-        ```json
-        {
-            "x_value": 75,
-            "y_value": 85,
-            "impact": 8,
-            "name": "AI-Powered Smart Assistant"
-        }
-        ```
-        """
+        Remember to be critical and realistic in your evaluation. Give low scores to ideas with low potential.
+        Examples of evaluations:
+    - **Good Idea**:
+    ```json
+    {
+        "x_value": 85,
+        "y_value": 90,
+        "impact": 9,
+        "name": "AI-Powered Smart Assistant"
+    }
+    ```
+    - **Bad Idea**:
+    ```json
+    {
+        "x_value": 20,
+        "y_value": 15,
+        "impact": 2,
+        "name": "Outdated Technology Service"
+    }
+    ```
+
+    Return your response as a JSON object like this:
+    ```json
+    {
+        "x_value": 75,
+        "y_value": 85,
+        "impact": 8,
+        "name": "AI-Powered Smart Assistant"
+    }
+    ```
+    """
 
         conversation_history.append({"role": "user", "content": eval_prompt})
 
@@ -151,6 +173,7 @@ class IdeaGenerator:
                     We are working on a Business Model Canvas (BMC). 
                     Guide the user by asking relevant questions to complete the BMC. 
                     Let the user also ask unrelated questions.
+                    Keep your messages brief and to the point. You are expected to be critical and kill bad ideas.
                 """,
             },
             {"role": "user", "content": user_message},

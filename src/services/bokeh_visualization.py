@@ -1,7 +1,7 @@
 from bokeh.palettes import Set2
 from bokeh.plotting import figure
 from bokeh.embed import components
-from bokeh.models import ColumnDataSource, Range1d
+from bokeh.models import ColumnDataSource, Range1d, Label, Span
 
 def create_scatter_plot(data):
     projects = data["projects"]
@@ -19,7 +19,7 @@ def create_scatter_plot(data):
     })
 
     p = figure(
-        height=420, width=420,
+        height=620, width=620,
         title="Project Portfolio Visualization",
         toolbar_location=None,
         match_aspect=True,
@@ -41,6 +41,22 @@ def create_scatter_plot(data):
             x="x_value", y="y_value", size="impact",  
             color=color, alpha=0.7, source=filtered_source, legend_label=category
         )
+
+        # Add horizontal and vertical spans to divide the grid
+    hline = Span(location=50, dimension='width', line_color='gray', line_width=1)
+    vline = Span(location=50, dimension='height', line_color='gray', line_width=1)
+    p.add_layout(hline)
+    p.add_layout(vline)
+
+    # Add labels to each section
+    labels = [
+        Label(x=25, y=25, text='Refactoring', text_align='center', text_color='gray', text_alpha=0.5),
+        Label(x=25, y=75, text='Transformation', text_align='center', text_color='gray', text_alpha=0.5),
+        Label(x=75, y=25, text='Disruption', text_align='center', text_color='gray', text_alpha=0.5),
+        Label(x=75, y=75, text='Revolution', text_align='center', text_color='gray', text_alpha=0.5)
+    ]
+    for label in labels:
+        p.add_layout(label)
 
     p.background_fill_color = None
     p.border_fill_color = None

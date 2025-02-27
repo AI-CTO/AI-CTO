@@ -3,7 +3,7 @@ import json
 from openai import OpenAI
 
 client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
-with open("prompt.txt", "r") as file:
+with open("src/prompt.txt", "r") as file:
     instruction_prompt = file.read().strip()
 
 
