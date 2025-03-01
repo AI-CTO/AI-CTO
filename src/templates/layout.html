@@ -15,14 +15,18 @@
     <script src="{{ url_for('static', filename='tab_script.js') }}"></script>
 
     <header>
-      <h1>AI-CTO: Project Portfolio Visualization Tool</h1>
+      <!-- Logo Image -->
+      <img src="{{ url_for('static', filename='logo_transparent2.png') }}" alt="Logo" class="logo">
+
+      <!-- Header Text and Navigation -->
+
       <nav>
         <ul class="tabs">
           <li><a href="{{ url_for('index') }}" class="tab-link" data-tab="home">Home</a></li>
           <li><a href="{{ url_for('visualize') }}" class="tab-link" data-tab="visualize">Visualization</a></li>
           <li><a href="{{ url_for('previous_projects') }}" class="tab-link" data-tab="previous-projects">Previous Projects</a></li>
           <li><a href="{{ url_for('update_project') }}" class="tab-link" data-tab="update-project">Update Project</a></li>
-      </ul>
+        </ul>
       </nav>
     </header>
 

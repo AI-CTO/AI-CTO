@@ -9,22 +9,43 @@ body {
     overflow-x: hidden;
 }
 
+
+
 header {
-    background: #ffffff;
+    background: #8E8787;
     color: #333;
-    padding: 0.1rem 0;
-    text-align: center;
+    padding: 0.1rem 20px;
     border-bottom: 1px solid #e0e0e0;
     position: sticky;
     top: 0;
     z-index: 1000;
     box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.05);
+    display: flex;
+    align-items: center; /* Vertically center the items */
+    justify-content: flex-start; /* Align logo and nav at the start */
+    width: 100%; /* Ensures the header takes up the full width */
 }
 
+header .logo {
+    width: 150px; /* Adjust logo size */
+    height: auto;
+    margin-right: 20px; /* Space between logo and nav */
+}
+
+nav {
+    display: flex;
+    justify-content: center; /* Center the tabs horizontally */
+    flex-grow: 1; /* Ensures navigation takes available space */
+    margin-right: 200px; /* Manually control the left space between logo and nav */
+}
+
+
+
 header h1 {
-    font-size: 2.5rem;
+    font-size: 1.2rem;
     font-weight: 600;
     margin: 0;
+    padding-left: 20px;
 }
 
 main {
@@ -48,7 +69,7 @@ footer {
     display: flex;
     justify-content: space-evenly;
     padding: 0;
-    margin: 2rem 0;
+    margin: 0; /* Remove margin from the list */
     background: #f0f0f0;
     border-radius: 8px;
     overflow: hidden;
@@ -133,3 +154,5 @@ button:active {
     background-color: #004f76;
     transform: translateY(0);
 }
+
+
