@@ -7,10 +7,14 @@ import os
 
 load_dotenv()
 
-def create_app():
+def create_app(test_config=None):
     app = Flask(__name__)
     database_url = os.environ.get("SQLALCHEMY_DATABASE_URI", "sqlite:///default.db")
-    app.config["SQLALCHEMY_DATABASE_URI"] = database_url
+    if test_config:
+        app.config.update(test_config)
+    else:
+        database_url = os.environ.get("SQLALCHEMY_DATABASE_URI", "sqlite:///default.db")
+        app.config["SQLALCHEMY_DATABASE_URI"] = database_url
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
     init_db(app) 
