@@ -20,6 +20,7 @@ echo "✅ Sovellus käynnissä!"
 
 echo "Ajetaan Robot Framework -testit..."
 poetry run robot tests/
+pytest tests/
 
 echo "Pysäytetään sovellus..."
 kill $APP_PID || echo "⚠️ Prosessi $APP_PID ei ollut käynnissä."
