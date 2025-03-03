@@ -6,6 +6,7 @@ from openai import OpenAI
 from services.bokeh_visualization import create_scatter_plot
 from models.models import Project, User, db
 from services.api_assist import IdeaGenerator
+from services.openai_service import extract_text_from_pdf
 
 
 def setup_routes(app):
@@ -73,7 +74,7 @@ def setup_routes(app):
 
             assistant_response = assistant_response.strip() if assistant_response else "No response from the assistant."
 
-            #print("📝 Assistant Response:", assistant_response)
+            print("📝 Assistant Response:", assistant_response)
          
             return jsonify(
                 {
@@ -317,6 +318,62 @@ def setup_routes(app):
                 ),
                 500,
             )
+        
+    @app.route("/upload_pdf", methods=["POST"])
+    def upload_pdf():
+        try:
+            if "pdf" not in request.files:
+                return jsonify({"error": "No PDF file provided"}), 400
+
+            pdf_file = request.files["pdf"]
+            extracted_text = extract_text_from_pdf(pdf_file)
+
+            if not extracted_text:
+                return jsonify({"error": "Failed to extract text from PDF"}), 500
+
+            thread_id = request.form.get("thread_id")
+
+            client = OpenAI()
+            generator = IdeaGenerator(client)
+
+            if thread_id:
+                client.beta.threads.messages.create(
+                    thread_id=thread_id,
+                    role="user",
+                    content=extracted_text
+                )
+                result = generator.resume_conversation()
+            else:
+                thread_id = generator.create_thread()
+                client.beta.threads.messages.create(
+                    thread_id=thread_id,
+                    role="user",
+                    content=extracted_text
+                )
+                result = generator.resume_conversation()
+
+                project = Project(
+                    name="Pending Evaluation",
+                    x_value=0,
+                    y_value=0,
+                    impact=0,
+                    thread_id=thread_id
+                )
+                db.session.add(project)
+                db.session.commit()
+
+
+            if "error" in result:
+                return jsonify({"error": result["error"]}), 400
+
+            return jsonify({
+                "thread_id": thread_id,
+                "message": result["message"]
+            }), 200
+
+        except Exception as e:
+            return jsonify({"error": "Failed to process file", "details": str(e)}), 500
+
 
     @app.route("/previous_projects")
     def previous_projects():

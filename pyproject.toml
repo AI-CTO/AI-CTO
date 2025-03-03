@@ -18,6 +18,7 @@ bokeh = "^3.6.2"
 robotframework = "^7.2"
 robotframework-seleniumlibrary = "^6.7.0"
 webdrivermanager = "^0.10.0"
+pymupdf = "^1.25.3"
 
 
 [tool.poetry.group.dev.dependencies]
