@@ -15,6 +15,7 @@ def create_app(test_config=None):
         key_func=get_remote_address,
         app=app, 
         default_limits=["50 per hour"],
+        storage_uri='memory://', 
     )
 
     database_url = os.environ.get("SQLALCHEMY_DATABASE_URI", "sqlite:///default.db")
