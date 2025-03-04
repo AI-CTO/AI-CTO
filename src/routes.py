@@ -1,31 +1,49 @@
 import time
 
 from flask import jsonify, render_template, request
+from flask_limiter import Limiter
 from openai import OpenAI
 
-from services.bokeh_visualization import create_scatter_plot
 from models.models import Project, User, db
 from services.api_assist import IdeaGenerator
+from services.bokeh_visualization import create_scatter_plot
 from services.openai_service import extract_text_from_pdf
 
 
-def setup_routes(app):
+def setup_routes(app, limiter):
+    MAX_DESCRIPTION_LENGTH = 700
+
     @app.route("/")
     def index():
         return render_template("index.html")
 
+    @app.route("/slow", methods=["GET"])
+    @limiter.limit("4/hour")
+    def slow():
+        return jsonify({"Result": "This works once an hour"})
+
     @app.route("/process_project", methods=["POST"])
+    @limiter.limit("15/hour")
     def chat_project():
         try:
             client = OpenAI()
             generator = IdeaGenerator(client)
 
-            user_input = request.json.get("description")
-            project_id = request.json.get("id")
+            user_input = str(request.json.get("description", ""))
+            project_id = str(request.json.get("id", ""))
 
             if not user_input:
                 return jsonify({"error": "Description is required"}), 400
 
+            if len(user_input) > MAX_DESCRIPTION_LENGTH:
+                return (
+                    jsonify(
+                        {
+                            "error": f"Description must be less than {MAX_DESCRIPTION_LENGTH} characters."
+                        }
+                    ),
+                    400,
+                )
 
             if project_id:
                 project = Project.query.get(project_id)
@@ -72,7 +90,11 @@ def setup_routes(app):
                             assistant_response += block.text.value + " "
                     break
 
-            assistant_response = assistant_response.strip() if assistant_response else "No response from the assistant."
+            assistant_response = (
+                assistant_response.strip()
+                if assistant_response
+                else "No response from the assistant."
+            )
 
             print("📝 Assistant Response:", assistant_response)
          
@@ -86,14 +108,18 @@ def setup_routes(app):
 
         except Exception as e:
             print(str(e))
-            return jsonify(
-                {
-                    "error": "An error occurred while processing the project.",
-                    "details": str(e),
-                }
-            ), 500
+            return (
+                jsonify(
+                    {
+                        "error": "An error occurred while processing the project.",
+                        "details": str(e),
+                    }
+                ),
+                500,
+            )
 
     @app.route("/evaluate_project", methods=["POST"])
+    @limiter.limit("10/hour")
     def evaluate_project():
         try:
             client = OpenAI()
@@ -142,16 +168,19 @@ def setup_routes(app):
             return jsonify({"error": str(e)}), 500
 
     @app.route("/update_project", methods=["GET", "POST"])
+    @limiter.limit("10/hour")
     def update_project():
         if request.method == "GET":
             project_id = request.args.get("id", type=int)
             if not project_id:
-                return render_template("update_project.html", error="Project ID is required")
+                return render_template(
+                    "update_project.html", error="Project ID is required"
+                )
 
             project = Project.query.get(project_id)
             if not project:
                 return jsonify({"error": "Project not found"}), 404
-            
+
             data = {
                 "projects": [project.name],
                 "business_novelty": [float(project.x_value)],
@@ -161,7 +190,9 @@ def setup_routes(app):
 
             script, div = create_scatter_plot(data)
 
-            return render_template("update_project.html", project=project, script=script, div=div)
+            return render_template(
+                "update_project.html", project=project, script=script, div=div
+            )
 
         elif request.method == "POST":
             project_id = request.args.get("id", type=int)
@@ -176,18 +207,18 @@ def setup_routes(app):
             new_description = data.get("description")
 
             if new_description:
-                project.name = new_description 
+                project.name = new_description
                 db.session.commit()
 
             return jsonify({"message": "Project updated successfully"}), 200
 
-    
     @app.route("/resume_project", methods=["POST"])
+    @limiter.limit("10/hour")
     def resume_project():
-        data = request.get_json() 
+        data = request.get_json()
         project_id = data.get("id")
 
-        print("Received request data:", data) 
+        print("Received request data:", data)
 
         if not project_id:
             return jsonify({"error": "Project ID is required"}), 400
@@ -216,13 +247,16 @@ def setup_routes(app):
         if "error" in result:
             return jsonify({"error": result["error"]}), 400
 
-        return jsonify({
-            "thread_id": thread_id,
-            "message": result["message"],
-            #**result
-        }), 200
-
-
+        return (
+            jsonify(
+                {
+                    "thread_id": thread_id,
+                    "message": result["message"],
+                    # **result
+                }
+            ),
+            200,
+        )
 
     @app.route("/add_user", methods=["POST"])
     def add_user():
