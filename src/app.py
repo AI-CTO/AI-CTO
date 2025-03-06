@@ -5,6 +5,7 @@ from dotenv import load_dotenv
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 import os
+from models.models import db
 
 load_dotenv()
 
@@ -25,9 +26,10 @@ def create_app(test_config=None):
         app.config["SQLALCHEMY_DATABASE_URI"] = database_url
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
-    init_db(app)
+    db.init_app(app)  # Initialize SQLAlchemy instance
+    init_db(app)  # Create tables
 
-    setup_routes(app, limiter)
+    setup_routes(app, limiter)  # Register routes
 
     return app
 
