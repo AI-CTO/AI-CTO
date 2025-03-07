@@ -134,7 +134,7 @@ jobs:
     - name: Determine image tags
       if: env.IMAGE_TAGS == ''
       run: |
-        echo "IMAGE_TAGS=latest ${GITHUB_SHA::12}" | tee -a $GITHUB_ENV
+        echo "IMAGE_TAGS=latest_auto ${GITHUB_SHA::12}" | tee -a $GITHUB_ENV
 
     # https://github.com/redhat-actions/buildah-build#readme
     - name: Build from Dockerfile
