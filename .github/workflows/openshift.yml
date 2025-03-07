@@ -156,7 +156,7 @@ jobs:
       id: push-image
       uses: redhat-actions/push-to-registry@v2
       with:
-        image: ${{ env.IMAGE_REGISTRY }}/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}
+        image: ${{ env.IMAGE_NAME }}
         tags: latest
         registry: ghcr.io
         username: ${{ github.actor }}
