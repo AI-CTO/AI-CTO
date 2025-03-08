@@ -35,6 +35,8 @@ env:
   # 🖊️ EDIT to set the kube context's namespace after login. Leave blank to use your user's default namespace.
   OPENSHIFT_NAMESPACE: ai-cto
 
+  OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+
   # 🖊️ EDIT to set a name for your OpenShift app, or a default one will be generated below.
   APP_NAME: ai-cto
 
