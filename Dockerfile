@@ -17,6 +17,7 @@ EXPOSE 5000
 
 # Define environment variable (edited)
 ENV FLASK_APP=app.py
+ENV OPENAI_API_KEY=${OPENAI_API_KEY}
 
 # Run app.py when the container launches
 CMD ["flask", "run", "--host=0.0.0.0"]
