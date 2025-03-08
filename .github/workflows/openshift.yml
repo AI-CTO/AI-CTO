@@ -126,11 +126,12 @@ jobs:
 
     - name: Check out repository
       uses: actions/checkout@v4
-
+      
     - name: Determine app name
       if: env.APP_NAME == ''
       run: |
-        echo "APP_NAME=$(basename $PWD)" | tee -a $GITHUB_ENV
+        echo "APP_NAME=$(basename $PWD | tr '[:upper:]' '[:lower:]')" | tee -a $GITHUB_ENV
+
 
     - name: Determine image tags
       if: env.IMAGE_TAGS == ''
