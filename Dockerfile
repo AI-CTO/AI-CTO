@@ -16,7 +16,7 @@ RUN poetry install --no-root
 EXPOSE 5000
 
 # Define environment variable (edited)
-ENV FLASK_APP=src/app.py
+ENV FLASK_APP=app.py # change to src/app.py when the branch gets refactored
 
 # Run app.py when the container launches
 CMD ["flask", "run", "--host=0.0.0.0"]
