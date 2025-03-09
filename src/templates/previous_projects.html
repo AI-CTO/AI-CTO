@@ -1,6 +1,4 @@
-{% extends "layout.html" %} 
-{% block title %}My Previous Projects{% endblock %}
-
+{% extends "layout.html" %} {% block title %}My Previous Projects{% endblock %}
 {% block content %}
 <div id="projects-container">Loading projects...</div>
 
@@ -16,22 +14,48 @@
         const container = document.getElementById("projects-container");
         container.innerHTML = "";
 
-        data.projects.forEach((project) => {
-          const projectDiv = document.createElement("div");
-          projectDiv.classList.add("project");
+        const table = document.createElement("table");
+        table.border = "1";
+        table.style.width = "100%";
+        table.innerHTML = `
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Time</th>
+              <th>Customer Novelty (x_value)</th>
+              <th>Business Novelty (y_value)</th>
+              <th>Impact</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="projects-table-body"></tbody>
+        `;
 
-          projectDiv.innerHTML = `
-            <h3>${project.name}</h3>
-            <h3>${project.timestamp}</h3>
-            <p><strong>Customer Novelty (x_value):</strong> ${project.x_value}</p>
-            <p><strong>Business Novelty (y_value):</strong> ${project.y_value}</p>
-            <p><strong>Impact:</strong> ${project.impact}</p>
-            <button onclick="window.location.href='/update_project?id=${project.id}'">Edit</button>
-            <button onclick="deleteProject(${project.id})">Delete</button>
+        const tableBody = table.querySelector("#projects-table-body");
+
+        data.projects.forEach((project) => {
+          const row = document.createElement("tr");
+
+          row.innerHTML = `
+            <td class="project-title">${project.name}</td>
+            <td>${project.timestamp.substring(0, 10)}</td>
+            <td>${project.x_value}</td>
+            <td>${project.y_value}</td>
+            <td>${project.impact}</td>
+            <td>
+              <button class="edit-btn" onclick="window.location.href='/update_project?id=${
+                project.id
+              }'">Edit</button>
+              <button class="delete-btn" onclick="deleteProject(${
+                project.id
+              })" style="color: red;">Delete</button>
+            </td>
           `;
 
-          container.appendChild(projectDiv);
+          tableBody.appendChild(row);
         });
+
+        container.appendChild(table);
       })
       .catch((error) => {
         console.error("Error fetching projects:", error);
@@ -52,7 +76,7 @@
             throw new Error("Failed to delete project.");
           }
           alert("Project deleted successfully!");
-          window.location.reload(); // Reload the page to update the list of projects
+          window.location.reload();
         })
         .catch((error) => {
           console.error("Error deleting project:", error);

@@ -1,158 +1,202 @@
 /* Global Styles */
 body {
-    font-family: 'Inter', sans-serif;
-    margin: 0;
-    padding: 0;
-    line-height: 1.6;
-    background: #f9f9f9;
-    color: #333;
-    overflow-x: hidden;
+  font-family: "Inter", sans-serif;
+  margin: 0;
+  padding: 0;
+  line-height: 1.6;
+  background: #f9f9f9;
+  color: #333;
+  overflow-x: hidden;
 }
 
-
-
 header {
-    background: #8E8787;
-    color: #333;
-    padding: 0.1rem 20px;
-    border-bottom: 1px solid #e0e0e0;
-    position: sticky;
-    top: 0;
-    z-index: 1000;
-    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.05);
-    display: flex;
-    align-items: center; /* Vertically center the items */
-    justify-content: flex-start; /* Align logo and nav at the start */
-    width: 100%; /* Ensures the header takes up the full width */
+  background: #8e8787;
+  color: #333;
+  padding: 0.1rem 20px;
+  border-bottom: 1px solid #e0e0e0;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.05);
+  display: flex;
+  align-items: center; /* Vertically center the items */
+  justify-content: flex-start; /* Align logo and nav at the start */
+  width: 100%; /* Ensures the header takes up the full width */
 }
 
 header .logo {
-    width: 150px; /* Adjust logo size */
-    height: auto;
-    margin-right: 20px; /* Space between logo and nav */
+  width: 150px; /* Adjust logo size */
+  height: auto;
+  margin-right: 20px; /* Space between logo and nav */
 }
 
 nav {
-    display: flex;
-    justify-content: center; /* Center the tabs horizontally */
-    flex-grow: 1; /* Ensures navigation takes available space */
-    margin-right: 200px; /* Manually control the left space between logo and nav */
+  display: flex;
+  justify-content: center; /* Center the tabs horizontally */
+  flex-grow: 1; /* Ensures navigation takes available space */
+  margin-right: 200px; /* Manually control the left space between logo and nav */
 }
 
-
-
 header h1 {
-    font-size: 1.2rem;
-    font-weight: 600;
-    margin: 0;
-    padding-left: 20px;
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin: 0;
+  padding-left: 20px;
 }
 
 main {
-    padding: 4rem 2rem;
-    max-width: 800px;
-    margin: 0 auto;
-    text-align: center;
+  padding: 4rem 2rem;
+  max-width: 800px;
+  margin: 0 auto;
+  text-align: center;
 }
 
 footer {
-    background: #ffffff;
-    color: #666;
-    text-align: center;
-    padding: 1rem 0;
-    border-top: 1px solid #e0e0e0;
+  background: #ffffff;
+  color: #666;
+  text-align: center;
+  padding: 1rem 0;
+  border-top: 1px solid #e0e0e0;
 }
 
 /* Minimal tab navigation */
 .tabs {
-    list-style: none;
-    display: flex;
-    justify-content: space-evenly;
-    padding: 0;
-    margin: 0; /* Remove margin from the list */
-    background: #f0f0f0;
-    border-radius: 8px;
-    overflow: hidden;
+  list-style: none;
+  display: flex;
+  justify-content: space-evenly;
+  padding: 0;
+  margin: 0; /* Remove margin from the list */
+  background: #f0f0f0;
+  border-radius: 8px;
+  overflow: hidden;
 }
 
 .tabs .tab-link {
-    font-weight: 400;
-    padding: 12px 24px;
-    cursor: pointer;
-    color: #666;
-    background: transparent;
-    flex-grow: 1;
-    text-align: center;
-    transition: color 0.3s ease, background 0.3s ease;
+  font-weight: 400;
+  padding: 12px 24px;
+  cursor: pointer;
+  color: #666;
+  background: transparent;
+  flex-grow: 1;
+  text-align: center;
+  transition: color 0.3s ease, background 0.3s ease;
 }
 
 /* Hover effect for tabs */
 .tabs .tab-link:hover {
-    background: #e0e0e0;
-    color: #333;
+  background: #e0e0e0;
+  color: #333;
 }
 
 /* Style for active tab */
 .tabs .tab-link.active {
-    background: #cdcebf; /* Light blue background for active tab */
-    color: #515354; /* Darker blue color for active tab text */
-    font-weight: 600;
+  background: #cdcebf; /* Light blue background for active tab */
+  color: #515354; /* Darker blue color for active tab text */
+  font-weight: 600;
 }
 
 /* Tab content (if used) */
 .tab-content {
-    display: none;
-    padding: 20px;
-    background: #ffffff;
-    border-radius: 8px;
-    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.05);
-    margin-top: 20px;
+  display: none;
+  padding: 20px;
+  background: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.05);
+  margin-top: 20px;
 }
 
 .tab-content.active {
-    display: block;
+  display: block;
 }
 
 /* Clean input fields */
 input[type="text"] {
-    width: 100%;
-    padding: 12px 16px;
-    font-size: 1rem;
-    color: #333;
-    background: #ffffff;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    box-sizing: border-box;
-    transition: border-color 0.3s ease, box-shadow 0.3s ease;
-    margin-bottom: 20px;
+  width: 100%;
+  padding: 12px 16px;
+  font-size: 1rem;
+  color: #333;
+  background: #ffffff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  box-sizing: border-box;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  margin-bottom: 20px;
 }
 
 input[type="text"]:focus {
-    border-color: #0077b6;
-    outline: none;
-    box-shadow: 0 0 5px rgba(0, 119, 182, 0.3);
+  border-color: #0077b6;
+  outline: none;
+  box-shadow: 0 0 5px rgba(0, 119, 182, 0.3);
 }
 
 /* Simple button styles */
 button {
-    background-color: #cdcebf;
-    color: white;
-    padding: 12px 24px;
-    border: none;
-    border-radius: 8px;
-    font-size: 1rem;
-    cursor: pointer;
-    transition: background-color 0.3s ease, transform 0.2s ease;
+  background-color: #cdcebf;
+  color: white;
+  padding: 12px 24px;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
 }
 
 button:hover {
-    background-color: #005f8e;
-    transform: translateY(-2px);
+  background-color: #005f8e;
+  transform: translateY(-2px);
 }
 
 button:active {
-    background-color: #004f76;
-    transform: translateY(0);
+  background-color: #004f76;
+  transform: translateY(0);
 }
 
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
 
+th,
+td {
+  border: 5px solid #ddd;
+  padding: 12px;
+  text-align: center;
+}
+
+th {
+  background-color: #c39b50;
+  color: white;
+}
+
+tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+tr:hover {
+  background-color: #f1f1f1;
+}
+
+.edit-btn,
+.delete-btn {
+  width: 100px; /* Set a fixed width */
+  text-align: center; /* Ensure text is centered */
+  padding: 8px; /* Adjust padding for better spacing */
+  border-radius: 4px;
+  border: none;
+  cursor: pointer;
+}
+
+.edit-btn {
+  background-color: #c39b50;
+  color: white;
+}
+
+.delete-btn {
+  color: red; /* Ensure text is visible */
+}
+
+.project-title {
+  font-weight: bold;
+  font-size: 16px;
+}
