@@ -1,18 +1,20 @@
 from bokeh.palettes import Set2
 from bokeh.plotting import figure
 from bokeh.embed import components
-from bokeh.models import ColumnDataSource
+from bokeh.models import ColumnDataSource, Range1d
 
 def create_scatter_plot(data):
     projects = data["projects"]
-    x_values = data["x_value"]  
-    y_values = data["y_value"]  
+    x_values = data["business_novelty"]  
+    y_values = data["customer_novelty"]
+    impact = [i * 5 for i in data["impact"]] # scales impact values to make the bubbles larger and easier to see  
     categories = data.get("categories", ["Existing"] * len(projects))  
 
     source = ColumnDataSource(data={
         'projects': projects,
         'x_value': x_values,
         'y_value': y_values,
+        'impact': impact,
         'categories': categories,
     })
 
@@ -22,7 +24,9 @@ def create_scatter_plot(data):
         toolbar_location=None,
         match_aspect=True,
         tools="hover",
-        tooltips="@projects: (X: @x_value, Y: @y_value)"
+        tooltips="@projects: (X: @x_value, Y: @y_value, Impact: @impact)",
+        x_range=Range1d(0, 100),  # Set x-axis range
+        y_range=Range1d(0, 100)   # Set y-axis range
     )
 
     colors = {"Existing": Set2[3][0], "Idea": Set2[3][1]}  
@@ -31,9 +35,10 @@ def create_scatter_plot(data):
         filtered_source = ColumnDataSource({
             k: [v[i] for i in range(len(projects)) if categories[i] == category] 
             for k, v in source.data.items()
+            
         })
         p.scatter(
-            x="x_value", y="y_value", size=10,  
+            x="x_value", y="y_value", size="impact",  
             color=color, alpha=0.7, source=filtered_source, legend_label=category
         )
 

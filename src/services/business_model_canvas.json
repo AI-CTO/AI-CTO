@@ -1,0 +1,281 @@
+[
+    {
+        "company": "Amazon",
+        "key_partners": [
+            "UPS",
+            "FedEx",
+            "DHL",
+            "Nike",
+            "Best Buy",
+            "Calvin Klein"
+        ],
+        "key_activities": [
+            "Quick fulfillment processes",
+            "Just-in-time delivery",
+            "R&D for fulfillment efficiency"
+        ],
+        "key_resources": [
+            "Shipping services",
+            "Warehouses",
+            "AWS servers"
+        ],
+        "value_propositions": {
+            "Ecommerce": "Fast online shopping and delivery",
+            "AWS": "Cloud infrastructure for businesses"
+        },
+        "customer_relationships": [
+            "Best-in-class fulfillment systems",
+            "Customer-first mindset",
+            "Online and phone communication"
+        ],
+        "channels": [
+            "Global distribution via shipping partners",
+            "Online marketing and advertising",
+            "Retail fulfillment"
+        ],
+        "customer_segments": {
+            "Business Clients": [
+                "Retailers on Amazon",
+                "Cloud service users",
+                "Advertisers"
+            ],
+            "Retail Clients": [
+                "Online shoppers",
+                "Amazon Prime subscribers"
+            ]
+        },
+        "cost_structure": [
+            "Fulfillment center investment",
+            "AWS maintenance",
+            "Product stocking costs"
+        ],
+        "revenue_streams": [
+            "Low-margin ecommerce sales",
+            "High-margin AWS services",
+            "Advertising and subscriptions"
+        ]
+    },
+    {
+        "company": "Google",
+        "key_partners": [
+            "OEMs",
+            "Platform partners"
+        ],
+        "key_activities": [
+            "Platform management",
+            "R&D"
+        ],
+        "key_resources": [
+            "Platform infrastructure"
+        ],
+        "value_propositions": {
+            "Search": "Free and fast search experience",
+            "Ads": "Effective advertising solutions"
+        },
+        "customer_relationships": [
+            "Personalized search experience",
+            "Ad targeting"
+        ],
+        "channels": [
+            "Online search engine",
+            "Ad networks"
+        ],
+        "customer_segments": {
+            "Search Users": [
+                "General public searching information"
+            ],
+            "Advertisers": [
+                "Businesses promoting products"
+            ],
+            "Content Owners": [
+                "Website owners using Google Ads"
+            ]
+        },
+        "cost_structure": [
+            "Platform maintenance",
+            "Content partnerships"
+        ],
+        "revenue_streams": [
+            "Search Ads",
+            "Display Ads"
+        ]
+    },
+    {
+        "company": "Skype",
+        "key_partners": [
+            "Payment providers",
+            "Telecom partners"
+        ],
+        "key_activities": [
+            "Software development"
+        ],
+        "key_resources": [
+            "Software developers",
+            "Platform infrastructure"
+        ],
+        "value_propositions": {
+            "Free Calls": "Internet-based free video calling",
+            "Low-Cost Calls": "Affordable international calling"
+        },
+        "customer_relationships": [
+            "Self-service platform"
+        ],
+        "channels": [
+            "Skype.com",
+            "Headset partnerships"
+        ],
+        "customer_segments": {
+            "Free Users": [
+                "People using Skype for free calls"
+            ],
+            "Paid Users": [
+                "Users making paid phone calls"
+            ]
+        },
+        "cost_structure": [
+            "Software development"
+        ],
+        "revenue_streams": [
+            "Free services",
+            "Prepaid calls",
+            "Hardware sales"
+        ]
+    },
+    {
+        "company": "Airbnb",
+        "key_partners": [
+            "Investors",
+            "Hosts",
+            "Insurance companies",
+            "Payment providers"
+        ],
+        "key_activities": [
+            "Maintain platform",
+            "Customer support",
+            "User research"
+        ],
+        "key_resources": [
+            "Community of hosts",
+            "Platform",
+            "Developers"
+        ],
+        "value_propositions": {
+            "Accommodation": "Affordable private homes",
+            "Booking": "Simple and competitive booking process"
+        },
+        "customer_relationships": [
+            "Self-service",
+            "Customer support"
+        ],
+        "channels": [
+            "Word of mouth",
+            "Social media",
+            "Travel bloggers"
+        ],
+        "customer_segments": {
+            "Budget Travelers": [
+                "Tourists looking for affordable options"
+            ],
+            "Hosts": [
+                "People renting their space"
+            ],
+            "Unconventional Travelers": [
+                "People seeking local experiences"
+            ]
+        },
+        "cost_structure": [
+            "Platform maintenance",
+            "Marketing"
+        ],
+        "revenue_streams": [
+            "Booking fees",
+            "Affiliate marketing"
+        ]
+    },
+    {
+        "company": "Uber",
+        "key_partners": [
+            "Drivers",
+            "Technology partners",
+            "Regulators"
+        ],
+        "key_activities": [
+            "Maintain platform",
+            "Data analytics",
+            "City expansion"
+        ],
+        "key_resources": [
+            "Driver network",
+            "App and data"
+        ],
+        "value_propositions": {
+            "Rides": "Fast, affordable rides",
+            "Drivers": "Flexible earning options"
+        },
+        "customer_relationships": [
+            "Self-service",
+            "Driver support"
+        ],
+        "channels": [
+            "App store",
+            "Social media",
+            "Word of mouth"
+        ],
+        "customer_segments": {
+            "Riders": [
+                "Commuters",
+                "Business travelers"
+            ],
+            "Drivers": [
+                "Full-time and part-time drivers"
+            ]
+        },
+        "cost_structure": [
+            "Marketing",
+            "Platform maintenance",
+            "Regulatory compliance"
+        ],
+        "revenue_streams": [
+            "Ride commissions",
+            "Service fees"
+        ]
+    },
+    {
+        "company": "Gillette",
+        "key_partners": [
+            "Manufacturers",
+            "Retailers"
+        ],
+        "key_activities": [
+            "Marketing",
+            "R&D",
+            "Logistics"
+        ],
+        "key_resources": [
+            "Brand",
+            "Patents"
+        ],
+        "value_propositions": {
+            "Bait": "Low-cost razor handle",
+            "Hook": "Recurring blade sales"
+        },
+        "customer_relationships": [
+            "Built-in lock-in strategy"
+        ],
+        "channels": [
+            "Retail stores"
+        ],
+        "customer_segments": [
+            "General consumers"
+        ],
+        "cost_structure": [
+            "Marketing",
+            "Manufacturing",
+            "R&D"
+        ],
+        "revenue_streams": [
+            "One-time handle sales",
+            "Frequent blade replacements"
+        ]
+    }
+]

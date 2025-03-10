@@ -2,6 +2,7 @@ __pycache__/
 .env
 instance/
 *.png
+!static/logo_transparent2.png 
 *.log
 venv
 Dockerfile

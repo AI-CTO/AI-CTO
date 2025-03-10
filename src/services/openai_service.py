@@ -1,5 +1,6 @@
 import os
 import json
+import fitz
 from openai import OpenAI
 
 client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
@@ -33,4 +34,23 @@ def get_openai_completion(description):
             raise ValueError("Response JSON does not contain all required fields.")
     except (json.JSONDecodeError, ValueError) as e:
         print(f"Invalid response format: {e}")
+        return None
+    
+def extract_text_from_pdf(pdf_file):
+    try:
+        pdf_bytes = pdf_file.read()
+        doc = fitz.open(stream=pdf_bytes, filetype="pdf")
+
+        extracted_text = ""
+        for page_num in range(doc.page_count):
+            page = doc.load_page(page_num)
+            text = page.get_text("text")
+            extracted_text += text + "\n"
+
+        if not extracted_text.strip():
+            return None
+
+        return extracted_text
+    except Exception as e:
+        print(f"Error extracting text from PDF: {e}")
         return None

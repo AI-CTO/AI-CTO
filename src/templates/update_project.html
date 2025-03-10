@@ -69,7 +69,17 @@ block content %}
       </p>
     </div>
   </div>
+
+<!-- Right: Project Visualization-->
+
+  <div style="flex: 1; text-align: center">
+    <h2>Project Visualization</h2>
+    <div style="display: flex; justify-content: center">
+      {{ script|safe }} {{ div|safe }}
+    </div>
+  </div>
 </div>
+
 
 <script>
   let threadId = null;
@@ -91,6 +101,12 @@ block content %}
           alert(data.error);
         } else {
           threadId = data.thread_id;
+
+          const chatBox = document.getElementById("chat-box");
+          chatBox.innerHTML += `<p><strong>Assistant:</strong> ${data.message}</p>`;
+          chatBox.scrollTop = chatBox.scrollHeight;
+        
+
           document.getElementById("conversation-status").style.display =
             "block";
           document.getElementById("evaluate-btn").style.display = "block";

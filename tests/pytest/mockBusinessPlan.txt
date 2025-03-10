@@ -1,0 +1,19 @@
+Business Idea: AI-powered Virtual Interior Designer
+
+Key Partners: Furniture retailers (IKEA, Wayfair, local stores), Interior designers, Augmented Reality (AR) software providers, Real estate agents.
+
+Key Activities: Develop AI for interior design suggestions, Integrate with AR for real-time visualization, Partner with furniture brands for direct purchases, Market the platform through social media and influencers.
+
+Value Propositions: AI-driven virtual room setup, Personalized furniture recommendations, Seamless AR integration to visualize changes in real-time, Easy purchase options through partner stores.
+
+Customer Relationships: Subscription-based premium features, Live chat and AI-powered customer support, User community for design sharing and inspiration.
+
+Customer Segments: Homeowners, Interior designers, Real estate agents, Furniture shoppers.
+
+Key Resources: AI-powered recommendation system, AR integration technology, Partnerships with furniture retailers, Cloud-based storage for user-generated designs.
+
+Channels: Mobile app (iOS & Android), Web-based platform, Social media marketing, Partnerships with home decor influencers.
+
+Cost Structure: AI model development and maintenance, Server and cloud storage costs, Marketing and advertising, Customer support team.
+
+Revenue Streams: Freemium model with premium subscription, Affiliate commission from furniture purchases, Advertisements from partner brands, Custom design consultations.

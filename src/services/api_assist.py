@@ -4,12 +4,10 @@ import uuid
 
 from openai import OpenAI
 
-
 class IdeaGenerator:
     def __init__(self, client: OpenAI):
         """
         Luokka uusien ideoiden generointiin ja hallintaan OpenAI Assistants API:n avulla.
-
         :param client: OpenAI API client
         """
         self.client = client
@@ -174,14 +172,3 @@ class IdeaGenerator:
             conversation.append({"role": "user", "content": user_input})
 
 
-if __name__ == "__main__":
-    client = OpenAI()
-    generator = IdeaGenerator(client)
-
-    start = input("Do you want assistance in a new idea? (Yes/No)")
-    if start.lower() == "no":
-        print("Shutting down...")
-    else:
-        generator.create_thread()
-        generator.start_chat()
-        print("\nFinalised Business Model Canvas saved.")
