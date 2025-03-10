@@ -19,7 +19,9 @@ def create_app(test_config=None):
         storage_uri='memory://', 
     )
 
-    database_url = os.environ.get("SQLALCHEMY_DATABASE_URI", "sqlite:///default.db")
+    database_path = os.path.join(os.path.dirname(__file__), 'instance/default.db')
+    database_url = os.environ.get("SQLALCHEMY_DATABASE_URI", f"sqlite:///{database_path}")
+    
     if test_config:
         app.config.update(test_config)
     else:
