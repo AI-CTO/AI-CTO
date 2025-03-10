@@ -19,7 +19,7 @@ RUN poetry install --no-root
 EXPOSE 5000
 
 # Define environment variable (edited)
-ENV FLASK_APP=app.py
+ENV FLASK_APP=src/app.py
 ENV OPENAI_API_KEY=${OPENAI_API_KEY}
 
 # Run app.py when the container launches
