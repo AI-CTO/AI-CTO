@@ -5,7 +5,7 @@ FROM python:3.10
 WORKDIR /app
 
 # Ensure instance folder exists with correct permissions
-RUN mkdir -p /app/instance && chmod 777 /app/src/instance
+RUN mkdir -p /app/src/instance && chmod 777 /app/src/instance
 
 # Copy the current directory contents into the container at /app
 COPY . /app
