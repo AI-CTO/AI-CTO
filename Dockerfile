@@ -10,9 +10,6 @@ RUN mkdir -p /app/instance && chmod 777 /app/instance
 # Copy the current directory contents into the container at /app
 COPY . /app
 
-# Copy the prompt.txt file into the container
-COPY prompt.txt /app/prompt.txt
-
 # Install any needed packages specified in requirements.txt
 RUN pip install --no-cache-dir poetry
 RUN poetry config virtualenvs.create false
