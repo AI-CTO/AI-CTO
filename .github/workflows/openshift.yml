@@ -192,6 +192,10 @@ jobs:
         namespace: ${{ env.OPENSHIFT_NAMESPACE }}
         port: ${{ env.APP_PORT }}
 
+    - name: Configure HTTPS route
+          run: |
+            oc patch route ${{ env.APP_NAME }} -p '{"spec":{"tls":{"termination":"edge"}}}'
+
     - name: Print application URL
       env:
         ROUTE: ${{ steps.deploy-and-expose.outputs.route }}
