@@ -4,7 +4,8 @@ import fitz
 from openai import OpenAI
 
 client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
-with open("prompt.txt", "r") as file:
+prompt_file_path = os.path.join(os.path.dirname(__file__), "../prompt.txt")
+with open(prompt_file_path, "r") as file:
     instruction_prompt = file.read().strip()
 
 

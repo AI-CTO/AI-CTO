@@ -5,4 +5,3 @@ instance/
 !static/logo_transparent2.png 
 *.log
 venv
-Dockerfile

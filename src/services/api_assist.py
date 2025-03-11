@@ -4,6 +4,7 @@ import uuid
 
 from openai import OpenAI
 
+
 class IdeaGenerator:
     def __init__(self, client: OpenAI):
         """
@@ -19,11 +20,64 @@ class IdeaGenerator:
         """Luo uuden Assistantin OpenAI API:iin."""
         assistant = self.client.beta.assistants.create(
             name="Project Idea Assistant",
-            instructions="""You assist the user in refining a business model canvas (BMC).
-                            First, ask the user to describe their idea in detail. Then,
-                            iteratively guide them through completing the BMC by dynamically adjusting questions based on their inputs. 
-                            The user should also be able to ask general questions outside the BMC process.
-                            If the user wishes to evaluate, use the data that you have to do so.""",
+            instructions="""  You assist the user in refining a business model canvas (BMC).
+                           First, ask the user to describe their idea in detail. Then,
+                           iteratively guide them through completing the BMC by dynamically adjusting questions based on their inputs.
+                           The user should also be able to ask general questions outside the BMC process.
+                           If the user wishes to evaluate, use the data that you have to do so.
+
+
+                           You will have two kinds of outputs for me. Imagine your answer to the user is in the variable "assistant_response"
+
+
+                           And now you have more instructions:
+
+
+                           You are an expert in Business Model Canvas (BMC) data extraction.
+                           You will be given unstructured business descriptions and extract relevant information into a structured BMC format.
+
+
+                           Your goal is to **fill in as many fields as possible** without overwriting existing values.
+
+
+                           ### **Instructions**
+                           1**Analyze the input text carefully.** 
+                           - Identify key components such as business goals, customers, revenue sources, partnerships, and technologies.
+                          
+                           2**Map the extracted information to the correct BMC fields.** 
+                           - Example mappings:
+                               - **Company Name** → If an organization is mentioned.
+                               - **Key Partners** → Any external companies or institutions involved.
+                               - **Key Activities** → Core operations mentioned in the text.
+                               - **Key Resources** → Technologies, infrastructure, or human resources.
+                               - **Value Propositions** → The benefits offered by the product/service.
+                               - **Customer Segments** → Who benefits from the product/service?
+                               - **Revenue Streams** → Monetization strategies.
+                               - **Cost Structure** → Main expenses.
+
+
+                           3**Preserve existing values** 
+                           - Do not overwrite previously filled fields unless explicitly stated.
+
+
+                          **Return ONLY a JSON object structured as follows, without extra text**:
+                           ```json
+                       {
+                          "company_name": null,
+                           "assistant_response": assistant_response,
+                           "key_partners": <extracted info here, null of not provided>,
+                           "key_activities": <extracted info here, null of not provided>,
+                           "key_resources": <extracted info here, null of not provided>,
+                           "value_propositions": <extracted info here, null of not provided>,
+                           "customer_relationships": <extracted info here, null of not provided>,
+                           "channels": <extracted info here, null of not provided>,
+                           "customer_segments": <extracted info here, null of not provided>,
+                           "cost_structure": <extracted info here, null of not provided>,
+                           "revenue_streams": <extracted info here, null of not provided>
+                       }
+                          
+                           ```
+""",
             tools=[{"type": "code_interpreter"}],
             model="gpt-4o",
         )
@@ -34,6 +88,27 @@ class IdeaGenerator:
         thread = self.client.beta.threads.create()
         self.thread_id = thread.id
         return self.thread_id
+    
+    def extract_json_from_response(self, response):
+        """
+        Extracts and parses JSON data from the assistant's response string.
+        
+        :param response: The string response from the assistant containing JSON data.
+        :return: A parsed dictionary containing the extracted JSON data.
+        """
+        try:
+            match = re.search(r"```json\s*([\s\S]+?)\s*```", response)
+            
+            if match:
+                json_data = match.group(1).strip()
+                parsed_data = json.loads(json_data) 
+                return parsed_data
+            else:
+                raise ValueError("No valid JSON found in response.")
+        
+        except json.JSONDecodeError as e:
+            raise ValueError(f"Error parsing JSON: {str(e)}")
+
 
     def evaluate(self):
         """Asks the AI to evaluate the project based on user discussions and updates the evaluation table."""
@@ -121,13 +196,19 @@ class IdeaGenerator:
 
         conversation_history = []
         for msg in messages.data:
-            if isinstance(msg.content, list) and len(msg.content) > 0 and "text" in msg.content[0]:
+            if (
+                isinstance(msg.content, list)
+                and len(msg.content) > 0
+                and "text" in msg.content[0]
+            ):
                 content_text = msg.content[0]["text"]
             else:
                 content_text = str(msg.content)
             conversation_history.append({"role": msg.role, "content": content_text})
 
-        conversation_history.append({"role": "user", "content": "Resume the project discussion."})
+        conversation_history.append(
+            {"role": "user", "content": "Resume the project discussion."}
+        )
 
         response = self.client.chat.completions.create(
             model="gpt-4o", messages=conversation_history
@@ -137,8 +218,6 @@ class IdeaGenerator:
         print("Resumed conversation response: ", ai_response_text)
 
         return {"success": True, "message": ai_response_text}
-
-
 
     def start_chat(self):
         """Käynnistää interaktiivisen OpenAI-pohjaisen chatin käyttäjän kanssa, jossa täytetään BMC."""
@@ -170,5 +249,3 @@ class IdeaGenerator:
 
             conversation.append({"role": "assistant", "content": assistant_reply})
             conversation.append({"role": "user", "content": user_input})
-
-
