@@ -38,6 +38,7 @@ def process_project(data):
             db.session.add(project)
             db.session.commit()
 
+        #tämä kohta lähettää käyttäjän syötteen assistantille  (User_input)
         client.beta.threads.messages.create(
             thread_id=thread_id, role="user", content=user_input
         )
@@ -54,7 +55,7 @@ def process_project(data):
                 break
             time.sleep(1)
 
-        messages = client.beta.threads.messages.list(thread_id=thread_id)
+        messages = client.beta.threads.messages.list(thread_id=thread_id) #tämä lähettää kutsun
 
         assistant_response = ""
 
@@ -74,17 +75,14 @@ def process_project(data):
         response_json = generator.extract_json_from_response(assistant_response)
         print(response_json)
 
-        return (
-            jsonify(
-                {
-                    "message": "Chat updated",
-                    "thread_id": str(thread_id),
-                    "assistant_response": response_json["assistant_response"],
-                }
-            ),
-            200,
-        )
-
+        return jsonify(
+            {
+                "message": "Chat updated",
+                "thread_id": str(thread_id),
+                "assistant_response": assistant_response,
+            }
+        ), 200
+        
     except Exception as e:
         print(str(e))
         return (

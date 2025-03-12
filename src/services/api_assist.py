@@ -1,9 +1,10 @@
 import json
 import re
 import uuid
-
 from openai import OpenAI
+from .BMC_recources import BusinessModelCanvas as BMC
 
+#bmc = BMC.update_from_text()
 
 class IdeaGenerator:
     def __init__(self, client: OpenAI):
@@ -13,7 +14,7 @@ class IdeaGenerator:
         """
         self.client = client
         self.thread_id = None
-        self.bmc = {}
+        self.bmc = {} #Luo tyhjän bmc tietueen
         self.assistant_id = self.create_assistant()
 
     def create_assistant(self):
@@ -219,33 +220,36 @@ class IdeaGenerator:
 
         return {"success": True, "message": ai_response_text}
 
-    def start_chat(self):
-        """Käynnistää interaktiivisen OpenAI-pohjaisen chatin käyttäjän kanssa, jossa täytetään BMC."""
-        print("Let's begin filling in the BMC Canvas. Describe your idea in detail.")
-        user_message = input("User: ")
-        conversation = [
-            {
-                "role": "system",
-                "content": """
-                    We are working on a Business Model Canvas (BMC). 
-                    Guide the user by asking relevant questions to complete the BMC. 
-                    Let the user also ask unrelated questions.
-                """,
-            },
-            {"role": "user", "content": user_message},
-        ]
+    # def start_chat(self):
+    #     """Käynnistää interaktiivisen OpenAI-pohjaisen chatin käyttäjän kanssa, jossa täytetään BMC."""
+    #     print("Let's begin filling in the BMC Canvas. Describe your idea in detail.")
+        
+    #     user_message = input("User: ")
+    #     print(f"\nUser: {user_message}")
+    #     conversation = [
+    #         {
+    #             "role": "system",
+    #             "content": """
+    #                 We are working on a Business Model Canvas (BMC). 
+    #                 Guide the user by asking relevant questions to complete the BMC. 
+    #                 Let the user also ask unrelated questions.
+    #             """,
+    #         },
+    #         {"role": "user", "content": user_message},
+    #     ]
 
-        while True:
-            response = self.client.chat.completions.create(
-                model="gpt-4o", messages=conversation, max_tokens=500
-            )
-            assistant_reply = response.choices[0].message.content.strip()
-            print(f"\nAssistant: {assistant_reply}")
+    #     while True:
+    #         response = self.client.chat.completions.create(
+    #             model="gpt-4o", messages=conversation, max_tokens=500
+    #         )
+    #         assistant_reply = response.choices[0].message.content.strip()
+    #         print(f"\nAssistant: {assistant_reply}")
 
-            user_input = input("User: ")
-            if user_input.lower() in ["lopeta", "valmis", "done", "finished"]:
-                print("\nBMC creation ends.")
-                break
+    #         user_input = input("User: ")
+    #         if user_input.lower() in ["lopeta", "valmis", "done", "finished"]:
+    #             print("\nBMC creation ends.")
+    #             break
 
-            conversation.append({"role": "assistant", "content": assistant_reply})
-            conversation.append({"role": "user", "content": user_input})
+    #         conversation.append({"role": "assistant", "content": assistant_reply})
+    #         conversation.append({"role": "user", "content": user_input})
+

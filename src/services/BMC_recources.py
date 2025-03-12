@@ -96,7 +96,7 @@ class BusinessModelCanvas(BaseModel):
             for field, value in new_data.dict().items():
                 if value is not None:
                     setattr(self, field, value)
-
+        
         except Exception as e:
             print(f"⚠️ OpenAI API -virhe: {e}")
 
@@ -264,16 +264,25 @@ if __name__ == "__main__":
     ]
     }
 
-    val = BmcValidator(
-    accuracy_of_information=False,
-    completeness_and_depth=False,
-    consistency_in_language=False,
-    uniformity_in_detail=False,
-    numerical_data_realism=False,
-    clarity_and_readability=False
-    )
+    bmc = BusinessModelCanvas()
+    while True:
+        text = input("Enter the text: ")
+        if text == "exit":
+            break
+        bmc.update_from_text(text)
+        print(bmc.model_dump_json(indent=2))
 
-    validation = val.current_vs_ideal_score(input_bmc)
-    print(validation)
-    print(val.calculate_score(validation))
+
+    #val = BmcValidator(
+    #accuracy_of_information=False,
+    #completeness_and_depth=False,
+    #consistency_in_language=False,
+    #uniformity_in_detail=False,
+    #numerical_data_realism=False,
+    #clarity_and_readability=False
+    #)
+
+    #validation = val.current_vs_ideal_score(input_bmc)
+    #print(validation)
+    #print(val.calculate_score(validation))
 
