@@ -1,10 +1,13 @@
 import time
+
 from flask import jsonify, render_template, request
 from openai import OpenAI
-from services.bokeh_visualization import create_scatter_plot
+
 from models.models import Project, db
 from services.api_assist import IdeaGenerator
+from services.bokeh_visualization import create_scatter_plot
 from services.openai_service import extract_text_from_pdf
+
 
 def process_project(data):
     try:
@@ -35,6 +38,7 @@ def process_project(data):
             db.session.add(project)
             db.session.commit()
 
+        #tämä kohta lähettää käyttäjän syötteen assistantille  (User_input)
         client.beta.threads.messages.create(
             thread_id=thread_id, role="user", content=user_input
         )
@@ -51,7 +55,7 @@ def process_project(data):
                 break
             time.sleep(1)
 
-        messages = client.beta.threads.messages.list(thread_id=thread_id)
+        messages = client.beta.threads.messages.list(thread_id=thread_id) #tämä lähettää kutsun
 
         assistant_response = ""
 
@@ -62,7 +66,14 @@ def process_project(data):
                         assistant_response += block.text.value + " "
                 break
 
-        assistant_response = assistant_response.strip() if assistant_response else "No response from the assistant."
+        assistant_response = (
+            assistant_response.strip()
+            if assistant_response
+            else "No response from the assistant."
+        )
+
+        response_json = generator.extract_json_from_response(assistant_response)
+        print(response_json)
 
         return jsonify(
             {
@@ -71,15 +82,19 @@ def process_project(data):
                 "assistant_response": assistant_response,
             }
         ), 200
-
+        
     except Exception as e:
         print(str(e))
-        return jsonify(
-            {
-                "error": "An error occurred while processing the project.",
-                "details": str(e),
-            }
-        ), 500
+        return (
+            jsonify(
+                {
+                    "error": "An error occurred while processing the project.",
+                    "details": str(e),
+                }
+            ),
+            500,
+        )
+
 
 def evaluate_project(data):
     try:
@@ -118,6 +133,7 @@ def evaluate_project(data):
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+
 def update_project_get(project_id):
     if not project_id:
         return render_template("update_project.html", error="Project ID is required")
@@ -125,7 +141,7 @@ def update_project_get(project_id):
     project = Project.query.get(project_id)
     if not project:
         return jsonify({"error": "Project not found"}), 404
-    
+
     data = {
         "projects": [project.name],
         "business_novelty": [float(project.x_value)],
@@ -135,7 +151,10 @@ def update_project_get(project_id):
 
     script, div = create_scatter_plot(data)
 
-    return render_template("update_project.html", project=project, script=script, div=div)
+    return render_template(
+        "update_project.html", project=project, script=script, div=div
+    )
+
 
 def update_project_post(project_id, data):
     if not project_id:
@@ -148,10 +167,11 @@ def update_project_post(project_id, data):
     new_description = data.get("description")
 
     if new_description:
-        project.name = new_description 
+        project.name = new_description
         db.session.commit()
 
     return jsonify({"message": "Project updated successfully"}), 200
+
 
 def resume_project(data):
     project_id = data.get("id")
@@ -183,10 +203,16 @@ def resume_project(data):
     if "error" in result:
         return jsonify({"error": result["error"]}), 400
 
-    return jsonify({
-        "thread_id": thread_id,
-        "message": result["message"],
-    }), 200
+    return (
+        jsonify(
+            {
+                "thread_id": thread_id,
+                "message": result["message"],
+            }
+        ),
+        200,
+    )
+
 
 def get_projects():
     try:
@@ -194,6 +220,7 @@ def get_projects():
         return jsonify({"projects": [p.to_dict() for p in projects]}), 200
     except Exception as e:
         return jsonify({"error": "Failed to fetch projects", "details": str(e)}), 500
+
 
 def get_project(project_id):
     try:
@@ -218,6 +245,7 @@ def get_project(project_id):
     except Exception as e:
         return jsonify({"error": "Failed to fetch project", "details": str(e)}), 500
 
+
 def delete_project(project_id):
     try:
         project = Project.query.get(project_id)
@@ -229,6 +257,7 @@ def delete_project(project_id):
         return jsonify({"message": "Project deleted!"}), 200
     except Exception as e:
         return jsonify({"error": "Failed to delete project", "details": str(e)}), 500
+
 
 def visualize():
     try:
@@ -250,12 +279,16 @@ def visualize():
         return render_template("visualization.html", script=script, div=div)
 
     except Exception as e:
-        return jsonify(
-            {
-                "error": "An error occurred while fetching data for visualization",
-                "details": str(e),
-            }
-        ), 500
+        return (
+            jsonify(
+                {
+                    "error": "An error occurred while fetching data for visualization",
+                    "details": str(e),
+                }
+            ),
+            500,
+        )
+
 
 def upload_pdf(request):
     try:
@@ -275,17 +308,13 @@ def upload_pdf(request):
 
         if thread_id:
             client.beta.threads.messages.create(
-                thread_id=thread_id,
-                role="user",
-                content=extracted_text
+                thread_id=thread_id, role="user", content=extracted_text
             )
             result = generator.resume_conversation()
         else:
             thread_id = generator.create_thread()
             client.beta.threads.messages.create(
-                thread_id=thread_id,
-                role="user",
-                content=extracted_text
+                thread_id=thread_id, role="user", content=extracted_text
             )
             result = generator.resume_conversation()
 
@@ -294,7 +323,7 @@ def upload_pdf(request):
                 x_value=0,
                 y_value=0,
                 impact=0,
-                thread_id=thread_id
+                thread_id=thread_id,
             )
             db.session.add(project)
             db.session.commit()
@@ -302,13 +331,11 @@ def upload_pdf(request):
         if "error" in result:
             return jsonify({"error": result["error"]}), 400
 
-        return jsonify({
-            "thread_id": thread_id,
-            "message": result["message"]
-        }), 200
+        return jsonify({"thread_id": thread_id, "message": result["message"]}), 200
 
     except Exception as e:
         return jsonify({"error": "Failed to process file", "details": str(e)}), 500
+
 
 def previous_projects():
     return render_template("previous_projects.html")
