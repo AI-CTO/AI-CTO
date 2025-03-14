@@ -10,6 +10,7 @@ body {
 }
 
 header {
+  height: 100px; /* Match the maxHeight value from shrink_script.js */
   background: #8e8787;
   color: #333;
   padding: 0.1rem 20px;
@@ -22,11 +23,13 @@ header {
   align-items: center; /* Vertically center the items */
   justify-content: flex-start; /* Align logo and nav at the start */
   width: 100%; /* Ensures the header takes up the full width */
+  transition: height 0.2s ease, padding 0.2s ease; /* Smooth height and padding transition */
 }
 
 header .logo {
-  width: 150px; /* Adjust logo size */
-  height: auto;
+  height: 80%; /* Default size relative to the header's height */
+  width: auto; /* Maintain the aspect ratio */
+  transition: height 0.2s ease; /* Smooth transition for logo size */
   margin-right: 20px; /* Space between logo and nav */
 }
 
@@ -209,7 +212,8 @@ header.shrink {
 }
 
 header.shrink .logo {
-  width: 100px; /* Shrink the logo */
+  height: 60%; /* Minimum size when the header shrinks */
+  min-height: 30px; /* Ensure the logo is always visible */
   transition: width 0.3s ease; /* Smooth transition for logo size */
 }
 
