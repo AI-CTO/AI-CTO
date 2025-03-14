@@ -200,3 +200,30 @@ tr:hover {
   font-weight: bold;
   font-size: 16px;
 }
+
+/* Shrinking header styles */
+header.shrink {
+  padding: 0.05rem 20px; /* Reduce padding */
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1); /* Slightly stronger shadow */
+  transition: all 0.3s ease; /* Smooth transition for shrinking */
+}
+
+header.shrink .logo {
+  width: 100px; /* Shrink the logo */
+  transition: width 0.3s ease; /* Smooth transition for logo size */
+}
+
+header.shrink h1 {
+  font-size: 1rem; /* Reduce font size of the header title */
+  transition: font-size 0.3s ease; /* Smooth transition for font size */
+}
+
+header.shrink nav {
+  margin-right: 150px; /* Adjust navigation spacing */
+  transition: margin-right 0.3s ease; /* Smooth transition for spacing */
+}
+
+header.shrink .tab-link {
+  font-size: 0.9rem; /* Reduce font size of navigation links */
+  transition: font-size 0.3s ease; /* Smooth transition for font size */
+}
