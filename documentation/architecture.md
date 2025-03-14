@@ -81,4 +81,24 @@ The logic of the application is primarily handled by various route handlers defi
 
 These examples illustrate how the application handles various project-related operations, such as processing user input, interacting with OpenAI for AI-based evaluations, and updating the database using SQLAlchemy ORM.
 
+### OpenAI Call Sequence
 
+```mermaid
+sequenceDiagram
+    participant User
+    participant Frontend
+    participant Backend
+    participant OpenAI
+
+    User->>Frontend: Submit project description
+    Frontend->>Backend: Send project data (/process_project)
+    Backend->>OpenAI: Create thread (create_thread())
+    OpenAI-->>Backend: Return thread ID
+    Backend->>OpenAI: Send project description (messages.create())
+    OpenAI-->>Backend: Return evaluation response
+    Backend->>Database: Update project with evaluation results
+    Backend-->>Frontend: Return updated project data
+    Frontend-->>User: Display evaluation results
+```
+
+This sequence diagram shows the flow of data and interactions when a user submits a project description for evaluation.
