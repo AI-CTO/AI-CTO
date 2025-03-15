@@ -9,6 +9,7 @@
       href="{{ url_for('static', filename='styles.css') }}"
     />
     <script src="https://cdn.bokeh.org/bokeh/release/bokeh-3.0.0.min.js"></script>
+    <script src="{{ url_for('static', filename='shrink_script.js') }}" defer></script>
     {% block extra_scripts %}{% endblock %}
   </head>
   <body>
