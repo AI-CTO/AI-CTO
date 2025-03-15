@@ -51,7 +51,7 @@ def create_scatter_plot(data):
         )
 
     # Apply lighter, modern theme styling
-    p.background_fill_color = "#ffffff"  # White background to complement page
+    p.background_fill_color = "#f9f9f9"  # White background to complement page
     p.border_fill_color = "#f9f9f9"  # Light gray border for a clean look
     p.outline_line_color = "#e0e0e0"  # Very light gray outline to keep it soft
 
