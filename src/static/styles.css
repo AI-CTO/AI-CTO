@@ -89,15 +89,24 @@ footer {
   cursor: pointer;
   z-index: 1;
   transition: color 0.3s ease;
+  text-decoration: none; /* Remove underline from tab texts */
 }
 
 .tabs .tab-link:hover {
   color: #333;
+  text-decoration: none; /* Ensure no underline on hover */
 }
 
 .tabs .tab-link.active {
   color: #fff;
   font-weight: 600;
+}
+
+/* Active Tab Link */
+.tabs .tab-link.active {
+  font-weight: 600; /* Keep the bold effect for the active tab */
+  color: #333; /* Ensure the text color remains consistent */
+  text-decoration: none; /* Ensure no underline for active tab */
 }
 
 /* Tab Indicator */
