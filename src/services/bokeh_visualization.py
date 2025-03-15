@@ -34,7 +34,7 @@ def create_scatter_plot(data):
     title = Title(text="Project Portfolio Visualization", align="left")
     title.text_font_size = '20pt' 
     title.text_font = "helvetica"
-    title.text_color = "#ffffff"  # White title text
+    title.text_color = "#333333"  # Dark text for title to stand out on white background
     p.title = title
 
     # Define colors for categories
@@ -47,39 +47,39 @@ def create_scatter_plot(data):
         })
         p.scatter(
             x="x_value", y="y_value", size="impact",  
-            color=color, alpha=0.7, source=filtered_source, legend_label=category
+            color=color, alpha=0.8, source=filtered_source, legend_label=category
         )
 
-    # Apply dark theme styling
-    p.background_fill_color = "#2e2e2e"  # Dark background
-    p.border_fill_color = "#2e2e2e"
-    p.outline_line_color = "#444444"  # Outline color
+    # Apply lighter, modern theme styling
+    p.background_fill_color = "#f9f9f9"  # White background to complement page
+    p.border_fill_color = "#f9f9f9"  # Light gray border for a clean look
+    p.outline_line_color = "#e0e0e0"  # Very light gray outline to keep it soft
 
-    # Customize grid lines
-    p.xgrid.grid_line_color = "#444444"  # Dark gray grid lines
-    p.ygrid.grid_line_color = "#444444"
-    p.xgrid.grid_line_alpha = 0.6       # Slight transparency
-    p.ygrid.grid_line_alpha = 0.6
-    p.xgrid.grid_line_dash = [6, 4]     # Dashed grid lines
+    # Customize grid lines for visibility on white background
+    p.xgrid.grid_line_color = "#dddddd"  # Very light gray grid lines for contrast
+    p.ygrid.grid_line_color = "#dddddd"
+    p.xgrid.grid_line_alpha = 0.5  # Light transparency
+    p.ygrid.grid_line_alpha = 0.5
+    p.xgrid.grid_line_dash = [6, 4]  # Dashed grid lines
     p.ygrid.grid_line_dash = [6, 4]
 
-    # Customize axes
+    # Customize axes for a modern, clean look
     p.xaxis.axis_label = "Business Novelty"
     p.yaxis.axis_label = "Customer Novelty"
-    p.xaxis.axis_label_text_color = "#ffffff"  # White axis labels
-    p.yaxis.axis_label_text_color = "#ffffff"
-    p.xaxis.major_label_text_color = "#cccccc"  # Light gray tick labels
-    p.yaxis.major_label_text_color = "#cccccc"
-    p.xaxis.axis_line_color = "#888888"  # Light gray axis lines
-    p.yaxis.axis_line_color = "#888888"
-    p.xaxis.major_tick_line_color = "#888888"  # Light gray ticks
-    p.yaxis.major_tick_line_color = "#888888"
-    p.axis.minor_tick_line_color = "#555555"  # Darker gray minor ticks
+    p.xaxis.axis_label_text_color = "#555555"  # Dark gray axis labels for contrast
+    p.yaxis.axis_label_text_color = "#555555"
+    p.xaxis.major_label_text_color = "#666666"  # Subtle gray tick labels
+    p.yaxis.major_label_text_color = "#666666"
+    p.xaxis.axis_line_color = "#cccccc"  # Light gray axis lines
+    p.yaxis.axis_line_color = "#cccccc"
+    p.xaxis.major_tick_line_color = "#cccccc"  # Light gray ticks
+    p.yaxis.major_tick_line_color = "#cccccc"
+    p.axis.minor_tick_line_color = "#bbbbbb"  # Even lighter minor ticks
 
-    # Customize legend
-    p.legend.label_text_color = "#ffffff"  # White legend text
-    p.legend.background_fill_color = "#444444"  # Dark gray legend background
-    p.legend.border_line_color = "#888888"  # Light gray legend border
+    # Customize legend for a refined look
+    p.legend.label_text_color = "#333333"  # Dark legend text for clarity
+    p.legend.background_fill_color = "#f9f9f9"  # Very light background for legend
+    p.legend.border_line_color = "#e0e0e0"  # Soft light border for the legend
     p.legend.location = "top_left"
     p.legend.orientation = "horizontal"
     p.legend.visible = True
