@@ -37,6 +37,8 @@ env:
 
   OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
 
+  SQALCHEMY_DATABASE_URI: ${{ secrets.SQALCHEMY_DATABASE_URI }}
+
   # 🖊️ EDIT to set a name for your OpenShift app, or a default one will be generated below.
   APP_NAME: ai-cto
 
