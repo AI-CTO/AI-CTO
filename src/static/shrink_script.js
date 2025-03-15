@@ -5,6 +5,11 @@ const shrinkThreshold = 50; // The main threshold
 const minHeight = 50; // Minimum height of the header
 const maxHeight = 150; // Increased initial height of the header
 
+// Calculate the initial ratio of the logo to the header
+const initialLogoHeight = logo.offsetHeight;
+const initialHeaderHeight = header.offsetHeight;
+const logoToHeaderRatio = initialLogoHeight / initialHeaderHeight; // Preserve this ratio
+
 let ticking = false;
 
 window.addEventListener("scroll", () => {
@@ -21,9 +26,9 @@ window.addEventListener("scroll", () => {
       // Apply the calculated height to the header
       header.style.height = `${newHeight}px`;
 
-      // Dynamically adjust the logo size
-      const logoHeight = (newHeight / maxHeight) * 80; // Scale logo size proportionally (80% of header height)
-      logo.style.height = `${logoHeight}%`;
+      // Dynamically adjust the logo size based on the preserved ratio
+      const logoHeight = newHeight * logoToHeaderRatio; // Maintain the initial ratio
+      logo.style.height = `${logoHeight}px`;
 
       ticking = false;
     });
