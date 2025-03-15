@@ -12,7 +12,7 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     // Add click event to change active tab
-    tabs.forEach((tab, index) => {
+    tabs.forEach((tab) => {
         tab.addEventListener("click", function (event) {
             event.preventDefault(); // Prevent the default link behavior
 
@@ -21,9 +21,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
             // Add active class to clicked tab
             this.classList.add("active");
-
-            // Move the indicator to the clicked tab
-            indicator.style.left = `${index * 20}%`; // Adjust based on the number of tabs
 
             // Optionally, you can navigate to the link after adding the active class
             window.location.href = this.getAttribute("href");
