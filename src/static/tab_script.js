@@ -7,7 +7,7 @@ document.addEventListener("DOMContentLoaded", function () {
         if (window.location.pathname === tab.getAttribute("href")) {
             tab.classList.add("active");
             // Move the indicator to the active tab
-            indicator.style.left = `${index * 20}%`; // Adjust based on the number of tabs
+            indicator.style.left = `${index * 24}%`; // Adjust based on the number of tabs
         }
     });
 
