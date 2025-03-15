@@ -1,7 +1,7 @@
 from bokeh.palettes import Set2
 from bokeh.plotting import figure
 from bokeh.embed import components
-from bokeh.models import ColumnDataSource, Range1d
+from bokeh.models import ColumnDataSource, Range1d, Title, Label
 
 def create_scatter_plot(data):
     projects = data["projects"]
@@ -19,15 +19,22 @@ def create_scatter_plot(data):
     })
 
     p = figure(
-        height=420, width=420,
+        height=500, width=1500,
         title="Project Portfolio Visualization",
         toolbar_location=None,
-        match_aspect=True,
+        match_aspect=False,
         tools="hover",
         tooltips="@projects: (X: @x_value, Y: @y_value, Impact: @impact)",
         x_range=Range1d(0, 100),  # Set x-axis range
-        y_range=Range1d(0, 100)   # Set y-axis range
+        y_range=Range1d(0, 100),  # Set y-axis range
+        sizing_mode="stretch_width"
     )
+
+    title = Title(text="Project Portfolio Visualization", align="left")
+    title.text_font_size = '20pt' 
+    title.text_font = "helvetica"
+    p.title = title
+
 
     colors = {"Existing": Set2[3][0], "Idea": Set2[3][1]}  
 
