@@ -3,7 +3,7 @@ const logo = document.querySelector(".logo");
 
 const shrinkThreshold = 50; // The main threshold
 const minHeight = 50; // Minimum height of the header
-const maxHeight = 100; // Maximum height of the header
+const maxHeight = 150; // Increased initial height of the header
 
 let ticking = false;
 
