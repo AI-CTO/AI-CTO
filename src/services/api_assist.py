@@ -17,7 +17,7 @@ class IdeaGenerator:
         self.bmc = {} #Luo tyhjän bmc tietueen
         self.assistant_id = self.create_assistant()
 
-    def create_assistant(self):
+    def create_assistant(self): 
         """Luo uuden Assistantin OpenAI API:iin."""
         assistant = self.client.beta.assistants.create(
             name="Project Idea Assistant",
