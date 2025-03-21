@@ -40,6 +40,7 @@ from typing import Optional, List, Dict
 client = OpenAI()
 
 class BusinessModelCanvas(BaseModel):
+    print("BMC IS RUNNING")
     company_name: Optional[str] = None 
     key_partners: Optional[List[str]] = None
     key_activities: Optional[List[str]] = None
@@ -50,8 +51,11 @@ class BusinessModelCanvas(BaseModel):
     customer_segments: Optional[Dict[str, List[str]]] = None
     cost_structure: Optional[List[str]] = None ###
     revenue_streams: Optional[List[str]] = None
+    print("BMC IS RUNNING")
 
     def update_from_text(self, text: str) -> None:
+        print("BMC IS RUNNING")
+
         try:
             completion = client.beta.chat.completions.parse(
                 model="gpt-4o",
@@ -101,6 +105,7 @@ class BusinessModelCanvas(BaseModel):
             print(f"⚠️ OpenAI API -virhe: {e}")
 
 class BmcValidator(BaseModel):
+    print("BMC IS RUNNING")
     accuracy_of_information: bool
     completeness_and_depth: bool
     consistency_in_language: bool

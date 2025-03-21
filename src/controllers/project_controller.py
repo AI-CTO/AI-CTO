@@ -9,6 +9,7 @@ from services.bokeh_visualization import create_scatter_plot
 from services.openai_service import extract_text_from_pdf
 
 
+
 def process_project(data):
     try:
         client = OpenAI()
@@ -16,6 +17,7 @@ def process_project(data):
 
         user_input = data.get("description")
         project_id = data.get("id")
+        print("Finds description")
 
         if not user_input:
             return jsonify({"error": "Description is required"}), 400
@@ -38,24 +40,90 @@ def process_project(data):
             db.session.add(project)
             db.session.commit()
 
+        # **Check if there is an active run and wait for it to finish**
+        existing_runs = client.beta.threads.runs.list(thread_id=thread_id)
+        print("Looking for existing runs: ", existing_runs)
+
+        for run in existing_runs.data:
+            if run.status in ["queued", "in_progress"]:
+                print(f"Existing active run detected: {run.id}. Waiting...")
+                timeout = 60  # 60 seconds timeout
+                start_time = time.time()
+                while True:
+                    run_status = client.beta.threads.runs.retrieve(run_id=run.id, thread_id=thread_id)
+                    print(f"Current run status: {run_status.status}")
+                    if run_status.status in ["completed", "failed", "cancelled"]:
+                        break
+                    if time.time() - start_time > timeout:
+                        print("Timeout waiting for the existing run to finish.")
+                        return jsonify({"error": "Timeout waiting for existing run."}), 500
+                    time.sleep(1)
+
+        print("Done looking for existing runs")
+
+        # **Send user input to the assistant**
         #tämä kohta lähettää käyttäjän syötteen assistantille  (User_input)
         client.beta.threads.messages.create(
             thread_id=thread_id, role="user", content=user_input
         )
 
-        run = client.beta.threads.runs.create(
-            thread_id=thread_id, assistant_id=generator.assistant_id
-        )
+        try:
+            run = client.beta.threads.runs.create(
+                thread_id=thread_id, assistant_id=generator.assistant_id
+            )
+        except Exception as e:
+            print("Error starting assistant run: ", str(e))
+            return jsonify({"error": "Failed to start assistant run", "details": str(e)}), 500
+
+        # **Wait for the assistant to respond**
+        print("Waiting for assistant response...")
+        timeout = 60  # 60 seconds timeout
+        start_time = time.time()
 
         while True:
-            run_status = client.beta.threads.runs.retrieve(
-                run_id=run.id, thread_id=thread_id
-            )
-            if run_status.status == "completed":
-                break
-            time.sleep(1)
+            try:
+                run_status = client.beta.threads.runs.retrieve(run_id=run.id, thread_id=thread_id)
+                print(f"Run status: {run_status.status}")
 
-        messages = client.beta.threads.messages.list(thread_id=thread_id) #tämä lähettää kutsun
+                if run_status.status == "completed":
+                    break
+                if run_status.status in ["failed", "cancelled"]:
+                    print("Assistant run failed or was cancelled.")
+    
+                    last_error = run_status.last_error
+                    if last_error:
+                        last_error_details = {
+                            "code": getattr(last_error, "code", None),
+                            "message": getattr(last_error, "message", None),
+                            "type": getattr(last_error, "type", None),
+                            "param": getattr(last_error, "param", None),
+                        }
+                    else:
+                        last_error_details = None
+
+                    return jsonify({
+                        "error": "Assistant run failed or was cancelled.",
+                        "details": {
+                            "run_id": run_status.id,
+                            "status": run_status.status,
+                            "created_at": run_status.created_at,
+                            "last_error": last_error_details
+                        }
+                    }), 500
+
+
+                if time.time() - start_time > timeout:
+                    print("Timeout waiting for assistant response.")
+                    return jsonify({"error": "Timeout waiting for assistant response."}), 500
+
+                time.sleep(1)
+            except Exception as e:
+                print("Error getting response: ", str(e))
+                return jsonify({"error": "Failed to retrieve assistant response", "details": str(e)}), 500
+
+        print("Client returned response")
+
+        messages = client.beta.threads.messages.list(thread_id=thread_id)
 
         assistant_response = ""
 
@@ -66,25 +134,23 @@ def process_project(data):
                         assistant_response += block.text.value + " "
                 break
 
-        assistant_response = (
-            assistant_response.strip()
-            if assistant_response
-            else "No response from the assistant."
-        )
-
+        assistant_response = assistant_response.strip() if assistant_response else "No response from the assistant."
         response_json = generator.extract_json_from_response(assistant_response)
         print(response_json)
 
-        return jsonify(
-            {
-                "message": "Chat updated",
-                "thread_id": str(thread_id),
-                "assistant_response": assistant_response,
-            }
-        ), 200
-        
+        return (
+            jsonify(
+                {
+                    "message": "Chat updated",
+                    "thread_id": str(thread_id),
+                    "assistant_response": response_json["assistant_response"],
+                }
+            ),
+            200,
+        )
+
     except Exception as e:
-        print(str(e))
+        print("Unexpected error:", str(e))
         return (
             jsonify(
                 {
