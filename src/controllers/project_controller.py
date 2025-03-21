@@ -204,22 +204,27 @@ def update_project_get(project_id):
     if not project_id:
         return render_template("update_project.html", error="Project ID is required")
 
+    # Retrieve the project from the database
     project = Project.query.get(project_id)
     if not project:
         return jsonify({"error": "Project not found"}), 404
+
 
     data = {
         "projects": [project.name],
         "business_novelty": [float(project.x_value)],
         "customer_novelty": [float(project.y_value)],
         "impact": [float(project.impact)],
+        "project_ids": [project.id]  # Include project_id here for the URL
     }
 
+    # Now pass the data to create_scatter_plot to generate the plot with one circle
     script, div = create_scatter_plot(data)
 
     return render_template(
         "update_project.html", project=project, script=script, div=div
     )
+
 
 
 def update_project_post(project_id, data):
@@ -333,12 +338,14 @@ def visualize():
         business_novelty = [float(project.x_value) for project in projects]
         customer_novelty = [float(project.y_value) for project in projects]
         impact = [float(project.impact) for project in projects]
+        project_ids = [project.id for project in projects]  # Add project IDs
 
         data = {
             "projects": project_names,
             "business_novelty": business_novelty,
             "customer_novelty": customer_novelty,
             "impact": impact,
+            "project_ids": project_ids,  # Include project_ids here
         }
 
         script, div = create_scatter_plot(data)

@@ -21,6 +21,7 @@ EXPOSE 5000
 # Define environment variable (edited)
 ENV FLASK_APP=src/app.py
 ENV OPENAI_API_KEY=${OPENAI_API_KEY}
+ENV SQLALCHEMY_DATABASE_URI=${SQLALCHEMY_DATABASE_URI}
 
 # Run app.py when the container launches
 CMD ["flask", "run", "--host=0.0.0.0"]

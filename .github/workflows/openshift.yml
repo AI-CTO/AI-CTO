@@ -37,6 +37,8 @@ env:
 
   OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
 
+  SQALCHEMY_DATABASE_URI: ${{ secrets.SQLALCHEMY_DATABASE_URI }}
+
   # 🖊️ EDIT to set a name for your OpenShift app, or a default one will be generated below.
   APP_NAME: ai-cto
 
@@ -95,6 +97,8 @@ jobs:
           const secrets = {
             OPENSHIFT_SERVER: `${{ secrets.OPENSHIFT_SERVER }}`,
             OPENSHIFT_TOKEN: `${{ secrets.OPENSHIFT_TOKEN }}`,
+            SQLALCHEMY_DATABASE_URI: `${{ secrets.SQLALCHEMY_DATABASE_URI }}`,
+            OPENAI_API_KEY: `${{ secrets.OPENAI_API_KEY }}`,
           };
 
           const GHCR = "ghcr.io";
