@@ -7,9 +7,12 @@ from openai import OpenAI
 # from .BMC_recources import BusinessModelCanvas as BMC
 
 script_dir = os.path.dirname(os.path.abspath(__file__))  # Get script's directory
-assistant_instructions = os.path.join(script_dir, "instructions.txt")  # Construct full path
+assistant_instructions = os.path.join(
+    script_dir, "instructions.txt"
+)  # Construct full path
 with open(assistant_instructions, "r", encoding="utf-8") as file:
     instructions_content = file.read()
+
 
 class IdeaGenerator:
     def __init__(self, client: OpenAI):
@@ -38,7 +41,49 @@ class IdeaGenerator:
         print("No existing assistant found. Creating a new one...")
         assistant = self.client.beta.assistants.create(
             name="Project Idea Assistant",
-            instructions=instructions_content,
+            instructions="""
+                           You assist the user in refining a business model canvas (BMC).
+                           First, ask the user to describe their idea in detail. Then,
+                           iteratively guide them through completing the BMC by dynamically adjusting questions based on their inputs.
+                           The user should also be able to ask general questions outside the BMC process.
+                           If the user wishes to evaluate, use the data that you have to do so.
+                           You will have two kinds of outputs for me. Imagine your answer to the user is in the variable "assistant_response"
+                           And now you have more instructions:
+                           You are an expert in Business Model Canvas (BMC) data extraction.
+                           You will be given unstructured business descriptions and extract relevant information into a structured BMC format.
+                           Your goal is to **fill in as many fields as possible** without overwriting existing values.
+                           ### **Instructions**
+                           1**Analyze the input text carefully.** 
+                           - Identify key components such as business goals, customers, revenue sources, partnerships, and technologies.
+                           2**Map the extracted information to the correct BMC fields.** 
+                           - Example mappings:
+                               - **Company Name** → If an organization is mentioned.
+                               - **Key Partners** → Any external companies or institutions involved.
+                               - **Key Activities** → Core operations mentioned in the text.
+                               - **Key Resources** → Technologies, infrastructure, or human resources.
+                               - **Value Propositions** → The benefits offered by the product/service.
+                               - **Customer Segments** → Who benefits from the product/service?
+                               - **Revenue Streams** → Monetization strategies.
+                               - **Cost Structure** → Main expenses.
+                           3**Preserve existing values** 
+                           - Do not overwrite previously filled fields unless explicitly stated.
+                          **Return ONLY a JSON object structured as follows, without extra text**:
+                           ```json
+                       {
+                          "company_name": null,
+                           "assistant_response": assistant_response,
+                           "key_partners": <extracted info here, null of not provided>,
+                           "key_activities": <extracted info here, null of not provided>,
+                           "key_resources": <extracted info here, null of not provided>,
+                           "value_propositions": <extracted info here, null of not provided>,
+                           "customer_relationships": <extracted info here, null of not provided>,
+                           "channels": <extracted info here, null of not provided>,
+                           "customer_segments": <extracted info here, null of not provided>,
+                           "cost_structure": <extracted info here, null of not provided>,
+                           "revenue_streams": <extracted info here, null of not provided>
+                       }
+                           ```
+""",
             tools=[{"type": "code_interpreter"}],
             model="gpt-4o",
         )
