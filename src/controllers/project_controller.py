@@ -5,11 +5,12 @@ from openai import OpenAI
 
 from models.models import Project, db
 from services.api_assist import IdeaGenerator
+from services.BMC_recources import BmcValidator as BMC #erik muutti
 from services.bokeh_visualization import create_scatter_plot
 from services.openai_service import extract_text_from_pdf
 
 
-
+# test_my_function.py
 def process_project(data):
     try:
         client = OpenAI()
@@ -138,13 +139,18 @@ def process_project(data):
         response_json = generator.extract_json_from_response(assistant_response)
         print(response_json)
 
-        return (
+        # erik Muutti 
+        ans = BMC.current_vs_ideal_score(BMC,response_json["assistant_response"])
+        score = BMC.calculate_score(BMC, ans)
+        # erik Muutti 
+        return ( 
             jsonify(
                 {
                     "message": "Chat updated",
                     "thread_id": str(thread_id),
                     "assistant_response": response_json["assistant_response"],
-                }
+                    "validation_score": score, #Erik Muutti
+                }   
             ),
             200,
         )

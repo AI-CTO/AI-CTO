@@ -135,7 +135,7 @@ class BmcValidator(BaseModel):
         this can be used to compare the current BMC with the ideal BMC and other stuff
         It can be accessed trough the self.ideal_bmc_list attribute.
         """
-        with open("src/services/business_model_canvas.json") as f:
+        with open("../src/services/business_model_canvas.json") as f:
             ideal_bmc_list = json.load(f)
         return ideal_bmc_list
 

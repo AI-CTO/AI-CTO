@@ -104,8 +104,13 @@
             document.getElementById("evaluate-btn").style.display = "block";
             chatBox.innerHTML += `<p><strong>Assistant:</strong> ${data.assistant_response}</p>`;
             chatBox.scrollTop = chatBox.scrollHeight;
+            // erik lisää 
+            if (data.validation_score !== undefined) {
+              chatBox.innerHTML += `<p><strong>Validation Score:</strong> ${data.validation_score}</p>`; // erik lisäsäi
           }
-        })
+        }
+    })
+      
         .catch((error) => console.error("Error:", error));
     });
 
