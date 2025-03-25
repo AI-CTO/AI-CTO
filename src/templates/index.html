@@ -15,6 +15,10 @@
     </button>
   </form>
 
+  <div id="loading-spinner" style="display: none; text-align: center; margin: 20px 0;">
+    <img src="{{ url_for('static', filename='spinner.gif') }}" alt="Loading..." style="width: 50px;" />
+  </div>
+
   <div id="chat-container" style="margin-top: 20px">
     <div class="conversation-header">
       <h2>Conversation</h2>
@@ -74,7 +78,7 @@
 
   if (threadIdParam && projectIdParam) {
     threadId = threadIdParam;
-
+    showLoader();
     fetch("/resume_project", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -88,6 +92,7 @@
           chatBox.scrollTop = chatBox.scrollHeight;
           document.getElementById("chat-container").style.display = "block";
         }
+        hideLoader();
       });
   }
 });
@@ -108,7 +113,7 @@
       if (threadId) {
         formData.append("thread_id", threadId);
       }
-
+      showLoader();
       fetch("/upload_pdf", {
         method: "POST",
         body: formData,
@@ -124,6 +129,7 @@
             chatBox.innerHTML += `<p><strong>Assistant:</strong> ${data.message}</p>`;
             chatBox.scrollTop = chatBox.scrollHeight;
           }
+          hideLoader();
         })
         .catch((error) => console.error("Error:", error));
     });
@@ -140,7 +146,7 @@
   userInputElement.style.height = "auto"; // reset height
   document.getElementById("chat-container").style.display = "block";
   chatBox.scrollTop = chatBox.scrollHeight;
-
+  showLoader();
   fetch("/process_project", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -183,6 +189,7 @@
       }
 
       chatBox.scrollTop = chatBox.scrollHeight;
+      hideLoader();
     })
     .catch((error) => {
       console.error("Error:", error);
@@ -198,7 +205,7 @@
         alert("Please submit a description or upload a PDF first!");
         return;
       }
-
+      showLoader();
       fetch("/evaluate_project", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -214,6 +221,7 @@
             document.getElementById("evaluation-output").textContent =
               JSON.stringify(data.evaluation, null, 2);
           }
+          hideLoader();
         })
         .catch((error) => console.error("Error:", error));
     });
@@ -232,6 +240,14 @@
         document.getElementById("chat-form").dispatchEvent(new Event("submit"));
       }
     });
+  
+  function showLoader() {
+  document.getElementById("loading-spinner").style.display = "block";
+}
+
+  function hideLoader() {
+    document.getElementById("loading-spinner").style.display = "none";
+  }
 </script>
 
 {% endblock %}
