@@ -51,7 +51,16 @@
         <strong>Assistant:</strong> Let's start! Describe your project idea.
       </p>
     </div>
-    <form id="chat-form" style="margin-top: 10px">
+    <form id="chat-form" class="centered-chat-form">
+      <textarea
+        id="user-input"
+        placeholder="Type your message..."
+        required
+        style="width: 80%; padding: 8px; resize: none; min-height: 40px; overflow-y: hidden;"
+      ></textarea>
+      <button type="submit" class="button">Send</button>
+    </form>
+    <!-- <form id="chat-form" style="margin-top: 10px">
       <input
         type="text"
         id="user-input"
@@ -60,7 +69,7 @@
         style="width: 80%; padding: 5px"
       />
       <button type="submit" class="button">Send</button>
-    </form>
+    </form> -->
 
     <button
       id="evaluate-btn"
@@ -258,6 +267,21 @@
           }
         })
         .catch((error) => console.error("Error:", error));
+    });
+    // Tee textarea käyttäytyy kuin chatissä (automaattinen korkeus)
+    const textarea = document.getElementById("user-input");
+
+    textarea.addEventListener("input", () => {
+      textarea.style.height = "auto";
+      textarea.style.height = textarea.scrollHeight + "px";
+    });
+
+    // Lähetä viesti Enterillä, rivinvaihto Shift+Enterillä
+    textarea.addEventListener("keydown", function (event) {
+      if (event.key === "Enter" && !event.shiftKey) {
+        event.preventDefault();
+        document.getElementById("chat-form").dispatchEvent(new Event("submit"));
+      }
     });
 </script>
 

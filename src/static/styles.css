@@ -340,3 +340,34 @@ header.shrink .tab-link {
   margin-left: 6px;
   white-space: nowrap;
 }
+
+#user-input {
+  font-family: inherit;
+  font-size: 1rem;
+  line-height: 1.4;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  padding: 8px 12px;
+  width: 100%;
+  resize: none;
+  min-height: 40px;
+  max-height: 200px;
+  overflow-y: hidden;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  box-sizing: border-box;
+}
+
+#user-input:focus {
+  border-color: #0077b6;
+  outline: none;
+  box-shadow: 0 0 5px rgba(0, 119, 182, 0.3);
+}
+
+.centered-chat-form {
+  margin: 20px auto 0 auto;
+  display: flex;
+  gap: 10px;
+  align-items: flex-end;
+  justify-content: center;
+  max-width: 800px;
+}
