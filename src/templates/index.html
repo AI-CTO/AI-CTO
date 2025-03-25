@@ -30,7 +30,15 @@
   </form>
 
   <div id="chat-container" style="display: none; margin-top: 20px">
-    <h2>Conversation</h2>
+    <div class="conversation-header">
+      <h2>Conversation</h2>
+      <div id="validation-bar-container">
+        <div id="validation-bar">
+          <div id="validation-fill"></div>
+          <span id="validation-text">0%</span>
+        </div>
+      </div>
+    </div>
     <div
       id="chat-box"
       style="
@@ -40,7 +48,6 @@
         overflow-y: auto;
       "
     >
-      <p>
         <strong>Assistant:</strong> Let's start! Describe your project idea.
       </p>
     </div>
@@ -106,8 +113,27 @@
             chatBox.scrollTop = chatBox.scrollHeight;
             // erik lisää 
             if (data.validation_score !== undefined) {
-              chatBox.innerHTML += `<p><strong>Validation Score:</strong> ${data.validation_score}</p>`; // erik lisäsäi
-          }
+              const score = parseFloat(data.validation_score).toFixed(1);
+              const percent = Math.min(100, Math.max(0, score)); // varmista 0–100 väli
+
+              const fill = document.getElementById("validation-fill");
+              const text = document.getElementById("validation-text");
+              const bar = document.getElementById("validation-bar");
+
+              fill.style.width = `${percent}%`;
+              text.textContent = `${percent}%`;
+
+              // Vaihda väri dynaamisesti (vihreä, oranssi, punainen)
+              if (percent < 40) {
+                fill.style.backgroundColor = "#f44336"; // punainen
+              } else if (percent < 70) {
+                fill.style.backgroundColor = "#ff9800"; // oranssi
+              } else {
+                fill.style.backgroundColor = "#4caf50"; // vihreä
+              }
+
+              bar.style.display = "flex";
+            }
         }
     })
       
@@ -175,7 +201,31 @@
           chatBox.innerHTML += `<p><strong>Assistant:</strong> ${data.assistant_response}</p>`;
         }
         chatBox.scrollTop = chatBox.scrollHeight;
-      })
+        
+        if (data.validation_score !== undefined) {
+          const score = parseFloat(data.validation_score).toFixed(1);
+          const percent = Math.min(100, Math.max(0, score)); // varmista 0–100 väli
+
+          const fill = document.getElementById("validation-fill");
+          const text = document.getElementById("validation-text");
+          const bar = document.getElementById("validation-bar");
+
+          fill.style.width = `${percent}%`;
+          text.textContent = `${percent}%`;
+
+          // Vaihda väri dynaamisesti (vihreä, oranssi, punainen)
+          if (percent < 40) {
+            fill.style.backgroundColor = "#f44336"; // punainen
+          } else if (percent < 70) {
+            fill.style.backgroundColor = "#ff9800"; // oranssi
+          } else {
+            fill.style.backgroundColor = "#4caf50"; // vihreä
+          }
+
+          bar.style.display = "flex";
+        }
+      }
+    )
       .catch((error) => {
         console.error("Error continuing conversation:", error);
         chatBox.innerHTML += `<p style="color: red;"><strong>Error:</strong> Unable to get response.</p>`;

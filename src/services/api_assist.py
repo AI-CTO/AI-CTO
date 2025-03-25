@@ -38,6 +38,7 @@ class IdeaGenerator:
             return existing_assistant.id
 
         # If no assistant exists, create a new one
+        print("ppptpptpptptpptptpptpptpppt")
         print("No existing assistant found. Creating a new one...")
         assistant = self.client.beta.assistants.create(
             name="Project Idea Assistant",

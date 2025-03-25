@@ -57,6 +57,7 @@ class BusinessModelCanvas(BaseModel):
         print("BMC IS RUNNING")
 
         try:
+            print("kakkakakakakakkakakakkakakakakakakakak")
             completion = client.beta.chat.completions.parse(
                 model="gpt-4o",
                 messages=[

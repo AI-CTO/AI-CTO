@@ -137,10 +137,11 @@ def process_project(data):
 
         assistant_response = assistant_response.strip() if assistant_response else "No response from the assistant."
         response_json = generator.extract_json_from_response(assistant_response)
-        print(response_json)
+        asistant_response = response_json.pop('assistant_response', None) #Erik Muutti
+        print("tämä on assistant response \n",response_json)
 
         # erik Muutti 
-        ans = BMC.current_vs_ideal_score(BMC,response_json["assistant_response"])
+        ans = BMC.current_vs_ideal_score(BMC,response_json)
         score = BMC.calculate_score(BMC, ans)
         # erik Muutti 
         return ( 
@@ -148,7 +149,7 @@ def process_project(data):
                 {
                     "message": "Chat updated",
                     "thread_id": str(thread_id),
-                    "assistant_response": response_json["assistant_response"],
+                    "assistant_response": asistant_response, #Erik Muutti
                     "validation_score": score, #Erik Muutti
                 }   
             ),
