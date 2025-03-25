@@ -66,6 +66,32 @@
 
 <script>
   let threadId = null;
+/////////
+  window.addEventListener("DOMContentLoaded", () => {
+  const params = new URLSearchParams(window.location.search);
+  const threadIdParam = params.get("thread_id");
+  const projectIdParam = params.get("project_id");
+
+  if (threadIdParam && projectIdParam) {
+    threadId = threadIdParam;
+
+    fetch("/resume_project", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id: projectIdParam }),
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.message) {
+          const chatBox = document.getElementById("chat-box");
+          chatBox.innerHTML += `<p><strong>Assistant:</strong> ${data.message}</p>`;
+          chatBox.scrollTop = chatBox.scrollHeight;
+          document.getElementById("chat-container").style.display = "block";
+        }
+      });
+  }
+});
+/////
 
   document
     .getElementById("upload-pdf-btn")
