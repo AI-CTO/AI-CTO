@@ -11,6 +11,10 @@ mock_businessPlan = os.path.join(os.path.dirname(__file__), "mockBusinessPlan.tx
 with open(mock_businessPlan, "r") as file:
     business_plan = file.read()
 
+idea_pdf = os.path.join(os.path.dirname(__file__), "idea.pdf")
+with open(idea_pdf, "r") as file:
+    pdf_business_plan = file.read()
+
 project_id = None
 thread_id = None
 
@@ -46,6 +50,31 @@ def test_create_and_get_project(client):
 
     assert project_id is not None, "Project ID was not found in the list of projects."
 
+def test_upload_pdf(client):
+    global project_id
+    global thread_id
+
+    response = client.post("/upload_pdf", json={"description": idea_pdf})
+    assert response.status_code == 200
+
+    response_data = response.get_json()
+    assert "thread_id" in response_data
+    assert "assistant_response" in response_data
+
+    thread_id = response_data["thread_id"]
+
+    response = client.get("/get_projects")
+    assert response.status_code == 200
+
+    response_data = response.get_json()
+    projects = response_data.get("projects", [])
+
+    for project in projects:
+        if project["thread_id"] == thread_id:
+            project_id = project["id"]
+            break
+
+    assert project_id is not None, "Project ID was not found in the list of projects."
 
 def test_evaluate_project(client):
     global project_id
@@ -65,16 +94,6 @@ def test_update_project(client):
     response = client.get(f"/update_project?id={project_id}")
 
     assert response.status_code == 200, f"Failed to fetch project: {response.get_json()}"
-
-
-def test_update_project(client):
-    global project_id
-    assert project_id is not None, "No valid project_id found from previous tests."
-
-    response = client.post(f"/resume_project", json={"id":project_id})
-
-    assert response.status_code == 200, f"Failed to fetch project: {response.get_json()}"
-
 
 def test_cleanup_project(client):
     global project_id
