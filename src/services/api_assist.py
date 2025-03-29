@@ -1,10 +1,18 @@
 import json
+import os
 import re
-import uuid
-from openai import OpenAI
-from .BMC_recources import BusinessModelCanvas as BMC
 
-#bmc = BMC.update_from_text()
+from openai import OpenAI
+
+# from .BMC_recources import BusinessModelCanvas as BMC
+
+script_dir = os.path.dirname(os.path.abspath(__file__))  # Get script's directory
+assistant_instructions = os.path.join(
+    script_dir, "instructions.txt"
+)  # Construct full path
+with open(assistant_instructions, "r", encoding="utf-8") as file:
+    instructions_content = file.read()
+
 
 class IdeaGenerator:
     def __init__(self, client: OpenAI):
@@ -14,37 +22,40 @@ class IdeaGenerator:
         """
         self.client = client
         self.thread_id = None
-        self.bmc = {} #Luo tyhjän bmc tietueen
-        self.assistant_id = self.create_assistant()
+        self.bmc = {}  # Luo tyhjän bmc tietueen
+        self.assistant_id = self.get_or_create_assistant()
 
-    def create_assistant(self):
-        """Luo uuden Assistantin OpenAI API:iin."""
+    def get_or_create_assistant(self):
+        """Checks if an assistant exists. If not, creates a new one."""
+        assistants = self.client.beta.assistants.list().data  # Get all assistants
+
+        if assistants:
+            # Use the first available assistant
+            existing_assistant = assistants[0]
+            print(
+                f"Using existing assistant: {existing_assistant.name} (ID: {existing_assistant.id})"
+            )
+            return existing_assistant.id
+
+        # If no assistant exists, create a new one
+        print("ppptpptpptptpptptpptpptpppt")
+        print("No existing assistant found. Creating a new one...")
         assistant = self.client.beta.assistants.create(
             name="Project Idea Assistant",
-            instructions="""  You assist the user in refining a business model canvas (BMC).
+            instructions="""
+                           You assist the user in refining a business model canvas (BMC).
                            First, ask the user to describe their idea in detail. Then,
                            iteratively guide them through completing the BMC by dynamically adjusting questions based on their inputs.
                            The user should also be able to ask general questions outside the BMC process.
                            If the user wishes to evaluate, use the data that you have to do so.
-
-
                            You will have two kinds of outputs for me. Imagine your answer to the user is in the variable "assistant_response"
-
-
                            And now you have more instructions:
-
-
                            You are an expert in Business Model Canvas (BMC) data extraction.
                            You will be given unstructured business descriptions and extract relevant information into a structured BMC format.
-
-
                            Your goal is to **fill in as many fields as possible** without overwriting existing values.
-
-
                            ### **Instructions**
                            1**Analyze the input text carefully.** 
                            - Identify key components such as business goals, customers, revenue sources, partnerships, and technologies.
-                          
                            2**Map the extracted information to the correct BMC fields.** 
                            - Example mappings:
                                - **Company Name** → If an organization is mentioned.
@@ -55,12 +66,8 @@ class IdeaGenerator:
                                - **Customer Segments** → Who benefits from the product/service?
                                - **Revenue Streams** → Monetization strategies.
                                - **Cost Structure** → Main expenses.
-
-
                            3**Preserve existing values** 
                            - Do not overwrite previously filled fields unless explicitly stated.
-
-
                           **Return ONLY a JSON object structured as follows, without extra text**:
                            ```json
                        {
@@ -76,7 +83,6 @@ class IdeaGenerator:
                            "cost_structure": <extracted info here, null of not provided>,
                            "revenue_streams": <extracted info here, null of not provided>
                        }
-                          
                            ```
 """,
             tools=[{"type": "code_interpreter"}],
@@ -89,27 +95,26 @@ class IdeaGenerator:
         thread = self.client.beta.threads.create()
         self.thread_id = thread.id
         return self.thread_id
-    
+
     def extract_json_from_response(self, response):
         """
         Extracts and parses JSON data from the assistant's response string.
-        
+
         :param response: The string response from the assistant containing JSON data.
         :return: A parsed dictionary containing the extracted JSON data.
         """
         try:
             match = re.search(r"```json\s*([\s\S]+?)\s*```", response)
-            
+
             if match:
                 json_data = match.group(1).strip()
-                parsed_data = json.loads(json_data) 
+                parsed_data = json.loads(json_data)
                 return parsed_data
             else:
                 raise ValueError("No valid JSON found in response.")
-        
+
         except json.JSONDecodeError as e:
             raise ValueError(f"Error parsing JSON: {str(e)}")
-
 
     def evaluate(self):
         """Asks the AI to evaluate the project based on user discussions and updates the evaluation table."""
@@ -219,37 +224,3 @@ class IdeaGenerator:
         print("Resumed conversation response: ", ai_response_text)
 
         return {"success": True, "message": ai_response_text}
-
-    # def start_chat(self):
-    #     """Käynnistää interaktiivisen OpenAI-pohjaisen chatin käyttäjän kanssa, jossa täytetään BMC."""
-    #     print("Let's begin filling in the BMC Canvas. Describe your idea in detail.")
-        
-    #     user_message = input("User: ")
-    #     print(f"\nUser: {user_message}")
-    #     conversation = [
-    #         {
-    #             "role": "system",
-    #             "content": """
-    #                 We are working on a Business Model Canvas (BMC). 
-    #                 Guide the user by asking relevant questions to complete the BMC. 
-    #                 Let the user also ask unrelated questions.
-    #             """,
-    #         },
-    #         {"role": "user", "content": user_message},
-    #     ]
-
-    #     while True:
-    #         response = self.client.chat.completions.create(
-    #             model="gpt-4o", messages=conversation, max_tokens=500
-    #         )
-    #         assistant_reply = response.choices[0].message.content.strip()
-    #         print(f"\nAssistant: {assistant_reply}")
-
-    #         user_input = input("User: ")
-    #         if user_input.lower() in ["lopeta", "valmis", "done", "finished"]:
-    #             print("\nBMC creation ends.")
-    #             break
-
-    #         conversation.append({"role": "assistant", "content": assistant_reply})
-    #         conversation.append({"role": "user", "content": user_input})
-

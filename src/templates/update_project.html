@@ -1,8 +1,6 @@
 {% extends "layout.html" %} {% block title %}Update Project{% endblock %} {%
 block content %}
-<header>
-  <h1>Update Project</h1>
-</header>
+
 
 {% if error %}
 <p style="color: red">{{ error }}</p>
@@ -11,12 +9,17 @@ block content %}
   <!-- Left: Project Details & Evaluate Form -->
   <div style="flex: 1">
     <h2>Current Details</h2>
+    <div id="validation-bar-container">
+      <div id="validation-bar">
+        <div id="validation-fill" style="width: 0%"></div>
+        <span id="validation-text">0%</span>
+    </div>
     <p><strong>Name:</strong> {{ project.name }}</p>
     <p><strong>Business Novelty:</strong> {{ project.x_value }}</p>
     <p><strong>Customer Novelty:</strong> {{ project.y_value }}</p>
     <p><strong>Impact:</strong> {{ project.impact }}</p>
 
-    <h3>Resume Conversation</h3>
+    <!-- <h3>Resume Conversation</h3>
     <form
       id="resume-conversation-form"
       onsubmit="event.preventDefault(); resumeConversation();"
@@ -25,6 +28,14 @@ block content %}
       <p id="conversation-status" style="color: green; display: none">
         Conversation resumed successfully!
       </p>
+    </form> -->
+    
+    <h3>Resume Conversation</h3>
+    <form 
+      id="resume-conversation-form" 
+      onsubmit="event.preventDefault(); resumeConversationRedirect();"
+    >
+      <button type="submit" id="resume-btn">Resume Conversation</button>
     </form>
 
     <div id="chat-container" style="display: none; margin-top: 20px">
@@ -85,44 +96,36 @@ block content %}
   let threadId = null;
   const projectId = "{{ project.id }}";
 
-  function resumeConversation() {
-    const resumeButton = document.getElementById("resume-btn");
-    resumeButton.disabled = true;
-    resumeButton.textContent = "Resuming...";
+  function resumeConversationRedirect() {
+  const resumeButton = document.getElementById("resume-btn");
+  resumeButton.disabled = true;
+  resumeButton.textContent = "Resuming...";
 
-    fetch("/resume_project", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ id: projectId }),
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        if (data.error) {
-          alert(data.error);
-        } else {
-          threadId = data.thread_id;
-
-          const chatBox = document.getElementById("chat-box");
-          chatBox.innerHTML += `<p><strong>Assistant:</strong> ${data.message}</p>`;
-          chatBox.scrollTop = chatBox.scrollHeight;
-        
-
-          document.getElementById("conversation-status").style.display =
-            "block";
-          document.getElementById("evaluate-btn").style.display = "block";
-          document.getElementById("chat-container").style.display = "block";
-        }
-      })
-      .catch((error) => {
-        console.error("Error resuming conversation:", error);
-        alert("Error resuming conversation. Please try again.");
-      })
-      .finally(() => {
+  fetch("/resume_project", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ id: "{{ project.id }}" }),
+  })
+    .then((response) => response.json())
+    .then((data) => {
+      if (data.error) {
+        alert(data.error);
         resumeButton.disabled = false;
         resumeButton.textContent = "Resume Conversation";
-      });
-  }
-
+      } else {
+        const threadId = data.thread_id;
+        // Redirect to index with threadId
+        window.location.href = `/?thread_id=${threadId}&project_id={{ project.id }}`;
+      }
+    })
+    .catch((error) => {
+      console.error("Error resuming conversation:", error);
+      alert("Error resuming conversation.");
+      resumeButton.disabled = false;
+      resumeButton.textContent = "Resume Conversation";
+    });
+}
+  
   function sendMessage() {
     const userMessage = document.getElementById("user-input").value;
     if (!userMessage.trim()) return;
@@ -155,7 +158,6 @@ block content %}
       });
   }
 
-  // Evaluate the project
   function evaluateProject() {
     const evaluateButton = document.getElementById("evaluate-btn");
     evaluateButton.disabled = true;

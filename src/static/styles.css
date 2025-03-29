@@ -10,9 +10,10 @@ body {
 }
 
 header {
+  height: 150px; /* Match the new maxHeight value from shrink_script.js */
   background: #8e8787;
   color: #333;
-  padding: 0.1rem 20px;
+  padding: 0.2rem 20px; /* Slightly larger padding for the bigger header */
   border-bottom: 1px solid #e0e0e0;
   position: sticky;
   top: 0;
@@ -22,11 +23,13 @@ header {
   align-items: center; /* Vertically center the items */
   justify-content: flex-start; /* Align logo and nav at the start */
   width: 100%; /* Ensures the header takes up the full width */
+  transition: height 0.2s ease, padding 0.2s ease; /* Smooth height and padding transition */
 }
 
 header .logo {
-  width: 150px; /* Adjust logo size */
-  height: auto;
+  height: 90%; /* Increase the logo's size relative to the header's height */
+  width: auto; /* Maintain the aspect ratio */
+  transition: height 0.2s ease; /* Smooth transition for logo size */
   margin-right: 20px; /* Space between logo and nav */
 }
 
@@ -38,15 +41,16 @@ nav {
 }
 
 header h1 {
-  font-size: 1.2rem;
+  font-size: 1.5rem; /* Increase the font size of the motto */
   font-weight: 600;
   margin: 0;
   padding-left: 20px;
+  transition: font-size 0.2s ease; /* Smooth transition for font size */
 }
 
 main {
   padding: 4rem 2rem;
-  max-width: 800px;
+  max-width: 1200px;
   margin: 0 auto;
   text-align: center;
 }
@@ -59,40 +63,63 @@ footer {
   border-top: 1px solid #e0e0e0;
 }
 
-/* Minimal tab navigation */
+/* Elastic tab container */
 .tabs {
-  list-style: none;
+  width: 80%; /* Increase the width of the tab bar */
+  margin: 0 auto; /* Center the tab bar horizontally */
   display: flex;
-  justify-content: space-evenly;
+  justify-content: space-evenly; /* Ensure even spacing between tabs */
   padding: 0;
-  margin: 0; /* Remove margin from the list */
   background: #f0f0f0;
-  border-radius: 8px;
+  border-radius: 50px;
   overflow: hidden;
+  height: 60px; /* Adjust height for the elastic effect */
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.25);
+  position: relative; /* Ensure the .tab-indicator is positioned relative to .tabs */
 }
 
+/* Ensure tabs have enough space */
 .tabs .tab-link {
-  font-weight: 400;
-  padding: 12px 24px;
-  cursor: pointer;
-  color: #666;
-  background: transparent;
-  flex-grow: 1;
+  flex: 1; /* Distribute space evenly */
   text-align: center;
-  transition: color 0.3s ease, background 0.3s ease;
+  line-height: 60px;
+  font-weight: 500;
+  font-size: 1rem;
+  color: #666;
+  cursor: pointer;
+  z-index: 1;
+  transition: color 0.3s ease;
+  text-decoration: none; /* Remove underline from tab texts */
 }
 
-/* Hover effect for tabs */
 .tabs .tab-link:hover {
-  background: #e0e0e0;
   color: #333;
+  text-decoration: none; /* Ensure no underline on hover */
 }
 
-/* Style for active tab */
 .tabs .tab-link.active {
-  background: #cdcebf; /* Light blue background for active tab */
-  color: #515354; /* Darker blue color for active tab text */
+  color: #fff;
   font-weight: 600;
+}
+
+/* Active Tab Link */
+.tabs .tab-link.active {
+  font-weight: 600; /* Keep the bold effect for the active tab */
+  color: #333; /* Ensure the text color remains consistent */
+  text-decoration: none; /* Ensure no underline for active tab */
+}
+
+/* Tab Indicator */
+.tabs .tab-indicator {
+  position: absolute;
+  bottom: 0; /* Keep it at the bottom of the tab bar */
+  left: 0;
+  height: 5px; /* Thin underline */
+  width: 20%; /* Adjust width based on the number of tabs */
+  background: linear-gradient(45deg, #05abe0 0%, #8200f4 100%);
+  border-radius: 50px;
+  transition: all 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  z-index: 1; /* Ensure it appears above the background but below the text */
 }
 
 /* Tab content (if used) */
@@ -151,52 +178,196 @@ button:active {
   transform: translateY(0);
 }
 
+/* Table container for better spacing */
 table {
   width: 100%;
   border-collapse: collapse;
-  margin-top: 20px;
+  margin: 20px 0;
+  font-size: 1rem;
+  font-family: 'Open Sans', sans-serif;
+  background: rgba(255, 255, 255, 0.1); /* Subtle glassy background */
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Soft shadow for a modern look */
 }
 
-th,
-td {
-  border: 5px solid #ddd;
-  padding: 12px;
-  text-align: center;
-}
-
+/* Table header */
 th {
-  background-color: #c39b50;
-  color: white;
+  background-color: rgba(146, 181, 174, 0.6); /* Less opaque emerald green */
+  color: white; /* White text for contrast */
+  text-align: left;
+  padding: 15px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
+/* Table rows */
+td {
+  padding: 12px 15px;
+  text-align: left;
+  color: #333; /* Dark text for readability */
+  border-bottom: 1px solid rgba(0, 128, 96, 0.2); /* Subtle row separator */
+}
+
+/* Alternate row background for better readability */
 tr:nth-child(even) {
-  background-color: #f9f9f9;
+  background-color: rgba(240, 240, 240, 0.5); /* Light gray for even rows */
 }
 
+/* Hover effect for rows */
 tr:hover {
-  background-color: #f1f1f1;
+  background-color: rgba(80, 200, 120, 0.05); /* Subtle emerald green highlight */
+  transition: background-color 0.3s ease;
 }
 
+/* Buttons inside the table */
 .edit-btn,
 .delete-btn {
-  width: 100px; /* Set a fixed width */
-  text-align: center; /* Ensure text is centered */
-  padding: 8px; /* Adjust padding for better spacing */
-  border-radius: 4px;
+  padding: 8px 12px;
   border: none;
+  border-radius: 4px;
+  font-size: 0.9rem;
   cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
 }
 
+/* Edit button styling */
 .edit-btn {
-  background-color: #c39b50;
+  background-color: rgba(134, 199, 185, 0.662); /* Emerald green */
   color: white;
 }
 
+.edit-btn:hover {
+  background-color: rgb(134, 179, 149); /* Slightly darker green on hover */
+  transform: translateY(-2px); /* Subtle lift effect */
+}
+
+/* Delete button styling */
 .delete-btn {
-  color: red; /* Ensure text is visible */
+  background-color: rgba(203, 134, 134, 0.8); /* Red for delete */
+  color: white;
+}
+
+.delete-btn:hover {
+  background-color: rgba(235, 87, 87, 1); /* Slightly darker red on hover */
+  transform: translateY(-2px); /* Subtle lift effect */
+}
+
+/* Table footer (if needed) */
+tfoot td {
+  background-color: rgba(80, 200, 120, 0.05); /* Very light emerald green */
+  color: #333;
+  font-weight: bold;
+  text-align: center;
+  padding: 10px;
 }
 
 .project-title {
   font-weight: bold;
   font-size: 16px;
+}
+
+/* Shrinking header styles */
+header.shrink {
+  padding: 0.05rem 20px; /* Reduce padding */
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1); /* Slightly stronger shadow */
+  transition: all 0.3s ease; /* Smooth transition for shrinking */
+}
+
+header.shrink .logo {
+  height: 60%; /* Minimum size when the header shrinks */
+  min-height: 30px; /* Ensure the logo is always visible */
+  transition: width 0.3s ease; /* Smooth transition for logo size */
+}
+
+header.shrink h1 {
+  font-size: 1rem; /* Reduce font size of the header title */
+  transition: font-size 0.3s ease; /* Smooth transition for font size */
+}
+
+header.shrink nav {
+  margin-right: 150px; /* Adjust navigation spacing */
+  transition: margin-right 0.3s ease; /* Smooth transition for spacing */
+}
+
+header.shrink .tab-link {
+  font-size: 0.9rem; /* Reduce font size of navigation links */
+  transition: font-size 0.3s ease; /* Smooth transition for font size */
+}
+.conversation-header {
+  display: flex;
+  align-items: center;
+  gap: 800px; 
+  margin-bottom: 10px;
+}
+
+.conversation-title {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+#validation-bar-container {
+  display: flex;
+  align-items: center;
+}
+
+#validation-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 120px;
+  height: 25px;
+  border: 2px solid #333;
+  border-radius: 4px;
+  background-color: #fff;
+  padding: 2px;
+  box-sizing: border-box;
+}
+
+#validation-fill {
+  height: 100%;
+  background-color: #4caf50;
+  border-radius: 2px;
+  transition: width 0.3s ease;
+}
+
+#validation-text {
+  font-size: 12px;
+  font-weight: bold;
+  color: #333;
+  margin-left: 6px;
+  white-space: nowrap;
+}
+
+#user-input {
+  font-family: inherit;
+  font-size: 1rem;
+  line-height: 1.4;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  padding: 8px 12px;
+  width: 100%;
+  resize: none;
+  min-height: 40px;
+  max-height: 200px;
+  overflow-y: hidden;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  box-sizing: border-box;
+}
+
+#user-input:focus {
+  border-color: #0077b6;
+  outline: none;
+  box-shadow: 0 0 5px rgba(0, 119, 182, 0.3);
+}
+
+.centered-chat-form {
+  margin: 20px auto 0 auto;
+  display: flex;
+  gap: 10px;
+  align-items: flex-end;
+  justify-content: center;
+  max-width: 800px;
 }

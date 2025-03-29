@@ -7,20 +7,6 @@
     Welcome to the AI Project Portfolio Visualization Tool. Describe your project idea or upload a PDF to get started.
   </p>
 
-  <form id="description-form">
-    <label for="description">Enter your project idea here:</label>
-    <input
-      type="text"
-      id="description"
-      name="description"
-      placeholder="Describe your project..."
-      style="margin-bottom: 10px; width: 100%"
-    />
-    <button type="button" id="send-description-btn" class="button">
-      Send Description
-    </button>
-  </form>
-
   <form id="pdf-form" enctype="multipart/form-data">
     <label for="pdf-file">Upload a PDF file:</label>
     <input type="file" id="pdf-file" name="pdf" accept=".pdf" />
@@ -29,8 +15,20 @@
     </button>
   </form>
 
-  <div id="chat-container" style="display: none; margin-top: 20px">
-    <h2>Conversation</h2>
+  <div id="loading-spinner" style="display: none; text-align: center; margin: 20px 0;">
+    <img src="{{ url_for('static', filename='spinner.gif') }}" alt="Loading..." style="width: 50px;" />
+  </div>
+
+  <div id="chat-container" style="margin-top: 20px">
+    <div class="conversation-header">
+      <h2>Conversation</h2>
+      <div id="validation-bar-container">
+        <div id="validation-bar">
+          <div id="validation-fill"></div>
+          <span id="validation-text">0%</span>
+        </div>
+      </div>
+    </div>
     <div
       id="chat-box"
       style="
@@ -40,21 +38,18 @@
         overflow-y: auto;
       "
     >
-      <p>
         <strong>Assistant:</strong> Let's start! Describe your project idea.
       </p>
     </div>
-    <form id="chat-form" style="margin-top: 10px">
-      <input
-        type="text"
+    <form id="chat-form" class="centered-chat-form">
+      <textarea
         id="user-input"
         placeholder="Type your message..."
         required
-        style="width: 80%; padding: 5px"
-      />
+        style="width: 80%; padding: 8px; resize: none; min-height: 40px; overflow-y: hidden;"
+      ></textarea>
       <button type="submit" class="button">Send</button>
     </form>
-
     <button
       id="evaluate-btn"
       class="button"
@@ -75,39 +70,33 @@
 
 <script>
   let threadId = null;
+/////////
+  window.addEventListener("DOMContentLoaded", () => {
+  const params = new URLSearchParams(window.location.search);
+  const threadIdParam = params.get("thread_id");
+  const projectIdParam = params.get("project_id");
 
-  document
-    .getElementById("send-description-btn")
-    .addEventListener("click", function () {
-      const description = document.getElementById("description").value;
-      const chatBox = document.getElementById("chat-box");
-      const errorMessage = document.getElementById("error-message")
-      if (!description) {
-        errorMessage.textContent = "Please enter text";
-        errorMessage.style.display = "block";
-      }
-
-      chatBox.innerHTML += `<p><strong>You:</strong> ${description}</p>`;
-
-      fetch("/process_project", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ description: description, thread_id: threadId }),
-      })
-        .then((response) => response.json())
-        .then((data) => {
-          if (data.error) {
-            alert(data.error);
-          } else {
-            threadId = data.thread_id;
-            document.getElementById("chat-container").style.display = "block";
-            document.getElementById("evaluate-btn").style.display = "block";
-            chatBox.innerHTML += `<p><strong>Assistant:</strong> ${data.assistant_response}</p>`;
-            chatBox.scrollTop = chatBox.scrollHeight;
-          }
-        })
-        .catch((error) => console.error("Error:", error));
-    });
+  if (threadIdParam && projectIdParam) {
+    threadId = threadIdParam;
+    showLoader();
+    fetch("/resume_project", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id: projectIdParam }),
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.message) {
+          const chatBox = document.getElementById("chat-box");
+          chatBox.innerHTML += `<p><strong>Assistant:</strong> ${data.message}</p>`;
+          chatBox.scrollTop = chatBox.scrollHeight;
+          document.getElementById("chat-container").style.display = "block";
+        }
+        hideLoader();
+      });
+  }
+});
+/////
 
   document
     .getElementById("upload-pdf-btn")
@@ -124,7 +113,7 @@
       if (threadId) {
         formData.append("thread_id", threadId);
       }
-
+      showLoader();
       fetch("/upload_pdf", {
         method: "POST",
         body: formData,
@@ -140,42 +129,73 @@
             chatBox.innerHTML += `<p><strong>Assistant:</strong> ${data.message}</p>`;
             chatBox.scrollTop = chatBox.scrollHeight;
           }
+          hideLoader();
         })
         .catch((error) => console.error("Error:", error));
     });
   document.getElementById("chat-form").addEventListener("submit", function (event) {
-    event.preventDefault();
-    const userInput = document.getElementById("user-input").value;
-    const chatBox = document.getElementById("chat-box");
-    if (!threadId) {
-      alert("Start a project first!");
-      return;
-    }
+  event.preventDefault();
+  const userInputElement = document.getElementById("user-input");
+  const userInput = userInputElement.value.trim();
+  const chatBox = document.getElementById("chat-box");
 
-    chatBox.innerHTML += `<p><strong>You:</strong> ${userInput}</p>`;
-    document.getElementById("user-input").value = "";
-    document.getElementById("chat-container").style.display = "block";
-    chatBox.scrollTop = chatBox.scrollHeight;
+  if (!userInput) return;
 
-    fetch("/process_project", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ description: userInput, thread_id: threadId }),
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        if (data.error) {
-          chatBox.innerHTML += `<p style="color: red;"><strong>Error:</strong> ${data.error}</p>`;
-        } else {
-          chatBox.innerHTML += `<p><strong>Assistant:</strong> ${data.assistant_response}</p>`;
+  chatBox.innerHTML += `<p><strong>You:</strong> ${userInput}</p>`;
+  userInputElement.value = "";
+  userInputElement.style.height = "auto"; // reset height
+  document.getElementById("chat-container").style.display = "block";
+  chatBox.scrollTop = chatBox.scrollHeight;
+  showLoader();
+  fetch("/process_project", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ description: userInput, thread_id: threadId }),
+  })
+    .then((response) => response.json())
+    .then((data) => {
+      if (data.error) {
+        chatBox.innerHTML += `<p style="color: red;"><strong>Error:</strong> ${data.error}</p>`;
+      } else {
+        threadId = data.thread_id;
+        chatBox.innerHTML += `<p><strong>Assistant:</strong> ${data.assistant_response}</p>`;
+
+        // validation score visuaalinen näyttö
+        if (data.validation_score !== undefined) {
+          const score = parseFloat(data.validation_score).toFixed(1);
+          const percent = Math.min(100, Math.max(0, score));
+
+          if (percent > 50) {
+          document.getElementById("evaluate-btn").style.display = "block";
         }
-        chatBox.scrollTop = chatBox.scrollHeight;
-      })
-      .catch((error) => {
-        console.error("Error continuing conversation:", error);
-        chatBox.innerHTML += `<p style="color: red;"><strong>Error:</strong> Unable to get response.</p>`;
-      });
-  });
+
+          const fill = document.getElementById("validation-fill");
+          const text = document.getElementById("validation-text");
+          const bar = document.getElementById("validation-bar");
+
+          fill.style.width = `${percent}%`;
+          text.textContent = `${percent}%`;
+
+          if (percent < 40) {
+            fill.style.backgroundColor = "#f44336";
+          } else if (percent < 70) {
+            fill.style.backgroundColor = "#ff9800";
+          } else {
+            fill.style.backgroundColor = "#4caf50";
+          }
+
+          bar.style.display = "flex";
+        }
+      }
+
+      chatBox.scrollTop = chatBox.scrollHeight;
+      hideLoader();
+    })
+    .catch((error) => {
+      console.error("Error:", error);
+      chatBox.innerHTML += `<p style="color: red;"><strong>Error:</strong> Unable to get response.</p>`;
+    });
+});
 
 
   document
@@ -185,7 +205,7 @@
         alert("Please submit a description or upload a PDF first!");
         return;
       }
-
+      showLoader();
       fetch("/evaluate_project", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -201,9 +221,33 @@
             document.getElementById("evaluation-output").textContent =
               JSON.stringify(data.evaluation, null, 2);
           }
+          hideLoader();
         })
         .catch((error) => console.error("Error:", error));
     });
+    // Tee textarea käyttäytyy kuin chatissä (automaattinen korkeus)
+    const textarea = document.getElementById("user-input");
+
+    textarea.addEventListener("input", () => {
+      textarea.style.height = "auto";
+      textarea.style.height = textarea.scrollHeight + "px";
+    });
+
+    // Lähetä viesti Enterillä, rivinvaihto Shift+Enterillä
+    textarea.addEventListener("keydown", function (event) {
+      if (event.key === "Enter" && !event.shiftKey) {
+        event.preventDefault();
+        document.getElementById("chat-form").dispatchEvent(new Event("submit"));
+      }
+    });
+  
+  function showLoader() {
+  document.getElementById("loading-spinner").style.display = "block";
+}
+
+  function hideLoader() {
+    document.getElementById("loading-spinner").style.display = "none";
+  }
 </script>
 
 {% endblock %}

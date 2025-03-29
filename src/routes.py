@@ -33,7 +33,7 @@ def setup_routes(app, limiter):
         return jsonify({"Result": "This works once an hour"})
 
     @app.route("/process_project", methods=["POST"])
-    @limiter.limit("15/hour")
+    @limiter.limit("30/hour")
     def process_project_route():
         return process_project(request.json)
 

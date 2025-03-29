@@ -9,6 +9,7 @@
       href="{{ url_for('static', filename='styles.css') }}"
     />
     <script src="https://cdn.bokeh.org/bokeh/release/bokeh-3.0.0.min.js"></script>
+    <script src="{{ url_for('static', filename='shrink_script.js') }}" defer></script>
     {% block extra_scripts %}{% endblock %}
   </head>
   <body>
@@ -19,9 +20,12 @@
       <img src="{{ url_for('static', filename='logo_transparent2.png') }}" alt="Logo" class="logo">
 
       <!-- Header Text and Navigation -->
-
       <nav>
         <ul class="tabs">
+          <!-- Tab Indicator -->
+          <div class="tab-indicator"></div>
+
+          <!-- Tab Links -->
           <li><a href="{{ url_for('index') }}" class="tab-link" data-tab="home">Home</a></li>
           <li><a href="{{ url_for('visualize_route') }}" class="tab-link" data-tab="visualize">Visualization</a></li>
           <li><a href="{{ url_for('previous_projects_route') }}" class="tab-link" data-tab="previous-projects">Previous Projects</a></li>
