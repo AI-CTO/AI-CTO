@@ -12,8 +12,7 @@ with open(mock_businessPlan, "r") as file:
     business_plan = file.read()
 
 idea_pdf = os.path.join(os.path.dirname(__file__), "idea.pdf")
-#with open(idea_pdf, "r") as file:
-#    pdf_business_plan = file.read()
+
 
 project_id = None
 thread_id = None

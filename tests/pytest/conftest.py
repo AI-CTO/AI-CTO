@@ -1,7 +1,6 @@
 import os
 import sys
-
-import load_dotenv
+from dotenv import load_dotenv
 load_dotenv()
 
 sys.path.insert(
