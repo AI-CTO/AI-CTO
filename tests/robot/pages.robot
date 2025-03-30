@@ -5,12 +5,12 @@ Resource    resource.robot
 Test Home Page
     Open And Configure Browser
     Go To    ${HOME_URL}
-    Page Should Contain    AICTO: Project Portfolio Visualization Tool
+    Page Should Contain    Welcome to the AI Project Portfolio Visualization Tool. Describe your project idea or upload a PDF to get started.
     
 User can see main page
     Open And Configure Browser
     Go To    ${HOME_URL}
-    Page Should Contain  AICTO: Project Portfolio Visualization Tool
+    Page Should Contain   Welcome to the AI Project Portfolio Visualization Tool. Describe your project idea or upload a PDF to get started.
 
 User can see Visualization page
     Open And Configure Browser
@@ -31,4 +31,4 @@ User can go back to Home page
     Page Should Contain    Previous Projects
     Click Element    //a[text()='Home']
     Page Should Contain    AI Project Portfolio Visualization Tool
-    Close Browser
+    resource.Close Browser

@@ -5,3 +5,7 @@ instance/
 !static/logo_transparent2.png 
 *.log
 venv
+log.html
+output.xml
+interactive_console_output.xml
+

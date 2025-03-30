@@ -7,7 +7,7 @@ User can input text to text-input field
     Open And Configure Browser
     Go To    ${HOME_URL}
     Page Should Contain  Project Portfolio Visualization Tool
-    Input Text    id=description    AirBNB for humans and cats
+    Input Text    id=user-input    AirBNB for humans and cats
     Click Button   css:button[type="submit"]
-    Sleep    10
-    Page Should Contain    Project Name: AirBNB for humans and cats
+    Sleep    5
+    Page Should Contain    AirBNB for humans and cats
