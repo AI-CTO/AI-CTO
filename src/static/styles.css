@@ -234,12 +234,12 @@ tr:hover {
 
 /* Edit button styling */
 .edit-btn {
-  background-color: rgba(134, 199, 185, 0.662); /* Emerald green */
+  background-color: rgba(4, 76, 4, 0.662); /* Emerald green */
   color: white;
 }
 
 .edit-btn:hover {
-  background-color: rgb(134, 179, 149); /* Slightly darker green on hover */
+  background-color: rgb(16, 30, 103); /* Slightly darker green on hover */
   transform: translateY(-2px); /* Subtle lift effect */
 }
 
