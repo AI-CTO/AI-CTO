@@ -17,7 +17,7 @@ This document explains how the AI-CTO application is deployed as a container in 
    - Exposing port `5000` for the Flask application.
    - Running the app using `flask run`.
 
-   File: [`Dockerfile`](./Dockerfile)
+   File: [`Dockerfile`](https://github.com/AI-CTO/AI-CTO/blob/cache/Dockerfile)
 
 2. **GitHub Actions Workflow**: Automates the build and deployment process. The workflow:
    - Builds the container image using the `Dockerfile`.
@@ -25,11 +25,11 @@ This document explains how the AI-CTO application is deployed as a container in 
    - Logs into the OpenShift cluster.
    - Deploys the application and exposes it to the internet.
 
-   File: [`.github/workflows/openshift.yml`](./.github/workflows/openshift.yml)
+   File: [`.github/workflows/openshift.yml`](https://github.com/AI-CTO/AI-CTO/blob/cache/.github/workflows/openshift.yml)
 
 ## Deployment Steps
 1. **Set Up the Workflow**:
-   - The workflow is defined in [`.github/workflows/openshift.yml`](./.github/workflows/openshift.yml).
+   - The workflow is defined in [`.github/workflows/openshift.yml`](https://github.com/AI-CTO/AI-CTO/blob/cache/.github/workflows/openshift.yml)
    - It uses actions like `buildah-build`, `push-to-registry`, and `oc-new-app` to build, push, and deploy the container.
 
 2. **Trigger the Workflow**:
