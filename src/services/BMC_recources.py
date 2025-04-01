@@ -39,71 +39,77 @@ from typing import Optional, List, Dict
 
 client = OpenAI()
 
-class BusinessModelCanvas(BaseModel):
-    print("BMC IS RUNNING")
-    company_name: Optional[str] = None 
-    key_partners: Optional[List[str]] = None
-    key_activities: Optional[List[str]] = None
-    key_resources: Optional[List[str]] = None
-    value_propositions: Optional[Dict[str, str]] = None
-    customer_relationships: Optional[List[str]] = None
-    channels: Optional[List[str]] = None
-    customer_segments: Optional[Dict[str, List[str]]] = None
-    cost_structure: Optional[List[str]] = None ###
-    revenue_streams: Optional[List[str]] = None
-    print("BMC IS RUNNING")
+# class BusinessModelCanvas(BaseModel):
+#     print("BMC IS RUNNING")
+#     company_name: Optional[str] = None 
+#     key_partners: Optional[List[str]] = None
+#     key_activities: Optional[List[str]] = None
+#     key_resources: Optional[List[str]] = None
+#     value_propositions: Optional[Dict[str, str]] = None
+#     customer_relationships: Optional[List[str]] = None
+#     channels: Optional[List[str]] = None
+#     customer_segments: Optional[Dict[str, List[str]]] = None
+#     cost_structure: Optional[List[str]] = None ###
+#     revenue_streams: Optional[List[str]] = None
+#     #Products
+#     #1 
+#     #2 
+#     #3
+#     #4
+#     #5
+#     print("BMC IS RUNNING")
 
-    def update_from_text(self, text: str) -> None:
-        print("BMC IS RUNNING")
+#     def update_from_text(self, text: str) -> None:
+#         print("BMC IS RUNNING")
 
-        try:
-            print("kakkakakakakakkakakakkakakakakakakakak")
-            completion = client.beta.chat.completions.parse(
-                model="gpt-4o",
-                messages=[
-                    {
-                        "role": "system",
-                        "content": """
-                        You are an expert in Business Model Canvas (BMC) data extraction. 
-                        You will be given unstructured business descriptions and extract relevant information into a structured BMC format.
+#         try:
+#             print("kakkakakakakakkakakakkakakakakakakakak")
+#             completion = client.beta.chat.completions.parse(
+#                 model="gpt-4o",
+#                 messages=[
+#                     {
+#                         "role": "system",
+#                         "content": """
+#                         You are an expert in Business Model Canvas (BMC) data extraction. 
+#                         You will be given unstructured business descriptions and extract relevant information into a structured BMC format.
 
-                        Your goal is to **fill in as many fields as possible** without overwriting existing values.
+#                         Your goal is to **fill in as many fields as possible** without overwriting existing values.
 
-                        ### **Instructions**
-                        1**Analyze the input text carefully.**  
-                        - Identify key components such as business goals, customers, revenue sources, partnerships, and technologies.
+#                         ### **Instructions**
+#                         1**Analyze the input text carefully.**  
+#                         - Identify key components such as business goals, customers, revenue sources, partnerships, and technologies.
                         
-                        2**Map the extracted information to the correct BMC fields.**  
-                        - Example mappings:
-                            - **Company Name** → If an organization is mentioned.
-                            - **Key Partners** → Any external companies or institutions involved.
-                            - **Key Activities** → Core operations mentioned in the text.
-                            - **Key Resources** → Technologies, infrastructure, or human resources.
-                            - **Value Propositions** → The benefits offered by the product/service.
-                            - **Customer Segments** → Who benefits from the product/service?
-                            - **Revenue Streams** → Monetization strategies.
-                            - **Cost Structure** → Main expenses.
+#                         2**Map the extracted information to the correct BMC fields.**  
+#                         - Example mappings:
+#                             - **Company Name** → If an organization is mentioned.
+#                             - **Key Partners** → Any external companies or institutions involved.
+#                             - **Key Activities** → Core operations mentioned in the text.
+#                             - **Key Resources** → Technologies, infrastructure, or human resources.
+#                             - **Value Propositions** → The benefits offered by the product/service.
+#                             - **Customer Segments** → Who benefits from the product/service?
+#                             - **Revenue Streams** → Monetization strategies.
+#                             - **Cost Structure** → Main expenses.
 
-                        3**Preserve existing values**  
-                        - Do not overwrite previously filled fields unless explicitly stated.
+#                         3**Preserve existing values**  
+#                         - Do not overwrite previously filled fields unless explicitly stated.
 
-                        Return the updated Business Model Canvas in **JSON format**.
-"""
-                    },
-                    {"role": "user", "content": text}
-                ],
-                response_format=BusinessModelCanvas
-            )
+#                         Return the updated Business Model Canvas in **JSON format**.
+# """
+#                     },
+#                     {"role": "user", "content": text}
+#                 ],
+#                 response_format=BusinessModelCanvas
+#             )
 
-            new_data = completion.choices[0].message.parsed
+#             new_data = completion.choices[0].message.parsed
 
 
-            for field, value in new_data.dict().items():
-                if value is not None:
-                    setattr(self, field, value)
+#             for field, value in new_data.dict().items():
+#                 if value is not None:
+#                     setattr(self, field, value)
         
-        except Exception as e:
-            print(f"⚠️ OpenAI API -virhe: {e}")
+#         except Exception as e:
+#             print(f"⚠️ OpenAI API -virhe: {e}")
 
 class BmcValidator(BaseModel):
     print("BMC IS RUNNING")

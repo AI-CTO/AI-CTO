@@ -38,9 +38,10 @@ class IdeaGenerator:
             return existing_assistant.id
 
         # If no assistant exists, create a new one
-        print("ppptpptpptptpptptpptpptpppt")
+   
         print("No existing assistant found. Creating a new one...")
         assistant = self.client.beta.assistants.create(
+            temperature=0.0, 
             name="Project Idea Assistant",
             instructions="""
                            You assist the user in refining a business model canvas (BMC).
