@@ -1,6 +1,7 @@
 from datetime import datetime, timezone
 
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import Column, String
 
 db = SQLAlchemy()
 
@@ -35,6 +36,7 @@ class Project(db.Model):
         default=lambda: datetime.now(timezone.utc),
         onupdate=lambda: datetime.now(timezone.utc),
     )
+    project_type = Column(String, nullable=False, default="Idea")  # New field
 
     def to_dict(self):
         return {
@@ -45,4 +47,5 @@ class Project(db.Model):
             "name": self.name,
             "thread_id": self.thread_id,
             "timestamp": self.timestamp.isoformat() if self.timestamp else None,
+            "project_type": self.project_type,  # Include project_type
         }

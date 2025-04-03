@@ -18,6 +18,7 @@ def process_project(data):
 
         user_input = data.get("description")
         project_id = data.get("id")
+        project_type = data.get("project_type", "Idea")  # Get project_type from input, default to "Idea"
         print("Finds description")
 
         if not user_input:
@@ -27,6 +28,9 @@ def process_project(data):
             project = Project.query.get(project_id)
             if project:
                 thread_id = project.thread_id
+                # Update the project_type if provided
+                project.project_type = project_type
+                db.session.commit()
             else:
                 return jsonify({"error": "Project not found"}), 404
         else:
@@ -37,6 +41,7 @@ def process_project(data):
                 y_value=0,
                 impact=0,
                 thread_id=thread_id,
+                project_type=project_type,  # Save project_type
             )
             db.session.add(project)
             db.session.commit()
@@ -174,6 +179,7 @@ def evaluate_project(data):
         client = OpenAI()
         generator = IdeaGenerator(client)
         thread_id = data.get("thread_id")
+        project_type = data.get("project_type", "Idea")  # Get project_type from input, default to "Idea"
 
         if not thread_id:
             return jsonify({"error": "Missing thread_id"}), 400
@@ -194,11 +200,12 @@ def evaluate_project(data):
         if not project:
             return jsonify({"error": "Project not found"}), 404
 
+        # Update project details
         project.x_value = x_value
         project.y_value = y_value
         project.impact = impact
         project.name = name
-
+        project.project_type = project_type  # Update project_type
         db.session.commit()
 
         return jsonify({"success": True, "evaluation": evaluation_result}), 200
@@ -214,15 +221,15 @@ def update_project_get(project_id):
     # Retrieve the project from the database
     project = Project.query.get(project_id)
     if not project:
-        return jsonify({"error": "Project not found"}), 404
-
+        return render_template("update_project.html", error="Project not found")
 
     data = {
         "projects": [project.name],
         "business_novelty": [float(project.x_value)],
         "customer_novelty": [float(project.y_value)],
         "impact": [float(project.impact)],
-        "project_ids": [project.id]  # Include project_id here for the URL
+        "project_types": [project.project_type],  # Include project_type
+        "project_ids": [project.id],  # Include project_id
     }
 
     # Now pass the data to create_scatter_plot to generate the plot with one circle
@@ -231,7 +238,6 @@ def update_project_get(project_id):
     return render_template(
         "update_project.html", project=project, script=script, div=div
     )
-
 
 
 def update_project_post(project_id, data):
@@ -345,14 +351,16 @@ def visualize():
         business_novelty = [float(project.x_value) for project in projects]
         customer_novelty = [float(project.y_value) for project in projects]
         impact = [float(project.impact) for project in projects]
-        project_ids = [project.id for project in projects]  # Add project IDs
+        project_types = [project.project_type for project in projects]  # Include project_type
+        project_ids = [project.id for project in projects]  # Include project_id
 
         data = {
             "projects": project_names,
             "business_novelty": business_novelty,
             "customer_novelty": customer_novelty,
             "impact": impact,
-            "project_ids": project_ids,  # Include project_ids here
+            "project_types": project_types,  # Pass project_type to visualization
+            "project_ids": project_ids,  # Pass project_id to visualization
         }
 
         script, div = create_scatter_plot(data)
@@ -382,6 +390,7 @@ def upload_pdf(request):
             return jsonify({"error": "Failed to extract text from PDF"}), 500
 
         thread_id = request.form.get("thread_id")
+        project_type = request.form.get("project_type", "Idea")  # Get project_type from form, default to "Idea"
 
         client = OpenAI()
         generator = IdeaGenerator(client)
@@ -398,12 +407,14 @@ def upload_pdf(request):
             )
             result = generator.resume_conversation()
 
+            # Include project_type when creating a new project
             project = Project(
                 name="Pending Evaluation",
                 x_value=0,
                 y_value=0,
                 impact=0,
                 thread_id=thread_id,
+                project_type=project_type,  # Save project_type
             )
             db.session.add(project)
             db.session.commit()
