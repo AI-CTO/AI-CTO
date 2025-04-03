@@ -7,9 +7,16 @@
     Welcome to the AI Project Portfolio Visualization Tool. Describe your project idea or upload a PDF to get started.
   </p>
 
-  <form id="pdf-form" enctype="multipart/form-data">
+  <form id="project-form" enctype="multipart/form-data">
     <label for="pdf-file">Upload a PDF file:</label>
     <input type="file" id="pdf-file" name="pdf" accept=".pdf" />
+
+    <label for="project-type">Project Type:</label>
+    <select id="project-type" name="project_type">
+      <option value="Idea" selected>Idea</option>
+      <option value="Existing">Existing</option>
+    </select>
+
     <button type="button" id="upload-pdf-btn" class="button">
       Upload PDF
     </button>
@@ -205,21 +212,26 @@
         alert("Please submit a description or upload a PDF first!");
         return;
       }
+
+      const projectType = document.getElementById("project-type").value; // Get project type
+
       showLoader();
       fetch("/evaluate_project", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ thread_id: threadId }),
+        body: JSON.stringify({ thread_id: threadId, project_type: projectType }), // Include project_type
       })
         .then((response) => response.json())
         .then((data) => {
           if (data.error) {
             alert(data.error);
           } else {
-            document.getElementById("evaluation-result").style.display =
-              "block";
-            document.getElementById("evaluation-output").textContent =
-              JSON.stringify(data.evaluation, null, 2);
+            document.getElementById("evaluation-result").style.display = "block";
+            document.getElementById("evaluation-output").textContent = JSON.stringify(
+              data.evaluation,
+              null,
+              2
+            );
           }
           hideLoader();
         })
