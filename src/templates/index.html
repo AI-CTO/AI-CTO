@@ -7,23 +7,6 @@
     Welcome to the AI Project Portfolio Visualization Tool. Describe your project idea or upload a PDF to get started.
   </p>
 
-  <form id="project-form" enctype="multipart/form-data">
-    <label for="pdf-file">Upload a PDF file:</label>
-    <input type="file" id="pdf-file" name="pdf" accept=".pdf" />
-
-    <div class="dropdown-container">
-      <label for="project-type" class="dropdown-label">Select Project Type:</label>
-      <select id="project-type" name="project_type" class="dropdown">
-        <option value="Idea" selected>💡 Idea</option>
-        <option value="Existing">✔️ Existing</option>
-      </select>
-    </div>
-
-    <button type="button" id="upload-pdf-btn" class="button">
-      Upload PDF
-    </button>
-  </form>
-
   <div id="loading-spinner" style="display: none; text-align: center; margin: 20px 0;">
     <img src="{{ url_for('static', filename='spinner.gif') }}" alt="Loading..." style="width: 50px;" />
   </div>
@@ -57,10 +40,21 @@
         required
         style="width: 80%; padding: 8px; resize: none; min-height: 40px; overflow-y: hidden;"
       ></textarea>
+      <div class="file-upload-container">
+        <input type="file" id="pdf-file" name="pdf" accept=".pdf" style="display: none;" />
+        <label for="pdf-file" class="choose-file-button">Choose File</label>
+        <button type="button" id="upload-pdf-btn" class="button attachment-button">
+          📎 Upload PDF
+        </button>
+      </div>
+      <div class="dropdown-container">
+        <label for="project-type" class="dropdown-label">Select Project Type:</label>
+        <select id="project-type" name="project_type" class="dropdown">
+          <option value="Idea" selected>💡 Idea</option>
+          <option value="Existing">✔️ Existing</option>
+        </select>
+      </div>
       <button type="submit" class="button">Send</button>
-      <button type="button" id="upload-pdf-btn" class="button attachment-button">
-        📎 Upload PDF
-      </button>
     </form>
     <button
       id="evaluate-btn"
@@ -70,7 +64,6 @@
       Evaluate Project
     </button>
   </div>
-
 
   <div id="evaluation-result" style="display: none; margin-top: 20px">
     <h2>Project Evaluation</h2>
@@ -110,41 +103,42 @@
 });
 /////
 
-  document
-    .getElementById("upload-pdf-btn")
-    .addEventListener("click", function () {
-      const pdfFile = document.getElementById("pdf-file").files[0];
-      const chatBox = document.getElementById("chat-box");
+  document.getElementById("upload-pdf-btn").addEventListener("click", function () {
+    const pdfFile = document.getElementById("pdf-file").files[0];
+    const chatBox = document.getElementById("chat-box");
 
-      if (!pdfFile) {
-        alert("Please select a PDF file!");
-        return;
-      }
-      const formData = new FormData();
-      formData.append("pdf", pdfFile);
-      if (threadId) {
-        formData.append("thread_id", threadId);
-      }
-      showLoader();
-      fetch("/upload_pdf", {
-        method: "POST",
-        body: formData,
+    if (!pdfFile) {
+      alert("Please select a PDF file!");
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("pdf", pdfFile);
+    if (threadId) {
+      formData.append("thread_id", threadId);
+    }
+
+    showLoader();
+    fetch("/upload_pdf", {
+      method: "POST",
+      body: formData,
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.error) {
+          alert(data.error);
+        } else {
+          threadId = data.thread_id;
+          document.getElementById("chat-container").style.display = "block";
+          document.getElementById("evaluate-btn").style.display = "block";
+          chatBox.innerHTML += `<p><strong>Assistant:</strong> ${data.message}</p>`;
+          chatBox.scrollTop = chatBox.scrollHeight;
+        }
+        hideLoader();
       })
-        .then((response) => response.json())
-        .then((data) => {
-          if (data.error) {
-            alert(data.error);
-          } else {
-            threadId = data.thread_id;
-            document.getElementById("chat-container").style.display = "block";
-            document.getElementById("evaluate-btn").style.display = "block";
-            chatBox.innerHTML += `<p><strong>Assistant:</strong> ${data.message}</p>`;
-            chatBox.scrollTop = chatBox.scrollHeight;
-          }
-          hideLoader();
-        })
-        .catch((error) => console.error("Error:", error));
-    });
+      .catch((error) => console.error("Error:", error));
+  });
+
   document.getElementById("chat-form").addEventListener("submit", function (event) {
   event.preventDefault();
   const userInputElement = document.getElementById("user-input");
@@ -268,7 +262,7 @@
   document.getElementById("project-type").addEventListener("change", function () {
     const selectedValue = this.value;
     console.log(`Project type selected: ${selectedValue}`);
-    // You can add additional logic here if needed
+    // Additional logic can be added here if needed
   });
 
   function showLoader() {
