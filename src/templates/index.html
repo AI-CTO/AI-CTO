@@ -34,19 +34,6 @@
       </p>
     </div>
     <form id="chat-form" class="centered-chat-form">
-      <textarea
-        id="user-input"
-        placeholder="Type your message..."
-        required
-        style="width: 80%; padding: 8px; resize: none; min-height: 40px; overflow-y: hidden;"
-      ></textarea>
-      <div class="file-upload-container">
-        <input type="file" id="pdf-file" name="pdf" accept=".pdf" style="display: none;" />
-        <label for="pdf-file" class="choose-file-button">Choose File</label>
-        <button type="button" id="upload-pdf-btn" class="button attachment-button">
-          📎 Upload PDF
-        </button>
-      </div>
       <div class="dropdown-container">
         <label for="project-type" class="dropdown-label">Select Project Type:</label>
         <select id="project-type" name="project_type" class="dropdown">
@@ -54,8 +41,24 @@
           <option value="Existing">✔️ Existing</option>
         </select>
       </div>
-      <button type="submit" class="button">Send</button>
+      <div class="input-container">
+        <textarea
+          id="user-input"
+          placeholder="Type your message..."
+          required
+        ></textarea>
+        <div class="circle-buttons">
+          <label for="pdf-file" class="circle-button choose-file-button" title="Choose File">
+            📎
+          </label>
+          <button type="button" id="upload-pdf-btn" class="circle-button upload-pdf-button" title="Upload PDF">
+            ⬆️
+          </button>
+        </div>
+      </div>
+      <button type="submit" class="button send-button">Send</button>
     </form>
+    <input type="file" id="pdf-file" name="pdf" accept=".pdf" style="display: none;" />
     <button
       id="evaluate-btn"
       class="button"
