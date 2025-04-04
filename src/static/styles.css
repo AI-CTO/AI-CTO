@@ -363,11 +363,225 @@ header.shrink .tab-link {
   box-shadow: 0 0 5px rgba(0, 119, 182, 0.3);
 }
 
+/* Adjust the layout of the chat form */
 .centered-chat-form {
   margin: 20px auto 0 auto;
   display: flex;
+  flex-direction: column;
   gap: 10px;
-  align-items: flex-end;
+  align-items: flex-start;
   justify-content: center;
   max-width: 800px;
+}
+
+/* Dropdown container styling */
+.dropdown-container {
+  width: 100%;
+  margin-bottom: 10px;
+}
+
+.dropdown {
+  width: 100%;
+  appearance: none;
+  background-color: #f9f9f9;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 0.5em 1em;
+  font-size: 1rem;
+  color: #333;
+  cursor: pointer;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.dropdown:focus {
+  border-color: #1868e3;
+  box-shadow: 0 0 5px rgba(24, 104, 227, 0.5);
+  outline: none;
+}
+
+.dropdown option {
+  padding: 0.5em;
+}
+
+/* File upload container styling */
+.file-upload-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.choose-file-button,
+.attachment-button {
+  background-color: #f9f9f9;
+  color: #333;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 4px 8px; /* Smaller size */
+  font-size: 0.9rem; /* Smaller font size */
+  cursor: pointer;
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.choose-file-button:hover,
+.attachment-button:hover {
+  background-color: #e6e6e6;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+}
+
+.choose-file-button:active,
+.attachment-button:active {
+  background-color: #dcdcdc;
+}
+
+.attachment-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #f9f9f9;
+  color: #333;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 8px 16px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+  margin-left: 10px;
+}
+
+.attachment-button:hover {
+  background-color: #e6e6e6;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+}
+
+.attachment-button:active {
+  background-color: #dcdcdc;
+}
+
+.attachment-button::before {
+  content: "📎";
+  margin-right: 8px;
+  font-size: 1.2rem;
+}
+
+.file-upload-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.choose-file-button {
+  background-color: #f9f9f9;
+  color: #333;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 8px 16px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.choose-file-button:hover {
+  background-color: #e6e6e6;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+}
+
+.choose-file-button:active {
+  background-color: #dcdcdc;
+}
+
+/* Input container for text area and buttons */
+.input-container {
+  display: flex;
+  align-items: center;
+  position: relative;
+  width: 100%;
+}
+
+#user-input {
+  flex: 1;
+  font-family: inherit;
+  font-size: 1rem;
+  line-height: 1.4;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  padding: 8px 12px;
+  resize: none;
+  min-height: 40px;
+  max-height: 200px;
+  overflow-y: hidden;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  box-sizing: border-box;
+}
+
+#user-input:focus {
+  border-color: #0077b6;
+  outline: none;
+  box-shadow: 0 0 5px rgba(0, 119, 182, 0.3);
+}
+
+/* Circle buttons container */
+.circle-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-left: 10px;
+}
+
+/* Circle buttons styling */
+.circle-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: #f9f9f9;
+  color: #333;
+  border: 1px solid #ccc;
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.circle-button:hover {
+  background-color: #e6e6e6;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+}
+
+.circle-button:active {
+  background-color: #dcdcdc;
+}
+
+/* Specific styles for the "Choose File" button */
+.choose-file-button {
+  font-size: 1.4rem;
+}
+
+/* Specific styles for the "Upload PDF" button */
+.upload-pdf-button {
+  font-size: 1.4rem;
+}
+
+/* Send button styling */
+.send-button {
+  margin-top: 10px;
+  align-self: flex-start;
+  background-color: #0077b6;
+  color: white;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.send-button:hover {
+  background-color: #005f8e;
+  transform: translateY(-2px);
+}
+
+.send-button:active {
+  background-color: #004f76;
+  transform: translateY(0);
 }
