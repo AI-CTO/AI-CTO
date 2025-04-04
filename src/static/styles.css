@@ -371,3 +371,68 @@ header.shrink .tab-link {
   justify-content: center;
   max-width: 800px;
 }
+
+.dropdown-container {
+  display: flex;
+  flex-direction: column;
+  margin: 1em 0;
+}
+
+.dropdown-label {
+  font-size: 1rem;
+  font-weight: bold;
+  margin-bottom: 0.5em;
+  color: #333;
+}
+
+.dropdown {
+  appearance: none;
+  background-color: #f9f9f9;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 0.5em 1em;
+  font-size: 1rem;
+  color: #333;
+  cursor: pointer;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.dropdown:focus {
+  border-color: #1868e3;
+  box-shadow: 0 0 5px rgba(24, 104, 227, 0.5);
+  outline: none;
+}
+
+.dropdown option {
+  padding: 0.5em;
+}
+
+.attachment-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #f9f9f9;
+  color: #333;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 8px 16px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+  margin-left: 10px;
+}
+
+.attachment-button:hover {
+  background-color: #e6e6e6;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+}
+
+.attachment-button:active {
+  background-color: #dcdcdc;
+}
+
+.attachment-button::before {
+  content: "📎";
+  margin-right: 8px;
+  font-size: 1.2rem;
+}
