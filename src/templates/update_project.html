@@ -65,6 +65,22 @@ block content %}
       <p id="evaluate-status" style="color: green; display: none">
         Project evaluated successfully!
       </p>
+      <button
+        id="evaluate-gemini-btn"
+        class="button"
+        style="margin-top: 10px; display: none"
+        onclick="evaluateWithGemini()"
+      >
+        Evaluate with Gemini
+      </button>
+      <p id="gemini-status" style="color: green; display: none">
+        Gemini evaluation completed successfully!
+      </p>
+      <textarea
+        id="gemini-evaluation-result"
+        style="width: 100%; height: 150px; margin-top: 10px; display: none"
+        readonly
+      ></textarea>
     </div>
   </div>
 
@@ -170,6 +186,7 @@ block content %}
           alert(data.error);
         } else {
           document.getElementById("evaluate-status").style.display = "block";
+          document.getElementById("evaluate-gemini-btn").style.display = "block"; // Show Gemini button
         }
       })
       .catch((error) => {
@@ -179,6 +196,45 @@ block content %}
       .finally(() => {
         evaluateButton.disabled = false;
         evaluateButton.textContent = "Evaluate Project";
+      });
+  }
+
+  function evaluateWithGemini() {
+    const geminiButton = document.getElementById("evaluate-gemini-btn");
+    const geminiResultArea = document.getElementById("gemini-evaluation-result");
+    geminiButton.disabled = true;
+    geminiButton.textContent = "Evaluating with Gemini...";
+
+    // Example: Fetch BMC canvas and evaluation results from the frontend
+    const bmcCanvas = "Example BMC Canvas Data"; // Replace with actual data
+    const evaluationResults = "Example Evaluation Results"; // Replace with actual data
+
+    fetch("/evaluate_with_gemini", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        thread_id: threadId,
+        bmc_canvas: bmcCanvas,
+        evaluation_results: evaluationResults,
+      }),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.error) {
+          alert(data.error);
+        } else {
+          document.getElementById("gemini-status").style.display = "block";
+          geminiResultArea.style.display = "block";
+          geminiResultArea.value = data.gemini_evaluation.gemini_response; // Display evaluation result
+        }
+      })
+      .catch((error) => {
+        console.error("Error evaluating with Gemini:", error);
+        alert("Error evaluating with Gemini. Please try again.");
+      })
+      .finally(() => {
+        geminiButton.disabled = false;
+        geminiButton.textContent = "Evaluate with Gemini";
       });
   }
 </script>

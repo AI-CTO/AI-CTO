@@ -15,6 +15,7 @@ from controllers.project_controller import (
     visualize,
     previous_projects,
     upload_pdf,
+    evaluate_with_gemini_controller,
 )
 from controllers.user_controller import user_bp
 
@@ -78,3 +79,8 @@ def setup_routes(app, limiter):
     @app.route("/upload_pdf", methods=["POST"])
     def upload_pdf_route():
         return upload_pdf(request)
+
+    @app.route("/evaluate_with_gemini", methods=["POST"])
+    @limiter.limit("10/hour")
+    def evaluate_with_gemini_route():
+        return evaluate_with_gemini_controller(request.json)

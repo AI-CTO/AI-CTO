@@ -7,6 +7,7 @@ from models.models import Project, db
 from services.api_assist import IdeaGenerator
 from services.bokeh_visualization import create_scatter_plot
 from services.openai_service import extract_text_from_pdf
+from services.gemini_service import evaluate_with_gemini
 
 
 
@@ -198,6 +199,21 @@ def evaluate_project(data):
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+
+def evaluate_with_gemini_controller(data):
+    try:
+        thread_id = data.get("thread_id")
+        if not thread_id:
+            return jsonify({"error": "Thread ID is required"}), 400
+
+        gemini_result = evaluate_with_gemini(thread_id)
+        if "error" in gemini_result:
+            return jsonify({"error": gemini_result["error"]}), 500
+
+        return jsonify({"success": True, "gemini_evaluation": gemini_result}), 200
+    except Exception as e:
+        return jsonify({"error": "Failed to evaluate with Gemini", "details": str(e)}), 500
 
 
 def update_project_get(project_id):
