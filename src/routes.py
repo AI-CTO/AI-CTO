@@ -81,6 +81,12 @@ def setup_routes(app, limiter):
         return upload_pdf(request)
 
     @app.route("/evaluate_with_gemini", methods=["POST"])
-    @limiter.limit("10/hour")
+    @limiter.limit("30/hour")
     def evaluate_with_gemini_route():
-        return evaluate_with_gemini_controller(request.json)
+        try:
+            data = request.json
+            print(f"Received data: {data}")  # Debugging log
+            return evaluate_with_gemini_controller(request.json)
+        except Exception as e:
+            print(f"Error in evaluate_with_gemini_controller: {e}")  # Debugging log
+            raise

@@ -205,17 +205,17 @@ block content %}
     geminiButton.disabled = true;
     geminiButton.textContent = "Evaluating with Gemini...";
 
-    // Example: Fetch BMC canvas and evaluation results from the frontend
-    const bmcCanvas = "Example BMC Canvas Data"; // Replace with actual data
-    const evaluationResults = "Example Evaluation Results"; // Replace with actual data
-
     fetch("/evaluate_with_gemini", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        thread_id: threadId,
-        bmc_canvas: bmcCanvas,
-        evaluation_results: evaluationResults,
+        evaluation_results: {
+          name: "{{ project.name }}",
+          x_value: "{{ project.x_value }}",
+          y_value: "{{ project.y_value }}",
+          impact: "{{ project.impact }}"
+        },
+        conversation_content: document.getElementById("chat-box").innerText,
       }),
     })
       .then((response) => response.json())

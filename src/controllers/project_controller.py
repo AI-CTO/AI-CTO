@@ -203,11 +203,8 @@ def evaluate_project(data):
 
 def evaluate_with_gemini_controller(data):
     try:
-        thread_id = data.get("thread_id")
-        if not thread_id:
-            return jsonify({"error": "Thread ID is required"}), 400
-
-        gemini_result = evaluate_with_gemini(thread_id)
+        gemini_result = evaluate_with_gemini(data["evaluation_results"], data["conversation_content"])
+        print("Gemini evaluation result:", gemini_result)  # Debugging log
         if "error" in gemini_result:
             return jsonify({"error": gemini_result["error"]}), 500
 
