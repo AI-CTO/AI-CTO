@@ -84,14 +84,18 @@ block content %}
     </div>
   </div>
 
-<!-- Right: Project Visualization-->
-
-  <div style="flex: 1; text-align: center">
-    <h2>Project Visualization</h2>
-    <div style="display: flex; justify-content: center">
-      {{ script|safe }} {{ div|safe }}
-    </div>
+<!-- Right: Project Visualization -->
+<div style="flex: 1; text-align: center">
+  <h2>Project Visualization</h2>
+  <div style="display: flex; justify-content: center">
+    {{ script|safe }} {{ div|safe }}
   </div>
+</div>
+</div>
+
+<!-- Gemini Evaluation Results (moved outside the flex container) -->
+<div id="gemini-evaluation-container" style="display: none; margin-top: 20px; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
+<!-- Evaluation results will be dynamically inserted here -->
 </div>
 
 
@@ -200,42 +204,82 @@ block content %}
   }
 
   function evaluateWithGemini() {
-    const geminiButton = document.getElementById("evaluate-gemini-btn");
-    const geminiResultArea = document.getElementById("gemini-evaluation-result");
-    geminiButton.disabled = true;
-    geminiButton.textContent = "Evaluating with Gemini...";
+  const geminiButton = document.getElementById("evaluate-gemini-btn");
+  const geminiResultContainer = document.getElementById("gemini-evaluation-container"); // Add a container for results
+  geminiButton.disabled = true;
+  geminiButton.textContent = "Evaluating with Gemini...";
 
-    fetch("/evaluate_with_gemini", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        evaluation_results: {
-          name: "{{ project.name }}",
-          x_value: "{{ project.x_value }}",
-          y_value: "{{ project.y_value }}",
-          impact: "{{ project.impact }}"
-        },
-        conversation_content: document.getElementById("chat-box").innerText,
-      }),
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        if (data.error) {
-          alert(data.error);
-        } else {
-          document.getElementById("gemini-status").style.display = "block";
-          geminiResultArea.style.display = "block";
-          geminiResultArea.value = data.gemini_evaluation.gemini_response; // Display evaluation result
+  fetch("/evaluate_with_gemini", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      evaluation_results: {
+        name: "{{ project.name }}",
+        x_value: "{{ project.x_value }}",
+        y_value: "{{ project.y_value }}",
+        impact: "{{ project.impact }}"
+      },
+      conversation_content: document.getElementById("chat-box").innerText,
+    }),
+  })
+    .then((response) => response.json())
+    .then((data) => {
+      if (data.error) {
+        alert(data.error);
+      } else {
+        try {
+          // 1. Extract the raw response string
+          let rawText = data.gemini_evaluation.gemini_response;
+
+          // 2. Clean the JSON string (remove unwanted characters)
+          let cleanedJson = rawText.replace(/```json\n/, '').replace(/\n```$/, '');
+
+          // 3. Parse the cleaned JSON string into an object
+          let evaluation = JSON.parse(cleanedJson);
+
+          // 4. Dynamically display the parsed data
+          displayEvaluationResults(evaluation);
+        } catch (error) {
+          console.error("Error parsing Gemini response:", error);
+          alert("Failed to parse Gemini evaluation response.");
         }
-      })
-      .catch((error) => {
-        console.error("Error evaluating with Gemini:", error);
-        alert("Error evaluating with Gemini. Please try again.");
-      })
-      .finally(() => {
-        geminiButton.disabled = false;
-        geminiButton.textContent = "Evaluate with Gemini";
-      });
+      }
+    })
+    .catch((error) => {
+      console.error("Error evaluating with Gemini:", error);
+      alert("Error evaluating with Gemini. Please try again.");
+    })
+    .finally(() => {
+      geminiButton.disabled = false;
+      geminiButton.textContent = "Evaluate with Gemini";
+    });
+}
+
+// Helper function to display the evaluation results
+function displayEvaluationResults(evaluation) {
+  const geminiResultContainer = document.getElementById("gemini-evaluation-container");
+
+  // Clear any existing content
+  geminiResultContainer.innerHTML = "";
+
+  // Create and append sections for each key in the evaluation object
+  for (const [key, value] of Object.entries(evaluation)) {
+    const section = document.createElement("div");
+    section.style.marginBottom = "10px";
+
+    const title = document.createElement("h3");
+    title.textContent = key.replace(/_/g, " ").toUpperCase(); // Format the key as a title
+    section.appendChild(title);
+
+    const content = document.createElement("p");
+    content.textContent = value;
+    section.appendChild(content);
+
+    geminiResultContainer.appendChild(section);
   }
+
+  // Make the container visible
+  geminiResultContainer.style.display = "block";
+}
 </script>
 {% endif %} {% endblock %}
