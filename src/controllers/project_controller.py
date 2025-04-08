@@ -23,7 +23,7 @@ def process_project(data):
 
         if not user_input:
             return jsonify({"error": "Description is required"}), 400
-
+        
         if project_id:
             project = Project.query.get(project_id)
             if project:
@@ -34,16 +34,20 @@ def process_project(data):
             else:
                 return jsonify({"error": "Project not found"}), 404
         else:
+
             thread_id = generator.create_thread()
+
             project = Project(
                 name="Pending Evaluation",
                 x_value=0,
                 y_value=0,
                 impact=0,
                 thread_id=thread_id,
-                project_type=project_type,  # Save project_type
+                project_type=project_type  # Save project_type
             )
+
             db.session.add(project)
+
             db.session.commit()
 
         # **Check if there is an active run and wait for it to finish**

@@ -254,10 +254,10 @@
         document.getElementById("chat-form").dispatchEvent(new Event("submit"));
       }
     });
-  
+
   document
   .getElementById("project-type-toggle")
-  .addEventListener("change", function () {
+  .addEventListener("change", function () { 
     const projectTypeInput = document.getElementById("project-type");
     projectTypeInput.value = this.checked ? "Existing" : "Idea";
   });
