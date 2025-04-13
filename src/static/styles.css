@@ -1,4 +1,9 @@
 /* Global Styles */
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
 body {
   font-family: "Inter", sans-serif;
   margin: 0;
@@ -9,21 +14,22 @@ body {
   overflow-x: hidden;
 }
 
+
 header {
-  height: 150px; /* Match the new maxHeight value from shrink_script.js */
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 150px;
   background: #8e8787;
   color: #333;
-  padding: 0.2rem 20px; /* Slightly larger padding for the bigger header */
-  border-bottom: 1px solid #e0e0e0;
-  position: sticky;
-  top: 0;
+  padding: 0.2rem 20px;
   z-index: 1000;
   box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.05);
   display: flex;
-  align-items: center; /* Vertically center the items */
-  justify-content: flex-start; /* Align logo and nav at the start */
-  width: 100%; /* Ensures the header takes up the full width */
-  transition: height 0.2s ease, padding 0.2s ease; /* Smooth height and padding transition */
+  align-items: center;
+  justify-content: flex-start;
+  transition: height 0.9s ease, padding 0.9s ease;
 }
 
 header .logo {
@@ -53,6 +59,7 @@ main {
   max-width: 1200px;
   margin: 0 auto;
   text-align: center;
+  padding-top: 160px;
 }
 
 footer {
@@ -272,7 +279,8 @@ tfoot td {
 header.shrink {
   padding: 0.05rem 20px; /* Reduce padding */
   box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1); /* Slightly stronger shadow */
-  transition: all 0.3s ease; /* Smooth transition for shrinking */
+  transition: all 0.9s ease; /* Smooth transition for shrinking */
+  height: 100px;
 }
 
 header.shrink .logo {
@@ -298,7 +306,8 @@ header.shrink .tab-link {
 .conversation-header {
   display: flex;
   align-items: center;
-  gap: 800px; 
+  justify-content: space-between;
+  /* gap: 800px; */
   margin-bottom: 10px;
 }
 
@@ -585,3 +594,25 @@ header.shrink .tab-link {
   background-color: #004f76;
   transform: translateY(0);
 }
+
+#chat-container {
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
+  box-sizing: border-box;
+}
+
+#chat-box {
+  height: 300px;
+  overflow-y: scroll;
+  border: 1px solid #ddd;
+  padding: 10px;
+  box-sizing: border-box;
+  background-color: #fff;
+}
+
+.conversation-header > * {
+  flex-shrink: 0;
+}
+
+
