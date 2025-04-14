@@ -37,7 +37,7 @@
       <div class="dropdown-container">
         <label for="project-type" class="dropdown-label">Select Project Type:</label>
         <select id="project-type" name="project_type" class="dropdown">
-          <option value="Idea" selected>💡 Idea</option>
+          <option value="Idea">💡 Idea</option> 
           <option value="Existing">✔️ Existing</option>
         </select>
       </div>
@@ -80,6 +80,32 @@
   let threadId = null;
 /////////
   window.addEventListener("DOMContentLoaded", () => {
+  // ✅ Palauta localStoragesta käyttäjän syöte
+  const savedInput = localStorage.getItem("userInput");
+  if (savedInput) {
+    document.getElementById("user-input").value = savedInput;
+  }
+
+  // ✅ Palauta project-type (TÄRKEÄ: tarkistetaan että select on olemassa!)
+  const savedType = localStorage.getItem("projectType");
+  const projectTypeSelect = document.getElementById("project-type");
+  if (savedType && projectTypeSelect) {
+    // tarkista että arvo löytyy vaihtoehdoista ennen asettamista
+    const optionExists = Array.from(projectTypeSelect.options).some(opt => opt.value === savedType);
+    if (optionExists) {
+      projectTypeSelect.value = savedType;
+    }
+  }
+  // ✅ Palauta chatin sisältö
+  const savedChat = localStorage.getItem("chatBoxContent");
+  if (savedChat) {
+    const chatBox = document.getElementById("chat-box");
+    chatBox.innerHTML = savedChat;
+    document.getElementById("chat-container").style.display = "block";
+    chatBox.scrollTop = chatBox.scrollHeight;
+  }
+
+  // ✅ Tarkista URL-parametrit ja jatka keskustelua
   const params = new URLSearchParams(window.location.search);
   const threadIdParam = params.get("thread_id");
   const projectIdParam = params.get("project_id");
@@ -104,7 +130,6 @@
       });
   }
 });
-/////
 
   document.getElementById("upload-pdf-btn").addEventListener("click", function () {
     const pdfFile = document.getElementById("pdf-file").files[0];
@@ -151,6 +176,7 @@
   if (!userInput) return;
 
   chatBox.innerHTML += `<p><strong>You:</strong> ${userInput}</p>`;
+  localStorage.setItem("chatBoxContent", chatBox.innerHTML);
   userInputElement.value = "";
   userInputElement.style.height = "auto"; // reset height
   document.getElementById("chat-container").style.display = "block";
@@ -168,6 +194,7 @@
       } else {
         threadId = data.thread_id;
         chatBox.innerHTML += `<p><strong>Assistant:</strong> ${data.assistant_response}</p>`;
+        localStorage.setItem("chatBoxContent", chatBox.innerHTML);
 
         // validation score visuaalinen näyttö
         if (data.validation_score !== undefined) {
@@ -245,6 +272,7 @@
     textarea.addEventListener("input", () => {
       textarea.style.height = "auto";
       textarea.style.height = textarea.scrollHeight + "px";
+      localStorage.setItem("userInput", textarea.value); // Tallenna localStorageen
     });
 
     // Lähetä viesti Enterillä, rivinvaihto Shift+Enterillä
@@ -255,16 +283,10 @@
       }
     });
 
-  document
-  .getElementById("project-type-toggle")
-  .addEventListener("change", function () { 
-    const projectTypeInput = document.getElementById("project-type");
-    projectTypeInput.value = this.checked ? "Existing" : "Idea";
-  });
-
   document.getElementById("project-type").addEventListener("change", function () {
     const selectedValue = this.value;
     console.log(`Project type selected: ${selectedValue}`);
+    localStorage.setItem("projectType", selectedValue); // Tallenna localStorageen
     // Additional logic can be added here if needed
   });
 
