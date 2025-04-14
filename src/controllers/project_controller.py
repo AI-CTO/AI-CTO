@@ -52,6 +52,7 @@ def process_project(data):
         else:
 
             thread_id = generator.create_thread()
+            print("toimii 1")
             project = Project(
                 name="Pending Evaluation",
                 x_value=0,
