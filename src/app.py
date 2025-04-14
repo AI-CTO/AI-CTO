@@ -11,7 +11,6 @@ load_dotenv()
 
 def create_app(test_config=None):
     app = Flask(__name__)
-
     limiter = Limiter(
         key_func=get_remote_address,
         app=app, 
@@ -19,9 +18,13 @@ def create_app(test_config=None):
         storage_uri='memory://', 
     )
 
-    database_path = os.path.join(os.path.dirname(__file__), 'instance/default.db')
+    project_root = os.path.dirname(os.path.dirname(__file__))  # eli AI-CTO/ ####
+    database_path = os.path.join(project_root, 'instance/default.db')  ### 
+    #database_path = os.path.join(os.path.dirname(__file__), 'instance/default.db')
     database_url = os.environ.get("SQLALCHEMY_DATABASE_URI", f"sqlite:///{database_path}")
     
+    print("Käytettävä tietokanta:", database_path) #####
+
     if test_config:
         app.config.update(test_config)
     else:

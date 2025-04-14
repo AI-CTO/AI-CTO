@@ -23,6 +23,7 @@ flask-caching = "^2.3.1"
 pymupdf = "^1.25.3"
 fitz = "^0.0.1.dev2"
 webdriver-manager = "^4.0.2"
+sqlalchemy = "^2.0.40"
 
 
 [tool.poetry.group.dev.dependencies]
