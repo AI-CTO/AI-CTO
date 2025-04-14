@@ -27,6 +27,7 @@ webdriver-manager = "^4.0.2"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.3.4"
+pylint = "^3.3.6"
 
 [build-system]
 requires = ["poetry-core"]
