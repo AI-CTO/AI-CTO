@@ -36,7 +36,7 @@ class Project(db.Model):
         default=lambda: datetime.now(timezone.utc),
         onupdate=lambda: datetime.now(timezone.utc),
     )
-    project_type = db.Column(db.String, nullable=False, default="Idea")  # New field
+    type = db.Column(db.String, nullable=False, default="Idea")  # New field
 
     def to_dict(self):
         return {

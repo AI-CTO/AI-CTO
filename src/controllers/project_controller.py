@@ -36,20 +36,20 @@ def process_project(data):
         else:
 
             thread_id = generator.create_thread()
-
+            print("toimii 1")
             project = Project(
                 name="Pending Evaluation",
                 x_value=0,
                 y_value=0,
                 impact=0,
                 thread_id=thread_id,
-                project_type=project_type  # Save project_type
+                type=project_type  # Save project_type
             )
-
+            print("toimii 2")
             db.session.add(project)
-
+            print("toimii 3")
             db.session.commit()
-
+            print("toimii 4")
         # **Check if there is an active run and wait for it to finish**
         existing_runs = client.beta.threads.runs.list(thread_id=thread_id)
         print("Looking for existing runs: ", existing_runs)
@@ -232,7 +232,7 @@ def update_project_get(project_id):
         "business_novelty": [float(project.x_value)],
         "customer_novelty": [float(project.y_value)],
         "impact": [float(project.impact)],
-        "project_types": [project.project_type],  # Include project_type
+        "project_types": [project.type],  # Include project_type
         "project_ids": [project.id],  # Include project_id
     }
 
@@ -355,7 +355,7 @@ def visualize():
         business_novelty = [float(project.x_value) for project in projects]
         customer_novelty = [float(project.y_value) for project in projects]
         impact = [float(project.impact) for project in projects]
-        project_types = [project.project_type for project in projects]  # Include project_type
+        project_types = [project.type for project in projects]  # Include project_type
         project_ids = [project.id for project in projects]  # Include project_id
 
         data = {
