@@ -1,4 +1,9 @@
 /* Global Styles */
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
 body {
   font-family: "Inter", sans-serif;
   margin: 0;
@@ -9,21 +14,22 @@ body {
   overflow-x: hidden;
 }
 
+
 header {
-  height: 150px; /* Match the new maxHeight value from shrink_script.js */
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 150px;
   background: #8e8787;
   color: #333;
-  padding: 0.2rem 20px; /* Slightly larger padding for the bigger header */
-  border-bottom: 1px solid #e0e0e0;
-  position: sticky;
-  top: 0;
+  padding: 0.2rem 20px;
   z-index: 1000;
   box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.05);
   display: flex;
-  align-items: center; /* Vertically center the items */
-  justify-content: flex-start; /* Align logo and nav at the start */
-  width: 100%; /* Ensures the header takes up the full width */
-  transition: height 0.2s ease, padding 0.2s ease; /* Smooth height and padding transition */
+  align-items: center;
+  justify-content: flex-start;
+  transition: height 0.9s ease, padding 0.9s ease;
 }
 
 header .logo {
@@ -53,6 +59,7 @@ main {
   max-width: 1200px;
   margin: 0 auto;
   text-align: center;
+  padding-top: 160px;
 }
 
 footer {
@@ -234,12 +241,12 @@ tr:hover {
 
 /* Edit button styling */
 .edit-btn {
-  background-color: rgba(134, 199, 185, 0.662); /* Emerald green */
+  background-color: rgba(210, 194, 21, 0.662); /* Emerald green */
   color: white;
 }
 
 .edit-btn:hover {
-  background-color: rgb(134, 179, 149); /* Slightly darker green on hover */
+  background-color: rgb(16, 30, 103); /* Slightly darker green on hover */
   transform: translateY(-2px); /* Subtle lift effect */
 }
 
@@ -272,7 +279,8 @@ tfoot td {
 header.shrink {
   padding: 0.05rem 20px; /* Reduce padding */
   box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1); /* Slightly stronger shadow */
-  transition: all 0.3s ease; /* Smooth transition for shrinking */
+  transition: all 0.9s ease; /* Smooth transition for shrinking */
+  height: 100px;
 }
 
 header.shrink .logo {
@@ -295,3 +303,316 @@ header.shrink .tab-link {
   font-size: 0.9rem; /* Reduce font size of navigation links */
   transition: font-size 0.3s ease; /* Smooth transition for font size */
 }
+.conversation-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  /* gap: 800px; */
+  margin-bottom: 10px;
+}
+
+.conversation-title {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+#validation-bar-container {
+  display: flex;
+  align-items: center;
+}
+
+#validation-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 120px;
+  height: 25px;
+  border: 2px solid #333;
+  border-radius: 4px;
+  background-color: #fff;
+  padding: 2px;
+  box-sizing: border-box;
+}
+
+#validation-fill {
+  height: 100%;
+  background-color: #4caf50;
+  border-radius: 2px;
+  transition: width 0.3s ease;
+}
+
+#validation-text {
+  font-size: 12px;
+  font-weight: bold;
+  color: #333;
+  margin-left: 6px;
+  white-space: nowrap;
+}
+
+#user-input {
+  font-family: inherit;
+  font-size: 1rem;
+  line-height: 1.4;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  padding: 8px 12px;
+  width: 100%;
+  resize: none;
+  min-height: 40px;
+  max-height: 200px;
+  overflow-y: hidden;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  box-sizing: border-box;
+}
+
+#user-input:focus {
+  border-color: #0077b6;
+  outline: none;
+  box-shadow: 0 0 5px rgba(0, 119, 182, 0.3);
+}
+
+/* Adjust the layout of the chat form */
+.centered-chat-form {
+  margin: 20px auto 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: flex-start;
+  justify-content: center;
+  max-width: 800px;
+}
+
+/* Dropdown container styling */
+.dropdown-container {
+  width: 100%;
+  margin-bottom: 10px;
+}
+
+.dropdown {
+  width: 100%;
+  appearance: none;
+  background-color: #f9f9f9;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 0.5em 1em;
+  font-size: 1rem;
+  color: #333;
+  cursor: pointer;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.dropdown:focus {
+  border-color: #1868e3;
+  box-shadow: 0 0 5px rgba(24, 104, 227, 0.5);
+  outline: none;
+}
+
+.dropdown option {
+  padding: 0.5em;
+}
+
+/* File upload container styling */
+.file-upload-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.choose-file-button,
+.attachment-button {
+  background-color: #f9f9f9;
+  color: #333;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 4px 8px; /* Smaller size */
+  font-size: 0.9rem; /* Smaller font size */
+  cursor: pointer;
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.choose-file-button:hover,
+.attachment-button:hover {
+  background-color: #e6e6e6;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+}
+
+.choose-file-button:active,
+.attachment-button:active {
+  background-color: #dcdcdc;
+}
+
+.attachment-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #f9f9f9;
+  color: #333;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 8px 16px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+  margin-left: 10px;
+}
+
+.attachment-button:hover {
+  background-color: #e6e6e6;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+}
+
+.attachment-button:active {
+  background-color: #dcdcdc;
+}
+
+.attachment-button::before {
+  content: "📎";
+  margin-right: 8px;
+  font-size: 1.2rem;
+}
+
+.file-upload-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.choose-file-button {
+  background-color: #f9f9f9;
+  color: #333;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 8px 16px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.choose-file-button:hover {
+  background-color: #e6e6e6;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+}
+
+.choose-file-button:active {
+  background-color: #dcdcdc;
+}
+
+/* Input container for text area and buttons */
+.input-container {
+  display: flex;
+  align-items: center;
+  position: relative;
+  width: 100%;
+}
+
+#user-input {
+  flex: 1;
+  font-family: inherit;
+  font-size: 1rem;
+  line-height: 1.4;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  padding: 8px 12px;
+  resize: none;
+  min-height: 40px;
+  max-height: 200px;
+  overflow-y: hidden;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  box-sizing: border-box;
+}
+
+#user-input:focus {
+  border-color: #0077b6;
+  outline: none;
+  box-shadow: 0 0 5px rgba(0, 119, 182, 0.3);
+}
+
+/* Circle buttons container */
+.circle-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-left: 10px;
+}
+
+/* Circle buttons styling */
+.circle-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: #f9f9f9;
+  color: #333;
+  border: 1px solid #ccc;
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.circle-button:hover {
+  background-color: #e6e6e6;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+}
+
+.circle-button:active {
+  background-color: #dcdcdc;
+}
+
+/* Specific styles for the "Choose File" button */
+.choose-file-button {
+  font-size: 1.4rem;
+}
+
+/* Specific styles for the "Upload PDF" button */
+.upload-pdf-button {
+  font-size: 1.4rem;
+}
+
+/* Send button styling */
+.send-button {
+  margin-top: 10px;
+  align-self: flex-start;
+  background-color: #0077b6;
+  color: white;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.send-button:hover {
+  background-color: #005f8e;
+  transform: translateY(-2px);
+}
+
+.send-button:active {
+  background-color: #004f76;
+  transform: translateY(0);
+}
+
+#chat-container {
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
+  box-sizing: border-box;
+}
+
+#chat-box {
+  height: 300px;
+  overflow-y: scroll;
+  border: 1px solid #ddd;
+  padding: 10px;
+  box-sizing: border-box;
+  background-color: #fff;
+}
+
+.conversation-header > * {
+  flex-shrink: 0;
+}
+
+

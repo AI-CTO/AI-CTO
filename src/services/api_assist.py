@@ -38,8 +38,10 @@ class IdeaGenerator:
             return existing_assistant.id
 
         # If no assistant exists, create a new one
+   
         print("No existing assistant found. Creating a new one...")
         assistant = self.client.beta.assistants.create(
+            temperature=0.0, 
             name="Project Idea Assistant",
             instructions="""
                            You assist the user in refining a business model canvas (BMC).
@@ -103,17 +105,32 @@ class IdeaGenerator:
         :return: A parsed dictionary containing the extracted JSON data.
         """
         try:
+            print("Attempting to extract JSON from:", response[:100] + "...")  # Print first 100 chars
+            
             match = re.search(r"```json\s*([\s\S]+?)\s*```", response)
-
             if match:
                 json_data = match.group(1).strip()
                 parsed_data = json.loads(json_data)
                 return parsed_data
             else:
-                raise ValueError("No valid JSON found in response.")
+                # If no JSON block found, try to extract any valid JSON from the response
+                # Look for anything that might be JSON (between curly braces)
+                json_match = re.search(r"\{[\s\S]*?\}", response)
+                if json_match:
+                    try:
+                        possible_json = json_match.group(0)
+                        parsed_data = json.loads(possible_json)
+                        return parsed_data
+                    except json.JSONDecodeError:
+                        pass
+                
+                # If all else fails, return the response as an assistant_response
+                print("No valid JSON block found, returning response as text")
+                return {"assistant_response": response}
 
         except json.JSONDecodeError as e:
-            raise ValueError(f"Error parsing JSON: {str(e)}")
+            print(f"Error parsing JSON: {str(e)}")
+            return {"assistant_response": response, "error": "Invalid JSON format"}
 
     def evaluate(self):
         """Asks the AI to evaluate the project based on user discussions and updates the evaluation table."""

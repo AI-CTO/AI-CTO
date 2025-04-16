@@ -5,12 +5,13 @@ from openai import OpenAI
 
 from models.models import Project, db
 from services.api_assist import IdeaGenerator
+from services.BMC_recources import BmcValidator as BMC #erik muutti
 from services.bokeh_visualization import create_scatter_plot
 from services.openai_service import extract_text_from_pdf
 from services.gemini_service import evaluate_with_gemini
 
 
-
+# test_my_function.py
 def process_project(data):
     try:
         client = OpenAI()
@@ -18,29 +19,38 @@ def process_project(data):
 
         user_input = data.get("description")
         project_id = data.get("id")
+        project_type = data.get("project_type", "Idea")  # Get project_type from input, default to "Idea"
         print("Finds description")
 
         if not user_input:
             return jsonify({"error": "Description is required"}), 400
-
+        
         if project_id:
             project = Project.query.get(project_id)
             if project:
                 thread_id = project.thread_id
+                # Update the project_type if provided
+                project.project_type = project_type
+                db.session.commit()
             else:
                 return jsonify({"error": "Project not found"}), 404
         else:
+
             thread_id = generator.create_thread()
+            print("toimii 1")
             project = Project(
                 name="Pending Evaluation",
                 x_value=0,
                 y_value=0,
                 impact=0,
                 thread_id=thread_id,
+                type=project_type  # Save project_type
             )
+            print("toimii 2")
             db.session.add(project)
+            print("toimii 3")
             db.session.commit()
-
+            print("toimii 4")
         # **Check if there is an active run and wait for it to finish**
         existing_runs = client.beta.threads.runs.list(thread_id=thread_id)
         print("Looking for existing runs: ", existing_runs)
@@ -137,15 +147,21 @@ def process_project(data):
 
         assistant_response = assistant_response.strip() if assistant_response else "No response from the assistant."
         response_json = generator.extract_json_from_response(assistant_response)
-        print(response_json)
+        asistant_response = response_json.pop('assistant_response', None) #Erik Muutti
+        print("tämä on assistant response \n",response_json)
 
-        return (
+        # erik Muutti 
+        ans = BMC.current_vs_ideal_score(BMC,response_json)
+        score = BMC.calculate_score(BMC, ans)
+        # erik Muutti 
+        return ( 
             jsonify(
                 {
                     "message": "Chat updated",
                     "thread_id": str(thread_id),
-                    "assistant_response": response_json["assistant_response"],
-                }
+                    "assistant_response": asistant_response, #Erik Muutti
+                    "validation_score": score, #Erik Muutti
+                }   
             ),
             200,
         )
@@ -168,6 +184,7 @@ def evaluate_project(data):
         client = OpenAI()
         generator = IdeaGenerator(client)
         thread_id = data.get("thread_id")
+        project_type = data.get("project_type", "Idea")  # Get project_type from input, default to "Idea"
 
         if not thread_id:
             return jsonify({"error": "Missing thread_id"}), 400
@@ -188,11 +205,12 @@ def evaluate_project(data):
         if not project:
             return jsonify({"error": "Project not found"}), 404
 
+        # Update project details
         project.x_value = x_value
         project.y_value = y_value
         project.impact = impact
         project.name = name
-
+        project.project_type = project_type  # Update project_type
         db.session.commit()
 
         return jsonify({"success": True, "evaluation": evaluation_result}), 200
@@ -217,17 +235,21 @@ def update_project_get(project_id):
     if not project_id:
         return render_template("update_project.html", error="Project ID is required")
 
+    # Retrieve the project from the database
     project = Project.query.get(project_id)
     if not project:
-        return jsonify({"error": "Project not found"}), 404
+        return render_template("update_project.html", error="Project not found")
 
     data = {
         "projects": [project.name],
         "business_novelty": [float(project.x_value)],
         "customer_novelty": [float(project.y_value)],
         "impact": [float(project.impact)],
+        "project_types": [project.type],  # Include project_type
+        "project_ids": [project.id],  # Include project_id
     }
 
+    # Now pass the data to create_scatter_plot to generate the plot with one circle
     script, div = create_scatter_plot(data)
 
     return render_template(
@@ -346,12 +368,16 @@ def visualize():
         business_novelty = [float(project.x_value) for project in projects]
         customer_novelty = [float(project.y_value) for project in projects]
         impact = [float(project.impact) for project in projects]
+        project_types = [project.type for project in projects]  # Include project_type
+        project_ids = [project.id for project in projects]  # Include project_id
 
         data = {
             "projects": project_names,
             "business_novelty": business_novelty,
             "customer_novelty": customer_novelty,
             "impact": impact,
+            "project_types": project_types,  # Pass project_type to visualization
+            "project_ids": project_ids,  # Pass project_id to visualization
         }
 
         script, div = create_scatter_plot(data)
@@ -381,6 +407,7 @@ def upload_pdf(request):
             return jsonify({"error": "Failed to extract text from PDF"}), 500
 
         thread_id = request.form.get("thread_id")
+        project_type = request.form.get("project_type", "Idea")  # Get project_type from form, default to "Idea"
 
         client = OpenAI()
         generator = IdeaGenerator(client)
@@ -397,12 +424,14 @@ def upload_pdf(request):
             )
             result = generator.resume_conversation()
 
+            # Include project_type when creating a new project
             project = Project(
                 name="Pending Evaluation",
                 x_value=0,
                 y_value=0,
                 impact=0,
                 thread_id=thread_id,
+                project_type=project_type,  # Save project_type
             )
             db.session.add(project)
             db.session.commit()

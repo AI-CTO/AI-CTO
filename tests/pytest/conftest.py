@@ -1,5 +1,7 @@
 import os
 import sys
+from dotenv import load_dotenv
+load_dotenv()
 
 sys.path.insert(
     0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../../src"))
@@ -25,3 +27,4 @@ def app():
 def client(app):
     """A test client for making requests."""
     return app.test_client()
+
