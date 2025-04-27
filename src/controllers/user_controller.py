@@ -1,3 +1,8 @@
+"""
+Module for user-related API routes.
+The user functionality has not yet been implemented in the application
+"""
+
 from flask import Blueprint, jsonify, request
 from models.models import db, User
 

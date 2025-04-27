@@ -1,3 +1,7 @@
+"""
+Module for managing OpenAI assistants.
+Connects to OpenAI using API key loaded from environment variables.
+"""
 import os
 
 import dotenv
@@ -35,6 +39,7 @@ def delete_all_assistants():
 
 
 def list_assistants():
+    """Lists all assistants from OpenAI API."""
     assistants = client.beta.assistants.list()
 
     print(f"Total Assistants: {len(assistants.data)}")
