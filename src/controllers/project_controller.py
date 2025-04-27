@@ -1,29 +1,45 @@
+"""
+Module for project-related API routes and project management functionality.
+Defines several functions to handle project creation, evaluation, updating,
+visualizing, deleting, and resuming progress.
+"""
 import time
 
-from flask import jsonify, render_template, request
+from flask import jsonify, render_template
 from openai import OpenAI
 
 from models.models import Project, db
 from services.api_assist import IdeaGenerator
-from services.BMC_recources import BmcValidator as BMC #erik muutti
+from services.BMC_recources import BmcValidator as BMC
 from services.bokeh_visualization import create_scatter_plot
 from services.openai_service import extract_text_from_pdf
 
 
-# test_my_function.py
+# pylint: disable=too-many-locals, too-many-return-statements, too-many-branches, too-many-statements
 def process_project(data):
+    """
+    Processes a project by interacting with the OpenAI assistant.
+    Handles project creation and update, sends user input to the assistant, 
+    validates responses, and updates the project.
+
+    Args:
+        data (dict): Data in JSON form with info about the project.
+
+    Returns:
+        A JSON response (either project details or an error message)
+    """
     try:
         client = OpenAI()
         generator = IdeaGenerator(client)
 
         user_input = data.get("description")
         project_id = data.get("id")
-        project_type = data.get("project_type", "Idea")  # Get project_type from input, default to "Idea"
-        print("Finds description")
+        project_type = data.get("project_type", "Idea")# Get project_type from input, default "Idea"
+
 
         if not user_input:
             return jsonify({"error": "Description is required"}), 400
-        
+
         if project_id:
             project = Project.query.get(project_id)
             if project:
@@ -36,7 +52,6 @@ def process_project(data):
         else:
 
             thread_id = generator.create_thread()
-            print("toimii 1")
             project = Project(
                 name="Pending Evaluation",
                 x_value=0,
@@ -45,31 +60,24 @@ def process_project(data):
                 thread_id=thread_id,
                 type=project_type  # Save project_type
             )
-            print("toimii 2")
             db.session.add(project)
-            print("toimii 3")
             db.session.commit()
-            print("toimii 4")
         # **Check if there is an active run and wait for it to finish**
         existing_runs = client.beta.threads.runs.list(thread_id=thread_id)
-        print("Looking for existing runs: ", existing_runs)
 
         for run in existing_runs.data:
             if run.status in ["queued", "in_progress"]:
-                print(f"Existing active run detected: {run.id}. Waiting...")
                 timeout = 60  # 60 seconds timeout
                 start_time = time.time()
                 while True:
-                    run_status = client.beta.threads.runs.retrieve(run_id=run.id, thread_id=thread_id)
-                    print(f"Current run status: {run_status.status}")
+                    run_status = client.beta.threads.runs.retrieve(
+                        run_id=run.id, thread_id=thread_id)
                     if run_status.status in ["completed", "failed", "cancelled"]:
                         break
                     if time.time() - start_time > timeout:
-                        print("Timeout waiting for the existing run to finish.")
                         return jsonify({"error": "Timeout waiting for existing run."}), 500
                     time.sleep(1)
 
-        print("Done looking for existing runs")
 
         # **Send user input to the assistant**
         #tämä kohta lähettää käyttäjän syötteen assistantille  (User_input)
@@ -81,8 +89,7 @@ def process_project(data):
             run = client.beta.threads.runs.create(
                 thread_id=thread_id, assistant_id=generator.assistant_id
             )
-        except Exception as e:
-            print("Error starting assistant run: ", str(e))
+        except Exception as e: # pylint: disable=broad-except
             return jsonify({"error": "Failed to start assistant run", "details": str(e)}), 500
 
         # **Wait for the assistant to respond**
@@ -99,7 +106,7 @@ def process_project(data):
                     break
                 if run_status.status in ["failed", "cancelled"]:
                     print("Assistant run failed or was cancelled.")
-    
+
                     last_error = run_status.last_error
                     if last_error:
                         last_error_details = {
@@ -127,9 +134,10 @@ def process_project(data):
                     return jsonify({"error": "Timeout waiting for assistant response."}), 500
 
                 time.sleep(1)
-            except Exception as e:
+            except Exception as e: # pylint: disable=broad-except
                 print("Error getting response: ", str(e))
-                return jsonify({"error": "Failed to retrieve assistant response", "details": str(e)}), 500
+                return jsonify(
+                    {"error": "Failed to retrieve assistant response", "details": str(e)}), 500
 
         print("Client returned response")
 
@@ -144,28 +152,26 @@ def process_project(data):
                         assistant_response += block.text.value + " "
                 break
 
-        assistant_response = assistant_response.strip() if assistant_response else "No response from the assistant."
+        assistant_response = (assistant_response or "No response from the assistant.").strip()
         response_json = generator.extract_json_from_response(assistant_response)
-        asistant_response = response_json.pop('assistant_response', None) #Erik Muutti
+        asistant_response = response_json.pop('assistant_response', None)
         print("tämä on assistant response \n",response_json)
 
-        # erik Muutti 
         ans = BMC.current_vs_ideal_score(BMC,response_json)
         score = BMC.calculate_score(BMC, ans)
-        # erik Muutti 
-        return ( 
+        return (
             jsonify(
                 {
                     "message": "Chat updated",
                     "thread_id": str(thread_id),
-                    "assistant_response": asistant_response, #Erik Muutti
-                    "validation_score": score, #Erik Muutti
-                }   
+                    "assistant_response": asistant_response,
+                    "validation_score": score,
+                }
             ),
             200,
         )
 
-    except Exception as e:
+    except Exception as e: # pylint: disable=broad-except
         print("Unexpected error:", str(e))
         return (
             jsonify(
@@ -179,11 +185,20 @@ def process_project(data):
 
 
 def evaluate_project(data):
+    """
+    Evaluates project and updates its details in the database.
+
+    Args:
+        data (dict): Contains thread ID and optional project type.
+
+    Returns:
+        JSON response with evaluation results or error message.
+    """
     try:
         client = OpenAI()
         generator = IdeaGenerator(client)
         thread_id = data.get("thread_id")
-        project_type = data.get("project_type", "Idea")  # Get project_type from input, default to "Idea"
+        project_type = data.get("project_type", "Idea") #Get project_type from input, default "Idea"
 
         if not thread_id:
             return jsonify({"error": "Missing thread_id"}), 400
@@ -214,11 +229,20 @@ def evaluate_project(data):
 
         return jsonify({"success": True, "evaluation": evaluation_result}), 200
 
-    except Exception as e:
+    except Exception as e: # pylint: disable=broad-except
         return jsonify({"error": str(e)}), 500
 
 
 def update_project_get(project_id):
+    """
+    Fetches a project from database using ID and renders update template.
+
+    Args:
+        project_id (int): ID of project.
+
+    Returns:
+        a HTML page with project details and visualization or an error page
+    """
     if not project_id:
         return render_template("update_project.html", error="Project ID is required")
 
@@ -245,6 +269,16 @@ def update_project_get(project_id):
 
 
 def update_project_post(project_id, data):
+    """
+    Updates project description in database.
+
+    Args:
+        project_id (int): Project ID
+        data (dict): dictionary with new description
+
+    Returns:
+        JSON response with success or error.
+    """
     if not project_id:
         return jsonify({"error": "Project ID is required"}), 400
 
@@ -262,6 +296,15 @@ def update_project_post(project_id, data):
 
 
 def resume_project(data):
+    """
+    Resumes OpenAI conversation for a given project.
+
+    Args:
+        data (dict): JSON dictionary with project ID
+
+    Returns:
+        JSON response with resumed conversation or error
+    """
     project_id = data.get("id")
 
     if not project_id:
@@ -303,14 +346,29 @@ def resume_project(data):
 
 
 def get_projects():
+    """
+    Gets all projects from database.
+
+    Returns:
+        JSON response with a list of all project details or error message.
+    """
     try:
         projects = Project.query.all()
         return jsonify({"projects": [p.to_dict() for p in projects]}), 200
-    except Exception as e:
+    except Exception as e: # pylint: disable=broad-except
         return jsonify({"error": "Failed to fetch projects", "details": str(e)}), 500
 
 
 def get_project(project_id):
+    """
+    Gets one project's details and generates a visualization.
+
+    Args:
+        project_id (int): Project ID
+
+    Returns:
+        JSON response with project data and visualization or error.
+    """
     try:
         if not project_id:
             return jsonify({"error": "Project ID is required"}), 400
@@ -330,11 +388,20 @@ def get_project(project_id):
 
         return jsonify({**project.to_dict(), "script": script, "div": div}), 200
 
-    except Exception as e:
+    except Exception as e: # pylint: disable=broad-except
         return jsonify({"error": "Failed to fetch project", "details": str(e)}), 500
 
 
 def delete_project(project_id):
+    """
+    Deletes a project from database given ID.
+
+    Args:
+        project_id (int): Project ID
+
+    Returns:
+        JSON response indicating success or failure of deletion.
+    """
     try:
         project = Project.query.get(project_id)
         if not project:
@@ -343,11 +410,17 @@ def delete_project(project_id):
         db.session.delete(project)
         db.session.commit()
         return jsonify({"message": "Project deleted!"}), 200
-    except Exception as e:
+    except Exception as e: # pylint: disable=broad-except
         return jsonify({"error": "Failed to delete project", "details": str(e)}), 500
 
 
 def visualize():
+    """
+    Generates a visualization of all projects.
+
+    Returns:
+        A HTML page with visualization or JSON error message.
+    """
     try:
         projects = Project.query.all()
 
@@ -370,7 +443,7 @@ def visualize():
         script, div = create_scatter_plot(data)
         return render_template("visualization.html", script=script, div=div)
 
-    except Exception as e:
+    except Exception as e: # pylint: disable=broad-except
         return (
             jsonify(
                 {
@@ -383,6 +456,16 @@ def visualize():
 
 
 def upload_pdf(request):
+    """
+    Extracts text from PDF, creates or resumes conversation thread with OpenAI,
+    optionally creates a new project in database.
+
+    Args:
+        request (Request): Flask request object containing uploaded PDF
+
+    Returns:
+        JSON response with thread ID and assistant message, or error.
+    """
     try:
         if "pdf" not in request.files:
             return jsonify({"error": "No PDF file provided"}), 400
@@ -394,7 +477,7 @@ def upload_pdf(request):
             return jsonify({"error": "Failed to extract text from PDF"}), 500
 
         thread_id = request.form.get("thread_id")
-        project_type = request.form.get("project_type", "Idea")  # Get project_type from form, default to "Idea"
+        project_type = request.form.get("project_type", "Idea") #Project_type from form
 
         client = OpenAI()
         generator = IdeaGenerator(client)
@@ -428,9 +511,10 @@ def upload_pdf(request):
 
         return jsonify({"thread_id": thread_id, "message": result["message"]}), 200
 
-    except Exception as e:
+    except Exception as e: # pylint: disable=broad-except
         return jsonify({"error": "Failed to process file", "details": str(e)}), 500
 
 
 def previous_projects():
+    """Displays previous projects page"""
     return render_template("previous_projects.html")
