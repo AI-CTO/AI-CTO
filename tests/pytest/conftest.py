@@ -15,10 +15,12 @@ from src.app import create_app, init_db
 @pytest.fixture
 def app():
     """Create and configure a new app instance for each test."""
-    test_app = create_app()
-    test_app.config["TESTING"] = True
-    test_app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///:memory:"
-    test_app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+    test_config= {
+        "TESTING": True,
+        "SQLALCHEMY_DATABASE_URI": "sqlite:///:memory:",
+        "SQLALCHEMY_TRACK_MODIFICATIONS": False,
+    }
+    test_app = create_app(test_config)
 
     yield test_app
 
