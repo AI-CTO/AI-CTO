@@ -502,7 +502,7 @@ def upload_pdf(request):
                 y_value=0,
                 impact=0,
                 thread_id=thread_id,
-                project_type=project_type,  # Save project_type
+                type=project_type,  # Save project_type
             )
             db.session.add(project)
             db.session.commit()

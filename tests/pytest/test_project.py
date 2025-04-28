@@ -1,5 +1,6 @@
 import json
 import os
+import io
 import sys
 from urllib import response
 
@@ -28,6 +29,8 @@ def test_create_and_get_project(client):
     global thread_id
 
     response = client.post("/process_project", json={"description": business_plan})
+    print(response.data.decode())
+    print(response.status_code)
     assert response.status_code == 200
 
     response_data = response.get_json()
@@ -49,9 +52,53 @@ def test_create_and_get_project(client):
 
     assert project_id is not None, "Project ID was not found in the list of projects."
 
+
+
 def test_upload_pdf(client):
     global project_id
     global thread_id
+
+    test_dir = os.path.dirname(__file__)
+    pdf_path = os.path.join(test_dir, "idea.pdf")
+
+    with open(pdf_path, "rb") as f:
+        data = {
+            "pdf": (f, "idea.pdf"),  # key must match your server expects "pdf"
+            "thread_id": "",          # optional form field
+            "type": "Idea",    # optional form field
+        }
+
+        response = client.post(
+            "/upload_pdf",
+            data=data,
+            content_type="multipart/form-data"
+        )
+        print(response.data.decode())
+        print(response.status_code)
+
+    assert response.status_code == 200
+
+    response_data = response.get_json()
+    assert "thread_id" in response_data
+    assert "message" in response_data
+
+    thread_id = response_data["thread_id"]
+
+    response = client.get("/get_projects")
+    assert response.status_code == 200
+
+    response_data = response.get_json()
+    projects = response_data.get("projects", [])
+
+    for project in projects:
+        if project["thread_id"] == thread_id:
+            project_id = project["id"]
+            break
+
+    assert project_id is not None, "Project ID was not found in the list of projects."
+
+
+"""
 
     response = client.post("/upload_pdf", json={"description": idea_pdf})
     assert response.status_code == 200
@@ -74,6 +121,7 @@ def test_upload_pdf(client):
             break
 
     assert project_id is not None, "Project ID was not found in the list of projects."
+"""
 
 def test_evaluate_project(client):
     global project_id

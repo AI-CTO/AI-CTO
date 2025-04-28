@@ -32,6 +32,7 @@ How to use these resources:
 
 import json
 import re
+import os
 import uuid
 from openai import OpenAI
 from pydantic import BaseModel
@@ -142,7 +143,9 @@ class BmcValidator(BaseModel):
         this can be used to compare the current BMC with the ideal BMC and other stuff
         It can be accessed trough the self.ideal_bmc_list attribute.
         """
-        with open("../src/services/business_model_canvas.json") as f:
+
+        file_path = os.path.join(os.path.dirname(__file__), "business_model_canvas.json")
+        with open(file_path) as f:
             ideal_bmc_list = json.load(f)
         return ideal_bmc_list
 
