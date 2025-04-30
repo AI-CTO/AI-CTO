@@ -38,12 +38,13 @@ class IdeaGenerator:
             return existing_assistant.id
 
         # If no assistant exists, create a new one
-   
+
         print("No existing assistant found. Creating a new one...")
         assistant = self.client.beta.assistants.create(
-            temperature=0.0, 
+            temperature=0.0,
             name="Project Idea Assistant",
             instructions="""
+            RULE: RETURN ONLY A JSON OBJECT.
                            You assist the user in refining a business model canvas (BMC).
                            First, ask the user to describe their idea in detail. Then,
                            iteratively guide them through completing the BMC by dynamically adjusting questions based on their inputs.
@@ -70,7 +71,9 @@ class IdeaGenerator:
                            3**Preserve existing values** 
                            - Do not overwrite previously filled fields unless explicitly stated.
                           **Return ONLY a JSON object structured as follows, without extra text**:
-                           ```json
+                          RULE: RETURN ONLY A JSON OBJECT. 
+                            - The JSON object should contain the following fields:
+                           ```json  
                        {
                           "company_name": null,
                            "assistant_response": assistant_response,
@@ -105,8 +108,10 @@ class IdeaGenerator:
         :return: A parsed dictionary containing the extracted JSON data.
         """
         try:
-            print("Attempting to extract JSON from:", response[:100] + "...")  # Print first 100 chars
-            
+            print(
+                "Attempting to extract JSON from:", response[:100] + "..."
+            )  # Print first 100 chars
+
             match = re.search(r"```json\s*([\s\S]+?)\s*```", response)
             if match:
                 json_data = match.group(1).strip()
@@ -123,7 +128,7 @@ class IdeaGenerator:
                         return parsed_data
                     except json.JSONDecodeError:
                         pass
-                
+
                 # If all else fails, return the response as an assistant_response
                 print("No valid JSON block found, returning response as text")
                 return {"assistant_response": response}
