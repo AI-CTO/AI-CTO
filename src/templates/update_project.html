@@ -205,7 +205,7 @@ block content %}
 
   function evaluateWithGemini() {
   const geminiButton = document.getElementById("evaluate-gemini-btn");
-  const geminiResultContainer = document.getElementById("gemini-evaluation-container"); // Add a container for results
+  const geminiResultContainer = document.getElementById("gemini-evaluation-container");
   geminiButton.disabled = true;
   geminiButton.textContent = "Evaluating with Gemini...";
 
@@ -228,16 +228,14 @@ block content %}
         alert(data.error);
       } else {
         try {
-          // 1. Extract the raw response string
-          let rawText = data.gemini_evaluation.gemini_response;
+          // Extract and clean the raw response string
+          const rawText = data.gemini_evaluation.gemini_response;
+          const cleanedJson = rawText.replace(/```json\n/, "").replace(/\n```$/, "").trim();
 
-          // 2. Clean the JSON string (remove unwanted characters)
-          let cleanedJson = rawText.replace(/```json\n/, '').replace(/\n```$/, '');
+          // Parse the cleaned JSON string
+          const evaluation = JSON.parse(cleanedJson);
 
-          // 3. Parse the cleaned JSON string into an object
-          let evaluation = JSON.parse(cleanedJson);
-
-          // 4. Dynamically display the parsed data
+          // Dynamically display the parsed data
           displayEvaluationResults(evaluation);
         } catch (error) {
           console.error("Error parsing Gemini response:", error);
