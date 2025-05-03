@@ -1,17 +1,21 @@
+"""
+Module for database stuff.
+"""
+
+import os
 from models.models import db
-import os
-
-#def init_db(app):
-    #with app.app_context():
-        #db.create_all()
-
-import os
 
 def init_db(app):
+    """
+    Initializes the database.
+
+    Args:
+        app (Flask): The Flask application
+    """
     db_path = app.config['SQLALCHEMY_DATABASE_URI'].replace("sqlite:///", "")
     if not os.path.exists(db_path):
         with app.app_context():
-            print("Luodaan uusi tietokanta:", db_path)
+            print("Creating new database", db_path)
             db.create_all()
     else:
-        print("Tietokanta jo olemassa, ei luoda uudelleen:", db_path)
+        print("Already existing databtase, can't make new one:", db_path)
