@@ -1,6 +1,8 @@
-import time
+"""
+Module that defines and registers all Flask routes for web application.
+"""
+
 from flask import jsonify, render_template, request
-from flask_limiter import Limiter
 
 
 from controllers.project_controller import (
@@ -19,7 +21,14 @@ from controllers.project_controller import (
 from controllers.user_controller import user_bp
 
 def setup_routes(app, limiter):
-    MAX_DESCRIPTION_LENGTH = 700
+    """
+    Sets up all of the app routes within the Flask app
+
+    Args:
+        app (Flask): Flask application instance
+        limiter (Limiter): Instance of Flask-Limiter for rate limits.
+    """
+    #MAX_DESCRIPTION_LENGTH = 700
 
     app.register_blueprint(user_bp)
 
@@ -47,8 +56,9 @@ def setup_routes(app, limiter):
     def update_project_route():
         if request.method == "GET":
             return update_project_get(request.args.get("id", type=int))
-        elif request.method == "POST":
+        if request.method == "POST":
             return update_project_post(request.args.get("id", type=int), request.json)
+        return "Method not allowed", 405
 
     @app.route("/resume_project", methods=["POST"])
     @limiter.limit("10/hour")
