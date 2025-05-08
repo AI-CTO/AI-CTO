@@ -1,7 +1,12 @@
 import requests
 import openai
 
+# pylint: skip-file
+
 class CrunchbaseService:
+    """
+    Class for the Crunch Base Service (currently not in use in the project, can be developed in the future)
+    """
     def __init__(self, api_key, openai_api_key, project_name, project_description):
         """
         Initializes the CrunchbaseService with the given API key, OpenAI API key, project name, and project description.

@@ -1,3 +1,13 @@
+"""
+Module for interacting with the OpenAI service.
+Provides functionality to:
+- send a user-provided description to OpenAI LLM.
+- extract plain text from uploaded files.
+
+Environment:
+Requires the OPENAI_API_KEY environment variable to be set.
+"""
+
 import os
 import json
 import fitz
@@ -5,11 +15,23 @@ from openai import OpenAI
 
 client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
 prompt_file_path = os.path.join(os.path.dirname(__file__), "../prompt.txt")
-with open(prompt_file_path, "r") as file:
+with open(prompt_file_path, "r", encoding="utf-8") as file:
     instruction_prompt = file.read().strip()
 
 
 def get_openai_completion(description):
+    """
+    Sends project description to OpenAI API and parses the JSON response.
+
+    Args:
+        description (str): text description of project
+
+    Raises:
+        ValueError: if wrong format
+
+    Returns:
+        dict or None: dictionary with structured project information or None if unsuccessful.
+    """
     response = client.chat.completions.create(
         messages=[
             {"role": "system", "content": instruction_prompt},
@@ -31,13 +53,21 @@ def get_openai_completion(description):
         ]
         if all(field in response_json for field in required_fields):
             return response_json
-        else:
-            raise ValueError("Response JSON does not contain all required fields.")
+        raise ValueError("Response JSON does not contain all required fields.")
     except (json.JSONDecodeError, ValueError) as e:
         print(f"Invalid response format: {e}")
         return None
-    
+
 def extract_text_from_pdf(pdf_file):
+    """
+    Extracts and returns text content from PDF file using PyMuPDF.
+
+    Args:
+        pdf_file: a file-like object with PDF data.
+
+    Returns:
+        str or None: Extracted text if successful, otherwise None.
+    """
     try:
         pdf_bytes = pdf_file.read()
         doc = fitz.open(stream=pdf_bytes, filetype="pdf")
@@ -52,6 +82,6 @@ def extract_text_from_pdf(pdf_file):
             return None
 
         return extracted_text
-    except Exception as e:
+    except Exception as e: #pylint: disable=broad-except
         print(f"Error extracting text from PDF: {e}")
         return None

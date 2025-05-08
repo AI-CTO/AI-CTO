@@ -1,3 +1,7 @@
+"""
+AI Assistant for business idea generation and evaluation using OpenAI Assistants API.
+"""
+
 import json
 import os
 import re
@@ -15,6 +19,9 @@ with open(assistant_instructions, "r", encoding="utf-8") as file:
 
 
 class IdeaGenerator:
+    """
+    Class for managing idea generation, BMC extraction, and evaluation of idea.
+    """
     def __init__(self, client: OpenAI):
         """
         Luokka uusien ideoiden generointiin ja hallintaan OpenAI Assistants API:n avulla.
@@ -117,31 +124,32 @@ class IdeaGenerator:
                 json_data = match.group(1).strip()
                 parsed_data = json.loads(json_data)
                 return parsed_data
-            else:
-                # If no JSON block found, try to extract any valid JSON from the response
-                # Look for anything that might be JSON (between curly braces)
-                json_match = re.search(r"\{[\s\S]*?\}", response)
-                if json_match:
-                    try:
-                        possible_json = json_match.group(0)
-                        parsed_data = json.loads(possible_json)
-                        return parsed_data
-                    except json.JSONDecodeError:
-                        pass
+            # If no JSON block found, try to extract any valid JSON from the response
+            # Look for anything that might be JSON (between curly braces)
+            json_match = re.search(r"\{[\s\S]*?\}", response)
+            if json_match:
+                try:
+                    possible_json = json_match.group(0)
+                    parsed_data = json.loads(possible_json)
+                    return parsed_data
+                except json.JSONDecodeError:
+                    pass
 
-                # If all else fails, return the response as an assistant_response
-                print("No valid JSON block found, returning response as text")
-                return {"assistant_response": response}
+            # If all else fails, return the response as an assistant_response
+            print("No valid JSON block found, returning response as text")
+            return {"assistant_response": response}
 
         except json.JSONDecodeError as e:
             print(f"Error parsing JSON: {str(e)}")
             return {"assistant_response": response, "error": "Invalid JSON format"}
 
     def evaluate(self):
-        """Asks the AI to evaluate the project based on user discussions and updates the evaluation table."""
+        """
+        Asks the AI to evaluate the project based on user discussions, updates evaluation table.
+        """
         if not self.thread_id:
             print("No active thread found. Start a conversation first.")
-            return
+            return None
 
         messages = self.client.beta.threads.messages.list(thread_id=self.thread_id)
 
