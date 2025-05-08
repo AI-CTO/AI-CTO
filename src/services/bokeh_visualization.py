@@ -1,9 +1,22 @@
-from bokeh.palettes import Set2
+"""
+Module for the bokeh visualization methods.
+"""
+
+#from bokeh.palettes import Set2
 from bokeh.plotting import figure
 from bokeh.embed import components
 from bokeh.models import ColumnDataSource, Range1d, Title, TapTool, OpenURL
 
+#pylint: disable=too-many-locals
 def create_scatter_plot(data):
+    """Creates a scatter plot based on inputted data.
+
+    Args:
+        data (dict): dictionary with the needed data.
+
+    Returns:
+        tuple[str, str]: (script, div) tuple for embedding the plot in HTML.
+    """
     projects = data["projects"]
     x_values = data["business_novelty"]
     y_values = data["customer_novelty"]

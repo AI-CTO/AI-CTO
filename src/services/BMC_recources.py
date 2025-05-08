@@ -1,3 +1,5 @@
+# pylint: skip-file
+
 '''
 How to use these resources:
 
@@ -9,7 +11,7 @@ How to use these resources:
    Call `variable.update_from_text('text')`, where `'text'` is the input data.  
    The AI will analyze and fill in the relevant fields of the BMC.
 
-   + thread_id should be added to the completion object to keep track of the conversation. NOT DONE YET
+   + thread_id should be added to the completion object to keep track of the conversation. NOT DONE
 
 3. **Retrieve the updated BusinessModelCanvas**  
    Call `json_output = variable.model_dump_json(indent=2)`.  
@@ -31,18 +33,16 @@ How to use these resources:
 
 
 import json
-import re
 import os
-import uuid
 from openai import OpenAI
 from pydantic import BaseModel
-from typing import Optional, List, Dict
+#from typing import Optional, List, Dict
 
 client = OpenAI()
 
 # class BusinessModelCanvas(BaseModel):
 #     print("BMC IS RUNNING")
-#     company_name: Optional[str] = None 
+#     company_name: Optional[str] = None
 #     key_partners: Optional[List[str]] = None
 #     key_activities: Optional[List[str]] = None
 #     key_resources: Optional[List[str]] = None
@@ -53,8 +53,8 @@ client = OpenAI()
 #     cost_structure: Optional[List[str]] = None ###
 #     revenue_streams: Optional[List[str]] = None
 #     #Products
-#     #1 
-#     #2 
+#     #1
+#     #2
 #     #3
 #     #4
 #     #5
@@ -71,15 +71,17 @@ client = OpenAI()
 #                     {
 #                         "role": "system",
 #                         "content": """
-#                         You are an expert in Business Model Canvas (BMC) data extraction. 
-#                         You will be given unstructured business descriptions and extract relevant information into a structured BMC format.
-
-#                         Your goal is to **fill in as many fields as possible** without overwriting existing values.
+#                         You are an expert in Business Model Canvas (BMC) data extraction.
+#                         You will be given unstructured business descriptions and extract
+#                         relevant information into a structured BMC format.
+#                         Your goal is to **fill in as many fields as possible**
+#                         without overwriting existing values.
 
 #                         ### **Instructions**
-#                         1**Analyze the input text carefully.**  
-#                         - Identify key components such as business goals, customers, revenue sources, partnerships, and technologies.
-                        
+#                         1**Analyze the input text carefully.**
+#                         - Identify key components such as business goals, customers, 
+#                         revenue sources, partnerships, and technologies.
+
 #                         2**Map the extracted information to the correct BMC fields.**  
 #                         - Example mappings:
 #                             - **Company Name** → If an organization is mentioned.
@@ -108,11 +110,15 @@ client = OpenAI()
 #             for field, value in new_data.dict().items():
 #                 if value is not None:
 #                     setattr(self, field, value)
-        
+    
 #         except Exception as e:
 #             print(f"⚠️ OpenAI API -virhe: {e}")
 
 class BmcValidator(BaseModel):
+    """
+    A class with methods for the BMC canvas.
+    """
+
     print("BMC IS RUNNING")
     accuracy_of_information: bool
     completeness_and_depth: bool
@@ -137,7 +143,7 @@ class BmcValidator(BaseModel):
                 score -= round(16.67, 1)
         return score
 
-    def load_ideal_bmc():
+    def load_ideal_bmc(self):
         """
         Loads the ideal Business Model Canvas (BMC) from a JSON file.
         this can be used to compare the current BMC with the ideal BMC and other stuff
@@ -145,7 +151,7 @@ class BmcValidator(BaseModel):
         """
 
         file_path = os.path.join(os.path.dirname(__file__), "business_model_canvas.json")
-        with open(file_path) as f:
+        with open(file_path, encoding="utf-8") as f:
             ideal_bmc_list = json.load(f)
         return ideal_bmc_list
 
@@ -220,7 +226,7 @@ class BmcValidator(BaseModel):
             return response
 
         except Exception as e:
-            print(f"⚠️ OpenAI API -virhe: {e}")
+            print(f"OpenAI API -virhe: {e}")
         
     
 
@@ -300,4 +306,3 @@ if __name__ == "__main__":
     #validation = val.current_vs_ideal_score(input_bmc)
     #print(validation)
     #print(val.calculate_score(validation))
-
