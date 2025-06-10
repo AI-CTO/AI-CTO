@@ -1,0 +1,76 @@
+{
+    "business_novelty": {
+        "key_partners": {
+            "ideal": "An ideal partner network brings strategic capabilities, co-innovation, and access to unique assets or markets that would be hard to build internally.",
+            "anti_ideal": "Partnerships are generic, transactional, or redundant—offering no strategic value or differentiation from competitors."
+        },
+        "key_activities": {
+            "ideal": "Key activities are focused, innovative, and directly tied to delivering unique value—often leveraging proprietary methods or technology.",
+            "anti_ideal": "Activities are routine, operationally bloated, or irrelevant to the core value proposition—offering no competitive edge."
+        },
+        "key_resources": {
+            "ideal": "The business leverages unique and hard-to-replicate resources—such as proprietary technology, brand equity, or specialized talent.",
+            "anti_ideal": "Resources are generic, easily available in the market, and do not contribute to any unique capability or advantage."
+        },
+        "value_propositions": {
+            "ideal": "A compelling and differentiated value proposition that solves real problems in a novel way and creates measurable customer impact.",
+            "anti_ideal": "A vague, undifferentiated offering that mimics existing solutions and fails to resonate with customer needs."
+        },
+        "customer_relationships": {
+            "ideal": "Customer relationships are personalized, trust-based, and continuously enhanced using data and feedback.",
+            "anti_ideal": "Interactions are impersonal, transactional, or inconsistent—resulting in low customer retention or engagement."
+        },
+        "channels": {
+            "ideal": "Channels are integrated, customer-centric, and optimized for convenience, efficiency, and brand coherence.",
+            "anti_ideal": "Channels are fragmented, outdated, or disconnected from how customers actually prefer to interact."
+        },
+        "revenue_streams": {
+            "ideal": "Revenue streams are diversified, recurring, and aligned with the value delivered—enabling long-term sustainability.",
+            "anti_ideal": "Revenues are one-off, unreliable, or misaligned with customer value, making growth and sustainability difficult."
+        }
+    },
+    "customer novelty": {
+        "customer_segments": {
+            "ideal": "The business serves clearly defined, high-potential segments with tailored offerings and deep understanding of their needs.",
+            "anti_ideal": "Customer segments are too broad, poorly defined, or selected without insight—leading to diluted focus and weak fit."
+        },
+        "value_propositions": {
+            "ideal": "A compelling and differentiated value proposition that solves real problems in a novel way and creates measurable customer impact.",
+            "anti_ideal": "A vague, undifferentiated offering that mimics existing solutions and fails to resonate with customer needs."
+        },
+        "customer_relationships": {
+            "ideal": "Customer relationships are personalized, trust-based, and continuously enhanced using data and feedback.",
+            "anti_ideal": "Interactions are impersonal, transactional, or inconsistent—resulting in low customer retention or engagement."
+        },
+        "channels": {
+            "ideal": "Channels are integrated, customer-centric, and optimized for convenience, efficiency, and brand coherence.",
+            "anti_ideal": "Channels are fragmented, outdated, or disconnected from how customers actually prefer to interact."
+        },
+        "key_activities": {
+            "ideal": "Key activities are focused, innovative, and directly tied to delivering unique value—often leveraging proprietary methods or technology.",
+            "anti_ideal": "Activities are routine, operationally bloated, or irrelevant to the core value proposition—offering no competitive edge."
+        }
+    },
+    "impact": {
+        "cost_structure": {
+            "ideal": "An ideal cost structure is lean, scalable, and aligned with value creation, enabling sustainable growth and adaptability.",
+            "anti_ideal": "Cost structure is inefficient, and misaligned with value creation—characterized by high fixed costs, low scalability, and spending on non-core activities."
+        },
+        "revenue_streams": {
+            "ideal": "Revenue streams are diversified, recurring, and aligned with the value delivered—enabling long-term sustainability.",
+            "anti_ideal": "Revenues are one-off, unreliable, or misaligned with customer value, making growth and sustainability difficult."
+        },
+        "key_resources": {
+            "ideal": "Resources not only provide competitive advantage but also enable positive social or environmental impact—such as open data, clean energy, or inclusive talent.",
+            "anti_ideal": "Resources are misused, unsustainable, or exploitative—damaging long-term value and stakeholder trust."
+        },
+        "value_propositions": {
+            "ideal": "Delivers measurable improvement to lives, ecosystems, or systems—not just customer satisfaction but real-world impact.",
+            "anti_ideal": "Adds no meaningful value or may even harm users, communities, or the environment."
+        },
+        "customer_segments": {
+            "ideal": "Targets underserved or high-impact segments where positive change or systemic improvement can be achieved.",
+            "anti_ideal": "Focuses only on short-term profits from overexploited, saturated, or vulnerable segments without regard for equity or need."
+        }
+    }
+}
