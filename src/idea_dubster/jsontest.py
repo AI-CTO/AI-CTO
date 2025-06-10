@@ -5,7 +5,7 @@ import pandas as pd
 from numpy.linalg import norm
 import json
 
-
+#moikka
 
 class fcp_score:
     
