@@ -98,6 +98,11 @@ class fcp_score:
         profiles_path = os.path.join(os.path.dirname(__file__), "../idea_dubster/semantic_profiles.json")
         with open(profiles_path, "r", encoding="utf-8") as f:
             self.bmc_semantic_profiles2 = json.load(f)
+            # Standardize keys to use underscores for consistency
+            self.bmc_semantic_profiles2 = {
+                key.replace(" ", "_"): value
+                for key, value in self.bmc_semantic_profiles2.items()
+            }
         self.bmc_semantic_profiles2_done = self.populate_semantic_vectors2() #tämä funktio muuttaa bmc:n vektoreiksi ja tallentaa uuteen sanakirjaan
     
     def populate_semantic_vectors(self):
