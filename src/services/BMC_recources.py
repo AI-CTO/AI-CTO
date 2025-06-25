@@ -127,7 +127,8 @@ class BmcValidator(BaseModel):
     numerical_data_realism: bool
     clarity_and_readability: bool
 
-    def calculate_score(self, validation: 'BmcValidator') -> int:
+    @staticmethod
+    def calculate_score(validation: 'BmcValidator') -> int:
         """
         Laskee numeerisen pisteytyksen sen perusteella, kuinka moni arvo on False.
 
@@ -143,7 +144,8 @@ class BmcValidator(BaseModel):
                 score -= round(16.67, 1)
         return score
 
-    def load_ideal_bmc(self):
+    @staticmethod
+    def load_ideal_bmc():
         """
         Loads the ideal Business Model Canvas (BMC) from a JSON file.
         this can be used to compare the current BMC with the ideal BMC and other stuff
@@ -155,7 +157,8 @@ class BmcValidator(BaseModel):
             ideal_bmc_list = json.load(f)
         return ideal_bmc_list
 
-    def current_vs_ideal_score(self, bmc:json) -> None:
+    @staticmethod
+    def current_vs_ideal_score(bmc: json) -> 'BmcValidator | None':
         """
         Päivittää nykyisen BMC-olion uusilla tiedoilla ilman, että aiemmat tiedot ylikirjoitetaan.
 
