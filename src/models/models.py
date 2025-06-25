@@ -6,6 +6,7 @@ Database models to represent application users and projects
 #pylint: disable=too-few-public-methods
 
 from datetime import datetime, timezone
+import json
 
 from flask_sqlalchemy import SQLAlchemy
 db = SQLAlchemy()
@@ -71,6 +72,7 @@ class Project(db.Model):
         onupdate=lambda: datetime.now(timezone.utc),
     )
     type = db.Column(db.String, nullable=False, default="Idea")  # New field
+    bmc_data = db.Column(db.Text, nullable=True)
 
     def to_dict(self):
         """
@@ -89,4 +91,5 @@ class Project(db.Model):
             "thread_id": self.thread_id,
             "timestamp": self.timestamp.isoformat() if self.timestamp else None,
             "project_type": self.type,
+            "bmc_data": json.loads(self.bmc_data) if self.bmc_data else None,
         }
