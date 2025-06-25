@@ -65,8 +65,7 @@ def process_project(data):
             project = Project.query.get(project_id)
             if project:
                 thread_id = project.thread_id
-                # Update the project_type if provided
-                project.project_type = project_type
+                project.type = project_type  # ensure stored correctly
                 db.session.commit()
             else:
                 return jsonify({"error": "Project not found"}), 404
@@ -183,6 +182,11 @@ def process_project(data):
         store[str(thread_id)] = response_json
         save_bmc_store(store)
 
+        # Persist BMC data on the project
+        if project:
+            project.bmc_data = json.dumps(response_json)
+            db.session.commit()
+
         ans = BMC.current_vs_ideal_score(response_json)
         score = BMC.calculate_score(ans) if ans is not None else None
         return (
@@ -227,10 +231,14 @@ def evaluate_project(data):
         if not thread_id:
             return jsonify({"error": "Missing thread_id"}), 400
 
-        store = load_bmc_store()
-        bmc_data = store.get(str(thread_id))
-        if not bmc_data:
+        project = Project.query.filter_by(thread_id=thread_id).first()
+        if not project:
+            return jsonify({"error": "Project not found"}), 404
+
+        if not project.bmc_data:
             return jsonify({"error": "No BMC data found for thread"}), 404
+
+        bmc_data = json.loads(project.bmc_data)
 
         from services.bmc_fca_score import fcp_score, MCDM
 
@@ -244,17 +252,12 @@ def evaluate_project(data):
         impact = ranking.get("impact_rank", 0)
         name = bmc_data.get("company_name", "Pending Evaluation")
 
-        project = Project.query.filter_by(thread_id=thread_id).first()
-
-        if not project:
-            return jsonify({"error": "Project not found"}), 404
-
         # Update project details
         project.x_value = x_value
         project.y_value = y_value
         project.impact = impact
         project.name = name
-        project.project_type = project_type  # Update project_type
+        project.type = project_type
         db.session.commit()
 
         result = {
