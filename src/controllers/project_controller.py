@@ -5,6 +5,9 @@ visualizing, deleting, and resuming progress.
 """
 import time
 
+import json
+import os
+
 from flask import jsonify, render_template
 from openai import OpenAI
 
@@ -13,6 +16,24 @@ from services.api_assist import IdeaGenerator
 from services.BMC_recources import BmcValidator as BMC
 from services.bokeh_visualization import create_scatter_plot
 from services.openai_service import extract_text_from_pdf
+
+BMC_DATA_FILE = os.path.join(os.path.dirname(__file__), "../services/bmc_data.json")
+
+
+def load_bmc_store():
+    if not os.path.exists(BMC_DATA_FILE):
+        return {}
+    with open(BMC_DATA_FILE, "r", encoding="utf-8") as file:
+        try:
+            return json.load(file)
+        except json.JSONDecodeError:
+            return {}
+
+
+def save_bmc_store(store):
+    with open(BMC_DATA_FILE, "w", encoding="utf-8") as file:
+        json.dump(store, file)
+
 
 
 # pylint: disable=too-many-locals, too-many-return-statements, too-many-branches, too-many-statements
@@ -156,7 +177,11 @@ def process_project(data):
         assistant_response = (assistant_response or "No response from the assistant.").strip()
         response_json = generator.extract_json_from_response(assistant_response)
         asistant_response = response_json.pop('assistant_response', None)
-        print("tämä on assistant response \n",response_json)
+        print("tämä on assistant response \n", response_json)
+
+        store = load_bmc_store()
+        store[str(thread_id)] = response_json
+        save_bmc_store(store)
 
         ans = BMC.current_vs_ideal_score(response_json)
         score = BMC.calculate_score(ans) if ans is not None else None
@@ -196,24 +221,28 @@ def evaluate_project(data):
         JSON response with evaluation results or error message.
     """
     try:
-        client = OpenAI()
-        generator = IdeaGenerator(client)
         thread_id = data.get("thread_id")
-        project_type = data.get("project_type", "Idea") #Get project_type from input, default "Idea"
+        project_type = data.get("project_type", "Idea")
 
         if not thread_id:
             return jsonify({"error": "Missing thread_id"}), 400
 
-        generator.thread_id = thread_id
-        evaluation_result = generator.evaluate()
+        store = load_bmc_store()
+        bmc_data = store.get(str(thread_id))
+        if not bmc_data:
+            return jsonify({"error": "No BMC data found for thread"}), 404
 
-        if not evaluation_result:
-            return jsonify({"error": "Evaluation failed"}), 500
+        from services.bmc_fca_score import fcp_score, MCDM
 
-        x_value = evaluation_result.get("x_value", 0)
-        y_value = evaluation_result.get("y_value", 0)
-        impact = evaluation_result.get("impact", 0)
-        name = evaluation_result.get("name", "Pending Evaluation")
+        scorer = fcp_score()
+        semantic_scores = scorer.bmc_fcp_score_multi(bmc_data)
+        mcdm = MCDM()
+        ranking = mcdm.calculate_single_ranking_wsa(semantic_scores)
+
+        x_value = ranking.get("customer_novelty_rank", 0)
+        y_value = ranking.get("business_novelty_rank", 0)
+        impact = ranking.get("impact_rank", 0)
+        name = bmc_data.get("company_name", "Pending Evaluation")
 
         project = Project.query.filter_by(thread_id=thread_id).first()
 
@@ -228,7 +257,14 @@ def evaluate_project(data):
         project.project_type = project_type  # Update project_type
         db.session.commit()
 
-        return jsonify({"success": True, "evaluation": evaluation_result}), 200
+        result = {
+            "x_value": x_value,
+            "y_value": y_value,
+            "impact": impact,
+            "name": name,
+        }
+
+        return jsonify({"success": True, "evaluation": result}), 200
 
     except Exception as e: # pylint: disable=broad-except
         return jsonify({"error": str(e)}), 500

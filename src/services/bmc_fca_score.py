@@ -5,6 +5,7 @@ from numpy import dot
 import pandas as pd
 from numpy.linalg import norm
 import json
+import os
 import plotly.express as px 
 import matplotlib.pyplot as plt
 import pandas as pd
@@ -94,7 +95,8 @@ class fcp_score:
     }
 }
         #self.bmc_semantic_vectors_done = self.populate_semantic_vectors() #tämä funktio muuttaa bmc:n vektoreiksi ja tallentaa uuteen sanakirjaan
-        with open("/Users/erikstandard/Desktop/AI-CTO/src/idea_dubster/semantic_profiles2.json") as f:
+        profiles_path = os.path.join(os.path.dirname(__file__), "../idea_dubster/semantic_profiles.json")
+        with open(profiles_path, "r", encoding="utf-8") as f:
             self.bmc_semantic_profiles2 = json.load(f)
         self.bmc_semantic_profiles2_done = self.populate_semantic_vectors2() #tämä funktio muuttaa bmc:n vektoreiksi ja tallentaa uuteen sanakirjaan
     
@@ -298,8 +300,9 @@ class MCDM:
         }
 
         
-        with open("/Users/erikstandard/Desktop/AI-CTO/src/idea_dubster/semantic_scores_output.json") as f:
-            self.customer_novelty_rank_data = json.load(f) 
+        scores_path = os.path.join(os.path.dirname(__file__), "../idea_dubster/semantic_scores_output.json")
+        with open(scores_path, "r", encoding="utf-8") as f:
+            self.customer_novelty_rank_data = json.load(f)
 
         self.df = pd.DataFrame(self.customer_novelty_rank_data)
         self.df_business = self.df["business_novelty"].apply(pd.Series)
