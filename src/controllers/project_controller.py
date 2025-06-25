@@ -158,8 +158,8 @@ def process_project(data):
         asistant_response = response_json.pop('assistant_response', None)
         print("tämä on assistant response \n",response_json)
 
-        ans = BMC.current_vs_ideal_score(BMC,response_json)
-        score = BMC.calculate_score(BMC, ans)
+        ans = BMC.current_vs_ideal_score(response_json)
+        score = BMC.calculate_score(ans) if ans is not None else None
         return (
             jsonify(
                 {
