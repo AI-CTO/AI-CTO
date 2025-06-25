@@ -87,7 +87,8 @@ class fcp_score:
         }
     }
 }
-        self.bmc_semantic_profiles = {
+        #kovakoodataan ensimmäinen ideaali-anti-ideaali versio
+        self.bmc_semantic_profiles1 = {
     "business_novelty": {
         "key_partners": {
             "ideal": "An ideal partner network brings strategic capabilities, co-innovation, and access to unique assets or markets that would be hard to build internally.",
@@ -163,8 +164,15 @@ class fcp_score:
         }
     }
 }
-        self.bmc_semantic_vectors_done = self.populate_semantic_vectors() #tämä funktio muuttaa bmc:n vektoreiksi ja tallentaa uuteen sanakirjaan
+        
+        #ladataan toinen ideaali-anti-ideaali versio
+        with open("/Users/erikstandard/Desktop/AI-CTO/src/idea_dubster/semantic_profiles2.json") as f:
+            self.bmc_semantic_profiles2 = json.load(f)
 
+
+        #self.bmc_semantic_vectors_done = self.populate_semantic_vectors() #tämä funktio muuttaa bmc:n vektoreiksi ja tallentaa uuteen sanakirjaan
+        self.bmc_semantic_profiles2_done = self.populate_semantic_vectors2() #tämä funktio muuttaa bmc:n vektoreiksi ja tallentaa uuteen sanakirjaan
+    
     def populate_semantic_vectors(self):
         #init funktio 
         #tämä funktio muuttaa ideaali_bmc:n vektoreiksi ja tallentaa uuteen sanakirjaan
@@ -177,11 +185,43 @@ class fcp_score:
                 self.bmc_semantic_vectors[category][key]["anti_ideal"] = self.model.encode(anti_ideal_text)
         return self.bmc_semantic_vectors
 
+    def populate_semantic_vectors2(self):
+        """
+        Tämä funktio rakentaa semanttiset projektioakselit multi-example erotusvektoreiden keskiarvona.
+        """
+        # Init uusi sanakirja joka tallentaa lopputuloksen
+        semantic_vectors = {}
 
-    #tämä funktio tulostaa bmc canvas + arvot
+        for category, fields in self.bmc_semantic_profiles2.items():
+            semantic_vectors[category] = {}
+
+            for field, examples in fields.items():
+                # Haetaan kaikki lauseparit
+                ideal_list = examples["ideal"]
+                anti_ideal_list = examples["anti_ideal"]
+
+                # Enkoodataan kaikki lauseet vektoreiksi
+                ideal_vectors = [self.model.encode(ideal) for ideal in ideal_list]
+                anti_ideal_vectors = [self.model.encode(anti) for anti in anti_ideal_list]
+
+                # Lasketaan erotusvektorit
+                difference_vectors = [anti - ideal for ideal, anti in zip(ideal_vectors, anti_ideal_vectors)]
+
+                # Erotusvektoreiden keskiarvo (robustimpi akseli)
+                mean_difference_vector = sum(difference_vectors) / len(difference_vectors)
+
+                # Tallennetaan tulos
+                semantic_vectors[category][field] = {
+                    "axis_vector": mean_difference_vector,  # tämä on nyt normalisoimaton akselivektori
+                    "ideal_mean": sum(ideal_vectors) / len(ideal_vectors),  # tarvitaan pisteen projektiota varten
+                }
+
+        return semantic_vectors
+
+
     def bmc_fcp_score1(self, model, bmc_semantic_vectors, bmc_regular_form):
         """
-        Laskee semanttisen pisteytyksen yhdelle BMC-rakenteelle.
+        Laskee semanttisen pisteytyksen yhdelle BMC-rakenteelle yhden ideaali vastaideaali parin semanttiselle projektio akselille.
         Palauttaa tulokset jaoteltuna samoihin kategorioihin kuin self.bmc_semantic_profiles.
         """
         scores = {
@@ -211,6 +251,41 @@ class fcp_score:
                     scores[category][field] = round(float(max(0, min(score, 100))), 2)
         return scores
     
+    def bmc_fcp_score_multi(self, model, bmc_semantic_vectors, bmc_regular_form):
+        """
+        Laskee semanttisen pisteytyksen BMC-rakenteelle käyttäen useiden lauseparien pohjalta laskettua akselia.
+        """
+        scores = {
+            "business_novelty": {},
+            "customer_novelty": {},
+            "impact": {}
+        }
+
+        for category, fields in bmc_semantic_vectors.items():
+            for field, vector_data in fields.items():
+                if field in bmc_regular_form[category] and bmc_regular_form[category][field]:
+                    axis_vector = vector_data["axis_vector"]
+                    ideal_mean = vector_data["ideal_mean"]
+
+                    axis_length = norm(axis_vector)
+                    if axis_length == 0:
+                        scores[category][field] = 50.0
+                        continue
+
+                    vec_test = model.encode(bmc_regular_form[category][field])
+                    relative = vec_test - ideal_mean
+                    x_proj = dot(relative, axis_vector)
+
+                    # Skaalataan kuten aiemmin (prosenttiasteikko 0-100)
+                    scaled_axis_length = axis_length / 2
+                    score = (1 - (x_proj / scaled_axis_length)) * 100
+                    score = round(float(max(0, min(score, 100))), 2)
+
+                    scores[category][field] = score
+                else:
+                    scores[category][field] = 50.0  # Jos data puuttuu, neutraali default
+
+        return scores
 
 if __name__ == "__main__":
     fcp = fcp_score()
@@ -225,9 +300,10 @@ if __name__ == "__main__":
     # 2. Käsittele kaikki BMC:t
     for entry in bmc_data:
         print(entry)
-        result = fcp.bmc_fcp_score1(model, fcp.bmc_semantic_vectors, entry)
+        #result = fcp.bmc_fcp_score1(model, fcp.bmc_semantic_vectors, entry) WANHA VERSIO TAPAUKSELLE MONO SEMANTIC PROJEKTIOAKSELI
+        result = fcp.bmc_fcp_score_multi(model, fcp.bmc_semantic_profiles2_done, entry)
         all_scores.append(result)
 
-    #tallenna uuden gradientin vertailupisteet
-    with open("/Users/erikstandard/Desktop/AI-CTO/src/idea_dubster/bmc_semantic_scores_new_gradient.json", "w") as f:
+    #tallenna multi-scores json tiedostoon
+    with open("/Users/erikstandard/Desktop/AI-CTO/src/idea_dubster/bmc_semantic_scores_multi.json", "w") as f:
         json.dump(all_scores, f, indent=4)

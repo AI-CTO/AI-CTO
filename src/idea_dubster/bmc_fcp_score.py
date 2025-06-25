@@ -169,8 +169,11 @@ class fcp_score:
         }
     }
 }
-        self.bmc_semantic_vectors_done = self.populate_semantic_vectors() #tämä funktio muuttaa bmc:n vektoreiksi ja tallentaa uuteen sanakirjaan
-
+        #self.bmc_semantic_vectors_done = self.populate_semantic_vectors() #tämä funktio muuttaa bmc:n vektoreiksi ja tallentaa uuteen sanakirjaan
+        with open("/Users/erikstandard/Desktop/AI-CTO/src/idea_dubster/semantic_profiles2.json") as f:
+            self.bmc_semantic_profiles2 = json.load(f)
+        self.bmc_semantic_profiles2_done = self.populate_semantic_vectors2() #tämä funktio muuttaa bmc:n vektoreiksi ja tallentaa uuteen sanakirjaan
+    
     def populate_semantic_vectors(self):
         """
         Converts the 'ideal' and 'anti_ideal' textual profiles in `self.bmc_semantic_profiles`
@@ -189,6 +192,40 @@ class fcp_score:
                 self.bmc_semantic_vectors[category][key]["ideal"] = self.model.encode(ideal_text)
                 self.bmc_semantic_vectors[category][key]["anti_ideal"] = self.model.encode(anti_ideal_text)
         return self.bmc_semantic_vectors
+    
+    def populate_semantic_vectors2(self):
+        """
+        Tämä funktio rakentaa semanttiset projektioakselit multi-example erotusvektoreiden keskiarvona.
+        """
+        # Init uusi sanakirja joka tallentaa lopputuloksen
+        semantic_vectors = {}
+
+        for category, fields in self.bmc_semantic_profiles2.items():
+            semantic_vectors[category] = {}
+
+            for field, examples in fields.items():
+                # Haetaan kaikki lauseparit
+                ideal_list = examples["ideal"]
+                anti_ideal_list = examples["anti_ideal"]
+                print(f"Ideaalit: {ideal_list}, Anti-ideaalit: {anti_ideal_list}")
+
+                # Enkoodataan kaikki lauseet vektoreiksi
+                ideal_vectors = [self.model.encode(ideal) for ideal in ideal_list]
+                anti_ideal_vectors = [self.model.encode(anti) for anti in anti_ideal_list]
+
+                # Lasketaan erotusvektorit
+                difference_vectors = [anti - ideal for ideal, anti in zip(ideal_vectors, anti_ideal_vectors)]
+
+                # Erotusvektoreiden keskiarvo (robustimpi akseli)
+                mean_difference_vector = sum(difference_vectors) / len(difference_vectors)
+
+                # Tallennetaan tulos
+                semantic_vectors[category][field] = {
+                    "axis_vector": mean_difference_vector,  # tämä on nyt normalisoimaton akselivektori
+                    "ideal_mean": sum(ideal_vectors) / len(ideal_vectors),  # tarvitaan pisteen projektiota varten
+                }
+
+        return semantic_vectors
     
     def round_scores(self, scores_dict):
         rounded = {}
@@ -245,6 +282,46 @@ class fcp_score:
                     score = (1 - (x_proj / scaled_axis_length)) * 100
                     scores[category][field] = float(round(max(0, min(score, 100)), 2))
         #return scores
+        return self.round_scores(scores)
+
+    def bmc_fcp_score_multi(self, user_given_bmc_dict):
+        """
+        Laskee semanttisen pisteytyksen käyttäjän syöttämälle BMC-rakenteelle 
+        käyttäen multi-profiilista laskettua akselia (multi-lausepareista).
+        """
+        user_given_bmc_dict_clean = self.bmc_cleaner(user_given_bmc_dict)
+        company_name, flat_bmc_data = list(user_given_bmc_dict_clean.items())[0]
+
+        scores = {
+            "business_novelty": {},
+            "customer_novelty": {},
+            "impact": {}
+        }
+
+        # Käytetään multi-profiilista luotua projektiodataa
+        for category, fields in self.bmc_semantic_profiles2_done.items():
+            for field, vector_data in fields.items():
+                if field in flat_bmc_data and flat_bmc_data[field]:
+                    axis_vector = vector_data["axis_vector"]
+                    ideal_mean = vector_data["ideal_mean"]
+
+                    axis_length = norm(axis_vector)
+                    if axis_length == 0:
+                        scores[category][field] = 50.0
+                        continue
+
+                    vec_test = self.model.encode(flat_bmc_data[field])
+                    relative = vec_test - ideal_mean
+                    x_proj = dot(relative, axis_vector)
+
+                    scaled_axis_length = axis_length / 2
+                    score = (1 - (x_proj / scaled_axis_length)) * 100
+                    score = round(float(max(0, min(score, 100))), 2)
+
+                    scores[category][field] = score
+                else:
+                    scores[category][field] = 50.0  # Jos data puuttuu
+
         return self.round_scores(scores)
 
 class MCDM:
@@ -549,7 +626,7 @@ if __name__ == "__main__":
         except Exception as e:
             return None, {"error": f"Virhe BMC-syötteessä: {e}"}
 
-        user_bmc_scores_dict = fcp.fcp_score(bmc_dict)
+        user_bmc_scores_dict = fcp.bmc_fcp_score_multi(bmc_dict)
         ranking = mcdm.calculate_single_ranking_wsa(user_bmc_scores_dict)
 
         # Tallenna visualisointidataan
