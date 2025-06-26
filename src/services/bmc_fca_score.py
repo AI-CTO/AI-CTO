@@ -17,6 +17,7 @@ import numpy as np
 class fcp_score:
     
     def __init__(self):
+        print("Initializing fcp_score class...")
         self.model = model = SentenceTransformer("all-mpnet-base-v2")
         self.bmc_semantic_vectors = {
     "business_novelty": {
@@ -95,7 +96,7 @@ class fcp_score:
     }
 }
         #self.bmc_semantic_vectors_done = self.populate_semantic_vectors() #tämä funktio muuttaa bmc:n vektoreiksi ja tallentaa uuteen sanakirjaan
-        profiles_path = os.path.join(os.path.dirname(__file__), "../idea_dubster/semantic_profiles.json")
+        profiles_path = os.path.join(os.path.dirname(__file__), ".../idea_dubster/semantic_profiles2.json")
         with open(profiles_path, "r", encoding="utf-8") as f:
             self.bmc_semantic_profiles2 = json.load(f)
             # Standardize keys to use underscores for consistency
@@ -130,7 +131,7 @@ class fcp_score:
         """
         # Init uusi sanakirja joka tallentaa lopputuloksen
         semantic_vectors = {}
-
+        print("Populating semantic vectors for multi-profile BMC...")
         for category, fields in self.bmc_semantic_profiles2.items():
             semantic_vectors[category] = {}
 
@@ -182,6 +183,7 @@ class fcp_score:
         return result
         
     def fcp_score(self, user_given_bmc_dict):
+        print("using WRONG fcp_score function")
 
         user_given_bmc_dict_clean = self.bmc_cleaner(user_given_bmc_dict)  # Puhdistetaan käyttäjän antama BMC sanakirja
         company_name, flat_bmc_data = list(user_given_bmc_dict_clean.items())[0]
@@ -216,10 +218,12 @@ class fcp_score:
         return self.round_scores(scores)
 
     def bmc_fcp_score_multi(self, user_given_bmc_dict):
+        print("Calculating FCP scores for multi-profile BMC...")
         """
         Laskee semanttisen pisteytyksen käyttäjän syöttämälle BMC-rakenteelle 
         käyttäen multi-profiilista laskettua akselia (multi-lausepareista).
         """
+        print("Calculating FCP scores for multi-profile BMC...")
         user_given_bmc_dict_clean = self.bmc_cleaner(user_given_bmc_dict)
         company_name, flat_bmc_data = list(user_given_bmc_dict_clean.items())[0]
 
@@ -305,16 +309,17 @@ class MCDM:
         }
 
         
-        scores_path = os.path.join(os.path.dirname(__file__), "../idea_dubster/semantic_scores_output.json")
+        scores_path = os.path.join(os.path.dirname(__file__), ".../idea_dubster/bmc_semantic_scores_multi.json")
         with open(scores_path, "r", encoding="utf-8") as f:
-            self.customer_novelty_rank_data = json.load(f)
+            self.novelty_rank_data = json.load(f)
 
-        self.df = pd.DataFrame(self.customer_novelty_rank_data)
+        self.df = pd.DataFrame(self.novelty_rank_data)
         self.df_business = self.df["business_novelty"].apply(pd.Series)
         self.df_customer = self.df["customer_novelty"].apply(pd.Series)
         self.df_impact = self.df["impact"].apply(pd.Series)
 
     def weighted_sum(self, row, weights):
+        print("Calculating weighted sum...")
         """
         Calculates the weighted sum of values in a row based on the provided weights.
 
@@ -329,6 +334,7 @@ class MCDM:
         return sum(float(row.get(k, 0)) * w for k, w in weights.items())
 
     def calculate_rankings_wsa(self):
+        print("Calculating rankings using Weighted Sum Approach (WSA)...")
         """
         Calculates rankings based on weighted scores for business novelty, customer novelty, 
         and impact, and returns the rankings.
@@ -356,6 +362,7 @@ class MCDM:
         return self.df[["business_novelty_rank", "customer_novelty_rank", "impact_rank"]]
     
     def calculate_single_ranking_wsa(self, new_bmc_entry):
+        print("Calculating single ranking WSA for new BMC entry...") 
         """
         Calculate scaled rankings for a new entry based on weighted scores and existing data.
 
@@ -414,6 +421,12 @@ class MCDM:
 
         # Palauta käyttäjän syötteen skaalatut rankingit
         last_index = len(extended_df) - 1
+
+        print("palautetaan skaalatut rankingit...")
+        print(extended_df.loc[last_index, [
+            "business_novelty_scaled", "customer_novelty_scaled", "impact_scaled"
+        ]])
+
         return extended_df.loc[last_index, [
             "business_novelty_scaled", "customer_novelty_scaled", "impact_scaled"
         ]].rename({
