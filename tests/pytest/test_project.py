@@ -55,7 +55,7 @@ def test_evaluate_project(client):
     assert response.status_code == 200
 
     response_data = response.get_json()
-    assert "evaluation" in response_data
+    assert "fca_score" in response_data
 
 
 def test_update_project(client):

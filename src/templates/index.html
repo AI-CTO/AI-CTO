@@ -66,7 +66,7 @@
 
 
   <div id="evaluation-result" style="display: none; margin-top: 20px">
-    <h2>Project Evaluation</h2>
+    <h2>FCA Score</h2>
     <pre id="evaluation-output" style="background: #f8f8f8; padding: 10px"></pre>
   </div>
 
@@ -199,7 +199,7 @@
             document.getElementById("evaluation-result").style.display =
               "block";
             document.getElementById("evaluation-output").textContent =
-              JSON.stringify(data.evaluation, null, 2);
+              data.fca_score;
           }
         })
         .catch((error) => console.error("Error:", error));

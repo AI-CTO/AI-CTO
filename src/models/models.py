@@ -28,6 +28,7 @@ class Project(db.Model):
     x_value = db.Column(db.Numeric, nullable=False)
     y_value = db.Column(db.Numeric, nullable=False)
     impact = db.Column(db.Numeric, nullable=False)
+    fca_score = db.Column(db.Numeric, nullable=True)
     name = db.Column(db.String(255), nullable=False)
     thread_id = db.Column(db.String, nullable=False, unique=True)
     timestamp = db.Column(
@@ -42,6 +43,7 @@ class Project(db.Model):
             "x_value": self.x_value,
             "y_value": self.y_value,
             "impact": self.impact,
+            "fca_score": self.fca_score,
             "name": self.name,
             "thread_id": self.thread_id,
             "timestamp": self.timestamp.isoformat() if self.timestamp else None,
