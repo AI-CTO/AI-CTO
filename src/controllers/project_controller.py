@@ -7,6 +7,7 @@ from models.models import Project, db
 from services.api_assist import IdeaGenerator
 from services.bokeh_visualization import create_scatter_plot
 from services.openai_service import extract_text_from_pdf
+from services.BMC_recources import BusinessModelCanvas, BmcValidator
 
 
 
@@ -165,36 +166,34 @@ def process_project(data):
 def evaluate_project(data):
     try:
         client = OpenAI()
-        generator = IdeaGenerator(client)
         thread_id = data.get("thread_id")
 
         if not thread_id:
             return jsonify({"error": "Missing thread_id"}), 400
 
-        generator.thread_id = thread_id
-        evaluation_result = generator.evaluate()
+        # Fetch conversation history for the thread
+        messages = client.beta.threads.messages.list(thread_id=thread_id)
+        conversation = ""
+        for msg in messages.data:
+            for block in msg.content:
+                if hasattr(block, "text") and hasattr(block.text, "value"):
+                    conversation += block.text.value + "\n"
 
-        if not evaluation_result:
-            return jsonify({"error": "Evaluation failed"}), 500
-
-        x_value = evaluation_result.get("x_value", 0)
-        y_value = evaluation_result.get("y_value", 0)
-        impact = evaluation_result.get("impact", 0)
-        name = evaluation_result.get("name", "Pending Evaluation")
+        # Build and evaluate the business model canvas
+        bmc = BusinessModelCanvas()
+        bmc.update_from_text(conversation)
+        validation = BmcValidator.current_vs_ideal_score(bmc.model_dump())
+        fca_score = BmcValidator.calculate_score(validation)
 
         project = Project.query.filter_by(thread_id=thread_id).first()
 
         if not project:
             return jsonify({"error": "Project not found"}), 404
 
-        project.x_value = x_value
-        project.y_value = y_value
-        project.impact = impact
-        project.name = name
-
+        project.fca_score = fca_score
         db.session.commit()
 
-        return jsonify({"success": True, "evaluation": evaluation_result}), 200
+        return jsonify({"success": True, "fca_score": fca_score}), 200
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
