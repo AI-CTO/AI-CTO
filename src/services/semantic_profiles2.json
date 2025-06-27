@@ -1,0 +1,154 @@
+{
+    "business_novelty": {
+        "key_partners": {
+            "ideal": ["Partners bring proprietary technology, exclusive distribution channels, or access to unique customer segments.",
+                "Strategic alliances enable co-development of innovative products not feasible alone.",
+                "Partnerships open entirely new revenue models, markets, or customer behaviors previously inaccessible."],
+            "anti_ideal": ["Partners are generic suppliers easily replaceable by others.",
+                "Partnerships exist mainly to fulfill routine operations with no added strategic value.",
+                "Partnerships sustain only existing business lines without enabling meaningful growth or novelty."]
+        },
+        "key_activities": {
+            "ideal": ["Core activities focus on developing proprietary technology, patented solutions, or unique algorithms not available elsewhere.",
+        "Key operations involve continuous innovation cycles that rapidly adapt to emerging market opportunities.",
+        "Activities include integration of advanced AI, machine learning, or other cutting-edge processes that redefine industry standards."],
+            "anti_ideal": ["Core activities involve standard service delivery or back-office functions easily outsourced or replicated.",
+        "Key operations maintain existing processes with minimal change, offering no competitive distinction.",
+        "Activities focus on administrative, compliance, or commodity-level operations with no direct customer impact or innovation."]
+        },
+        "key_resources": {
+            "ideal": ["Possesses proprietary technology platforms, patented intellectual property, or exclusive data assets that create sustainable differentiation.",
+        "Employs uniquely skilled talent with domain expertise unavailable in the broader labor market.",
+        "Owns brand equity, trusted reputation, or global partner networks that serve as non-replicable market advantages."],
+            "anti_ideal": ["Relies on off-the-shelf technology or generic tools accessible to all competitors.",
+        "Staff consists of generalist labor easily replaceable without significant onboarding or expertise development.",
+        "Core assets include office space, standard IT infrastructure, and basic operational tools that offer no unique leverage."]
+        },
+        "value_propositions": {
+            "ideal": ["Delivers highly differentiated solutions that address unmet customer needs in ways competitors cannot replicate.",
+        "Combines proprietary technology and market insights to offer superior performance or cost advantages.",
+        "Creates measurable, long-term value for customers by improving business outcomes, reducing risk, or opening new opportunities."],
+            "anti_ideal": ["Offers generic products or services with features that closely mimic competitors' existing offerings.",
+        "Focuses on marginal improvements that fail to significantly impact customer outcomes.",
+        "Delivers vague promises without clear metrics, making customer value perception weak or inconsistent."]
+        },
+        "customer_relationships": {
+            "ideal": ["Builds long-term, trust-based partnerships where customer feedback directly informs product development and innovation.",
+        "Leverages data-driven personalization to continuously adapt offerings to evolving customer needs.",
+        "Positions customer relationships as co-creation platforms, enabling joint value creation beyond transactional interactions."],
+            "anti_ideal": ["Maintains purely transactional, one-size-fits-all customer service with minimal differentiation.",
+        "Lacks systematic processes for gathering or utilizing customer feedback in product or service development.",
+        "Focuses on short-term sales interactions without building deeper customer loyalty or engagement."]
+        },
+        "channels": {
+            "ideal": ["Utilizes proprietary digital platforms or exclusive distribution networks that competitors cannot easily access.",
+        "Seamlessly integrates multiple online and offline channels to deliver a unified and highly differentiated customer experience.",
+        "Innovates in channel design by introducing new delivery models that disrupt industry norms."],
+            "anti_ideal": ["Relies primarily on publicly available, undifferentiated sales platforms used by most competitors.",
+        "Operates disconnected sales and support channels that create friction and inconsistency for customers.",
+        "Fails to adapt to emerging customer behaviors, maintaining outdated or limited distribution models."]
+        },
+        "revenue_streams": {
+            "ideal": ["Generates diversified, recurring revenue through subscriptions, licensing, or long-term contracts that ensure financial stability.",
+        "Leverages usage-based pricing models that scale with customer value creation, enhancing stickiness.",
+        "Monetizes proprietary technology, data assets, or exclusive platforms unavailable to competitors."],
+            "anti_ideal": ["Relies heavily on one-time transactions with no predictable future revenue.",
+        "Has narrow customer concentration where a few clients account for most income, increasing financial risk.",
+        "Offers commoditized services with constant downward pricing pressure and low margins."]
+        }
+    },
+    "customer_novelty": {
+        "customer_segments": {
+            "ideal": ["Focuses on well-defined, underserved or high-growth customer segments with clear, validated needs.",
+        "Targets niche markets where the company can offer specialized, superior value compared to generalist competitors.",
+        "Prioritizes customer groups that align with the firm's core competencies and long-term strategic goals."],
+            "anti_ideal": ["Attempts to serve overly broad or undefined customer groups with diluted value propositions.",
+        "Chases trendy markets without assessing fit, profitability, or the firm's ability to serve them effectively.",
+        "Targets saturated or declining segments with no clear competitive advantage or differentiation."]
+        },
+        "value_propositions": {
+            "ideal": ["Delivers tailored solutions that address specific pain points of the target customer segments with measurable outcomes.",
+        "Combines product innovation with customer insights to create offerings that are difficult for competitors to replicate.",
+        "Provides long-term value by improving customer performance, reducing costs, or enabling new opportunities."],
+            "anti_ideal": ["Offers generic products that fail to address any particular customer group's unique needs.",
+        "Relies on superficial features that are easily copied by competitors and offer no sustainable differentiation.",
+        "Focuses on selling standard solutions with little customer input or ongoing adaptation to market changes."]
+        },
+        "customer_relationships": {
+            "ideal": ["Establishes proactive, trust-based relationships where ongoing customer feedback informs continuous improvement.",
+        "Applies customer insights to adapt offerings and communication to evolving client needs.",
+        "Engages in long-term partnerships with customers, focusing on mutual success and shared value creation."],
+            "anti_ideal": ["Customer interactions are limited to one-time transactions with minimal follow-up or ongoing engagement.",
+        "Treats all customers uniformly without considering their unique needs or preferences.",
+        "Relationship management is reactive, addressing problems only after they arise, with no systematic improvement."]
+        },
+        "channels": {
+            "ideal": ["Utilizes customer-preferred channels that match the habits and expectations of each target segment.",
+        "Continuously optimizes channels based on customer feedback and usage analytics to improve experience.",
+        "Combines digital and physical channels in a coordinated way to ensure seamless customer journeys."],
+            "anti_ideal": ["Relies on outdated or inconvenient channels that do not align with how customers prefer to interact.",
+        "Provides limited access points, forcing customers to adapt to the company's rigid delivery model.",
+        "Fails to integrate channels, resulting in fragmented and inconsistent customer experiences."]
+        },
+        "key_activities": {
+            "ideal": ["Activities are designed around understanding and addressing specific customer pain points and unmet needs.",
+        "Continuously collects customer insights to adapt and refine operational processes and offerings.",
+        "Develops customized solutions and services that are directly aligned with distinct customer segments."],
+            "anti_ideal": ["Operates based on internal convenience without considering the unique needs of different customer groups.",
+        "Fails to incorporate customer feedback into service design or product development.",
+        "Delivers standardized offerings that ignore important variations across customer segments."]
+        }
+    },
+    "impact": {
+        "cost_structure": {
+            "ideal": [
+        "Cost structure is flexible, scales efficiently with demand, and prioritizes investments that directly support value creation.",
+        "Resources are allocated based on measurable ROI and strategic alignment with long-term goals.",
+        "Maintains lean operations while preserving quality and responsiveness to market changes."],
+            "anti_ideal": [
+                "Fixed costs are bloated and disconnected from value creation priorities.",
+                "Spending decisions are driven by tradition or sunk costs rather than strategic needs.",
+                "Cost structure locks the company into inefficient, rigid financial commitments that hinder adaptability."]
+        },
+        "revenue_streams": {
+            "ideal": [
+                "Revenue streams are diversified, recurring, and closely aligned with customer value realization.",
+                "Business models balance short-term profitability with long-term sustainable income generation.",
+                "Leverages complementary monetization channels to maximize both revenue stability and growth."],
+            "anti_ideal": [
+                "Revenue relies on a narrow customer base or one-time transactions that are volatile and unsustainable.",
+                "Business model overemphasizes short-term extraction over lasting customer relationships.",
+                "Revenue sources are poorly diversified, making the business vulnerable to market fluctuations."]
+        },
+        "key_resources": {
+            "ideal": [
+                "Core resources include scalable technologies, specialized expertise, and intellectual property that sustain long-term advantage.",
+                "Invests in resources that also drive positive social, environmental, or ethical outcomes.",
+                "Maintains strategic control over critical assets that enable both profitability and resilience."],
+            "anti_ideal": [
+                "Relies heavily on commoditized or easily replicable resources offering no lasting differentiation.",
+                "Key assets are outsourced or externally controlled, limiting the firm’s ability to adapt or defend its position.",
+                "Resource use creates negative social, ethical, or environmental externalities that damage reputation and long-term viability."]
+        },
+        "value_propositions": {
+            "ideal": [
+                "Solutions create measurable positive outcomes not only for customers but for broader stakeholder ecosystems.",
+                "Delivers long-term value that contributes to economic, environmental, or social resilience.",
+                "Addresses systemic problems with scalable solutions that compound value over time."],
+            "anti_ideal": [
+                "Value propositions offer marginal or superficial benefits lacking meaningful long-term impact.",
+                "Solutions create unintended harm to customers, communities, or the environment.",
+                "Focuses on narrow, short-lived customer gains without contributing to wider positive outcomes."]
+        },
+        "customer_segments": {
+            "ideal": [
+                "Targets underserved or high-potential segments where impactful outcomes can be achieved sustainably.",
+                "Prioritizes customer groups whose needs are aligned with creating shared long-term value.",
+                "Balances profitability with accessibility and ethical market development."],
+            "anti_ideal": [
+                "Focuses on saturated, over-exploited segments vulnerable to disruption or regulatory pressure.",
+                "Pursues customer bases purely for short-term profitability regardless of broader consequences.",
+                "Neglects emerging or underserved markets where greater long-term value could be created."]
+        }
+    }
+}

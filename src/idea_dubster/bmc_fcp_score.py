@@ -170,7 +170,7 @@ class fcp_score:
     }
 }
         #self.bmc_semantic_vectors_done = self.populate_semantic_vectors() #tämä funktio muuttaa bmc:n vektoreiksi ja tallentaa uuteen sanakirjaan
-        with open("/Users/erikstandard/Desktop/AI-CTO/src/idea_dubster/semantic_profiles2.json") as f:
+        with open("/Users/erikstandard/Desktop/AI-CTO/src/services/semantic_profiles2.json") as f:
             self.bmc_semantic_profiles2 = json.load(f)
         self.bmc_semantic_profiles2_done = self.populate_semantic_vectors2() #tämä funktio muuttaa bmc:n vektoreiksi ja tallentaa uuteen sanakirjaan
     

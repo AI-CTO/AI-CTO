@@ -95,8 +95,7 @@ class fcp_score:
         }
     }
 }
-        #self.bmc_semantic_vectors_done = self.populate_semantic_vectors() #tämä funktio muuttaa bmc:n vektoreiksi ja tallentaa uuteen sanakirjaan
-        profiles_path = os.path.join(os.path.dirname(__file__), ".../idea_dubster/semantic_profiles2.json")
+        profiles_path = os.path.join(os.path.dirname(__file__), "/Users/erikstandard/Desktop/AI-CTO/src/services/semantic_profiles2.json")
         with open(profiles_path, "r", encoding="utf-8") as f:
             self.bmc_semantic_profiles2 = json.load(f)
             # Standardize keys to use underscores for consistency
@@ -106,24 +105,6 @@ class fcp_score:
             }
         self.bmc_semantic_profiles2_done = self.populate_semantic_vectors2() #tämä funktio muuttaa bmc:n vektoreiksi ja tallentaa uuteen sanakirjaan
     
-    def populate_semantic_vectors(self):
-        """
-        Converts the 'ideal' and 'anti_ideal' textual profiles in `self.bmc_semantic_profiles`
-        into semantic vector representations using the model's `encode` method, and stores
-        them in `self.bmc_semantic_vectors`. This process should be performed each time the
-        application is started to ensure the vectors are up to date.
-
-        Returns:
-            dict: The updated `self.bmc_semantic_vectors` dictionary containing the semantic
-            vectors for each category and key.
-        """
-        for category, items in self.bmc_semantic_vectors.items():
-            for key in items:
-                ideal_text = self.bmc_semantic_profiles[category][key]["ideal"]
-                anti_ideal_text = self.bmc_semantic_profiles[category][key]["anti_ideal"]
-                self.bmc_semantic_vectors[category][key]["ideal"] = self.model.encode(ideal_text)
-                self.bmc_semantic_vectors[category][key]["anti_ideal"] = self.model.encode(anti_ideal_text)
-        return self.bmc_semantic_vectors
     
     def populate_semantic_vectors2(self):
         """
@@ -144,7 +125,6 @@ class fcp_score:
                 # Enkoodataan kaikki lauseet vektoreiksi
                 ideal_vectors = [self.model.encode(ideal) for ideal in ideal_list]
                 anti_ideal_vectors = [self.model.encode(anti) for anti in anti_ideal_list]
-
                 # Lasketaan erotusvektorit
                 difference_vectors = [anti - ideal for ideal, anti in zip(ideal_vectors, anti_ideal_vectors)]
 
@@ -309,7 +289,7 @@ class MCDM:
         }
 
         
-        scores_path = os.path.join(os.path.dirname(__file__), ".../idea_dubster/bmc_semantic_scores_multi.json")
+        scores_path = os.path.join(os.path.dirname(__file__), "/Users/erikstandard/Desktop/AI-CTO/src/services/bmc_semantic_scores_multi.json")
         with open(scores_path, "r", encoding="utf-8") as f:
             self.novelty_rank_data = json.load(f)
 

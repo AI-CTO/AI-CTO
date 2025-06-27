@@ -20,7 +20,8 @@ def create_scatter_plot(data):
     projects = data["projects"]
     x_values = data["business_novelty"]
     y_values = data["customer_novelty"]
-    impact = [i * 5 for i in data["impact"]]  # Scale impact values for bubble size
+    impact = [i * 1.2 for i in data["impact"]]  # Scale impact values for bubble size
+
     project_types = data["project_types"]  # Get project_type from data
     project_ids = data["project_ids"]  # Unique project IDs
 
