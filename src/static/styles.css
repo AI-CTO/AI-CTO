@@ -360,8 +360,8 @@ header.shrink .tab-link {
   width: 100%;
   resize: none;
   min-height: 40px;
-  max-height: 200px;
-  overflow-y: hidden;
+  max-height: 300px;
+  overflow-y: auto;
   transition: border-color 0.3s ease, box-shadow 0.3s ease;
   box-sizing: border-box;
 }
@@ -517,8 +517,8 @@ header.shrink .tab-link {
   padding: 8px 12px;
   resize: none;
   min-height: 40px;
-  max-height: 200px;
-  overflow-y: hidden;
+  max-height: 300px;
+  overflow-y: auto;
   transition: border-color 0.3s ease, box-shadow 0.3s ease;
   box-sizing: border-box;
 }

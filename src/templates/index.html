@@ -268,11 +268,14 @@
     });
     // Tee textarea käyttäytyy kuin chatissä (automaattinen korkeus)
     const textarea = document.getElementById("user-input");
+    const MAX_HEIGHT = 300; // maximum height for the textarea
 
     textarea.addEventListener("input", () => {
       textarea.style.height = "auto";
-      textarea.style.height = textarea.scrollHeight + "px";
-      localStorage.setItem("userInput", textarea.value); // Tallenna localStorageen
+      const newHeight = Math.min(textarea.scrollHeight, MAX_HEIGHT);
+      textarea.style.height = `${newHeight}px`;
+      textarea.style.overflowY = textarea.scrollHeight > MAX_HEIGHT ? "auto" : "hidden";
+      localStorage.setItem("userInput", textarea.value);
     });
 
     // Lähetä viesti Enterillä, rivinvaihto Shift+Enterillä
