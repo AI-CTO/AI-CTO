@@ -50,7 +50,7 @@
           placeholder="Type your message..."
           rows="1"
           required
-          style="width: 80%; padding: 5px; resize: none; overflow-y: hidden"
+          style="width: 80%; padding: 5px;"
         ></textarea>
         <button type="submit" class="button">Send</button>
       </form>
@@ -78,9 +78,18 @@
   const userInputEl = document.getElementById("user-input");
   const formEl = document.getElementById("chat-form");
 
+  const MAX_INPUT_HEIGHT = 200;
+
   function autoResize(el) {
     el.style.height = "auto";
-    el.style.height = el.scrollHeight + "px";
+    const newHeight = el.scrollHeight;
+    if (newHeight > MAX_INPUT_HEIGHT) {
+      el.style.height = MAX_INPUT_HEIGHT + "px";
+      el.style.overflowY = "auto";
+    } else {
+      el.style.height = newHeight + "px";
+      el.style.overflowY = "hidden";
+    }
   }
 
   autoResize(userInputEl);
