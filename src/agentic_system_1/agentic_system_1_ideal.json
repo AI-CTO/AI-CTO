@@ -1,0 +1,22 @@
+{
+  "s1_s2_transition": {
+    "ideal_output": [
+      "The agent correctly identifies the user's intent as related to a product or company and explains this classification with reference to the user's message.",
+      "The explanation includes semantic cues such as product features, brand names, organizational context, or market-oriented questions.",
+      "The reply_to_user is natural and flows with the conversation while the internal explanation justifies a logical and context-aware transition to a specialized agent.",
+      "The topic field is set to 'Product' or 'Company', and the explanation justifies this without ambiguity or hallucination."
+    ],
+    "anti_ideal_output": [
+      "The explanation field is missing or vague, e.g. contains generic phrases like 'just seemed appropriate' with no semantic link to the input.",
+      "The topic is misclassified as 'Product' or 'Company' when the user's message clearly refers to nature, preferences, or general inquiries.",
+      "The agent fails to distinguish between open-domain chatting and domain-specific needs, leading to hallucinated routing decisions.",
+      "The response lacks grounding in the user's actual message or uses unrelated keywords to justify the topic."
+    ]
+  },
+  "s3_s4_transition": {
+    "ideal_output": [
+    ],
+    "anti_ideal_output": [
+    ]
+  }
+}

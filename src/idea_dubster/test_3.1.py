@@ -1,75 +1,50 @@
-import numpy as np
 from sentence_transformers import SentenceTransformer
-from numpy.linalg import norm
-from sklearn.decomposition import PCA
-import gradio as gr
+import numpy as np
+import json
+import os
 
-# PCA-komponentin poisto:
-"""📐 Miten PCA-komponentti poistetaan?
-Lasketaan kaikkien embedding-vektorien matriisi, esim. lauseiden embeddingit.
-
-Suoritetaan PCA → löydetään pääkomponentti (vektori u).
-
-Jokaisesta embedding-vektorista v poistetaan se osa, joka projisoituu pääkomponenttiin:
-
-
-Tämä toimii aivan kuten jos poistaisit varjon valosta — jäljelle jää se, mikä on semanttisesti uniikkia.
-"""
-def remove_pc(X):
-    pca = PCA(n_components=1)
-    pc = pca.fit(X).components_
-    return X - X @ pc.T @ pc
+# Polut
+input_path = "/Users/erikstandard/Desktop/AI-CTO/src/idea_dubster/agentic_system_1_ideal.json"
+output_path = "/Users/erikstandard/Desktop/AI-CTO/src/idea_dubster/agentic_system_1_idealvectors.json"
 
 # Ladataan malli
 model = SentenceTransformer("all-mpnet-base-v2")
 
-# Määritellään ideaalit ja anti-ideaalit siten että kummassakin on kolme määritelmää jotka tukevat toisiaan
-IDEALS = [
-    "A person who consistently acts with compassion, integrity, and a sense of justice.",
-    "Someone who helps others selflessly and promotes well-being in their community.",
-    "An individual who respects others, contributes positively to society, and values honesty."
-]
+# Ladataan alkuperäinen ideaali/anti-ideaali -lauseiden tiedosto
+with open(input_path, "r", encoding="utf-8") as f:
+    all_ideals = json.load(f)
 
-ANTI_IDEALS = [
-    "A person who causes harm intentionally, disregards others, and lies for personal gain.",
-    "Someone who manipulates, exploits, or abuses others without remorse.",
-    "An individual who fosters division, spreads hate, and thrives on dishonesty."
-]
+vectorized_transitions = {}
 
-# Lasketaan keskivektorit yhteensä kuudelle lauseelle, jotka kuvaavat ideaalista ja anti-ideaalista semanttista akselia.
-# tämä tehdään vasta kun PCA-komponentti on poistettu, jotta saadaan puhdas semanttinen akseli ilman pääkomponentin vaikutusta.
-def encode_clean_mean(sentences):
-    vecs = model.encode(sentences)
-    vecs = remove_pc(vecs)
-    return np.mean(vecs, axis=0)
+for transition_key, entry in all_ideals.items():
+    print(f"Processing transition: {transition_key}")
 
-vec_ideal = encode_clean_mean(IDEALS)
-vec_anti = encode_clean_mean(ANTI_IDEALS)
-axis_vector = vec_ideal - vec_anti
-axis_vector /= norm(axis_vector)
+    ideal_output = entry.get("ideal_output", [])
+    anti_ideal_output = entry.get("anti_ideal_output", [])
 
-# Tämä funktio muodostaa semanttisen projektio pinnan käyttäen projektioetäisyyttä anti-ideaalista suhteessa koko akselin pituuteen.
-def fixed_semantic_axis_score(definition):
-    vec = remove_pc(model.encode([definition]))[0]
-    proj = np.dot(vec - vec_anti, axis_vector)
-    axis_length = np.dot(vec_ideal - vec_anti, axis_vector)
-    score = (proj / axis_length) * 100
-    return round(np.clip(score, 0, 100), 2)
+    # Tarkistus
+    if not ideal_output or not anti_ideal_output:
+        print(f"Skipping {transition_key}: missing ideal or anti-ideal outputs.")
+        continue
 
-# Tämä loppuosa visualisoi tulokset ja antaa käyttäjälle selityksen siitä, miten pisteytys toimii.
-def visualize_score(definition):
-    score = fixed_semantic_axis_score(definition)
-    explanation = f"Score: {score:.2f} (0=Anti-Ideal, 100=Ideal)"
-    return score, explanation
+    # Upotetaan lauseet
+    ideal_embeddings = model.encode(ideal_output)
+    antiideal_embeddings = model.encode(anti_ideal_output)
 
-# Gradio UI
-with gr.Blocks() as demo:
-    gr.Markdown("""# Semantic Projection Visualizer\nType a semantic element below. The model will position it on a semantic scale from Anti-Ideal (0) to Ideal (100).""")
+    # Lasketaan keskiarvot ja projektioakseli
+    avg_ideal = np.mean(ideal_embeddings, axis=0)
+    avg_antiideal = np.mean(antiideal_embeddings, axis=0)
+    semantic_axis = avg_ideal - avg_antiideal
 
-    textbox = gr.Textbox(label="Enter a 'test' phrase", placeholder="Describe your concept here...")
-    output_score = gr.Slider(label="Semantic Score", minimum=0, maximum=100, step=0.1)
-    output_text = gr.Textbox(label="Explanation")
+    # Tallennetaan vektorimuodossa
+    vectorized_transitions[transition_key] = {
+        "avg_ideal": avg_ideal.tolist(),
+        "avg_antiideal": avg_antiideal.tolist(),
+        "semantic_axis_vector": semantic_axis.tolist()
+    }
 
-    textbox.change(fn=visualize_score, inputs=textbox, outputs=[output_score, output_text])
+# Tallennetaan kaikki siirtymät yhteen tiedostoon
+with open(output_path, "w", encoding="utf-8") as f:
+    json.dump(vectorized_transitions, f, indent=2)
 
-demo.launch()
+print("✅ All semantic axes stored successfully.")

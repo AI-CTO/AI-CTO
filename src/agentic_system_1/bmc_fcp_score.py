@@ -207,7 +207,6 @@ class fcp_score:
                 # Haetaan kaikki lauseparit
                 ideal_list = examples["ideal"]
                 anti_ideal_list = examples["anti_ideal"]
-                print(f"Ideaalit: {ideal_list}, Anti-ideaalit: {anti_ideal_list}")
 
                 # Enkoodataan kaikki lauseet vektoreiksi
                 ideal_vectors = [self.model.encode(ideal) for ideal in ideal_list]
@@ -284,7 +283,7 @@ class fcp_score:
         #return scores
         return self.round_scores(scores)
 
-    def bmc_fcp_score_multi(self, user_given_bmc_dict):
+    def bmc_fcp_score_multi(self, user_given_bmc_dict: dict):
         """
         Laskee semanttisen pisteytyksen käyttäjän syöttämälle BMC-rakenteelle 
         käyttäen multi-profiilista laskettua akselia (multi-lausepareista).
@@ -321,7 +320,6 @@ class fcp_score:
                     scores[category][field] = score
                 else:
                     scores[category][field] = 50.0  # Jos data puuttuu
-
         return self.round_scores(scores)
 
 class MCDM:
