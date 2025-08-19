@@ -3,9 +3,23 @@ import numpy as np
 import json
 import os
 
+"""
+Agentic System 1 - Ideal/Anti-Ideal Vectorization
+This script processes ideal and anti-ideal outputs from a JSON file,
+vectorizes them using a pre-trained SentenceTransformer model,
+and computes the semantic axis between the two sets of outputs.
+The results are saved in a new JSON file.   
+
+Usage:
+1. Ensure you have the `sentence-transformers` library installed.
+2. Update the `input_path` and `output_path` variables with the correct file paths.
+3. Write ideal and anti-ideal outputs in the specified JSON format ""/Users/erikstandard/Desktop/AI-CTO/src/idea_dubster/agentic_system_1_ideal.json"
+4. Run the script to generate the vectorized outputs.
+"""
+
 # Polut
-input_path = "/Users/erikstandard/Desktop/AI-CTO/src/idea_dubster/agentic_system_1_ideal.json"
-output_path = "/Users/erikstandard/Desktop/AI-CTO/src/idea_dubster/agentic_system_1_idealvectors.json"
+input_path = "/Users/erikstandard/Desktop/AI-CTO/src/agentic_system_1/agentic_system_1_ideal.json"
+output_path = "/Users/erikstandard/Desktop/AI-CTO/src/agentic_system_1/agentic_system_1_idealvectors.json"
 
 # Ladataan malli
 model = SentenceTransformer("all-mpnet-base-v2")

@@ -1,22 +1,84 @@
 {
-  "s1_s2_transition": {
+  "s1_move": {
     "ideal_output": [
-      "The agent correctly identifies the user's intent as related to a product or company and explains this classification with reference to the user's message.",
-      "The explanation includes semantic cues such as product features, brand names, organizational context, or market-oriented questions.",
-      "The reply_to_user is natural and flows with the conversation while the internal explanation justifies a logical and context-aware transition to a specialized agent.",
-      "The topic field is set to 'Product' or 'Company', and the explanation justifies this without ambiguity or hallucination."
+    "The agent correctly identifies the user's intent as related to a product or company and explains this classification with reference to the user's message.",
+    "The explanation includes semantic cues such as product features, brand names, organizational context, or market-oriented questions.",
+    "The reply_to_user is natural and flows with the conversation while the internal explanation justifies a logical and context-aware transition to a specialized agent.",
+    "The topic field is set to 'Product' or 'Company', and the explanation justifies this without ambiguity or hallucination."
     ],
     "anti_ideal_output": [
-      "The explanation field is missing or vague, e.g. contains generic phrases like 'just seemed appropriate' with no semantic link to the input.",
-      "The topic is misclassified as 'Product' or 'Company' when the user's message clearly refers to nature, preferences, or general inquiries.",
-      "The agent fails to distinguish between open-domain chatting and domain-specific needs, leading to hallucinated routing decisions.",
-      "The response lacks grounding in the user's actual message or uses unrelated keywords to justify the topic."
+    "The explanation field is missing or vague, e.g. contains generic phrases like 'just seemed appropriate' with no semantic link to the input.",
+    "The topic is misclassified as 'Product' or 'Company' when the user's message clearly refers to nature, preferences, or general inquiries.",
+    "The agent fails to distinguish between open-domain chatting and domain-specific needs, leading to hallucinated routing decisions.",
+    "The response lacks grounding in the user's actual message or uses unrelated keywords to justify the topic."
     ]
   },
-  "s3_s4_transition": {
+  "s1_stay": {
     "ideal_output": [
+    "The agent correctly identifies the user's intent as related to a product or company and explains this classification with reference to the user's message.",
+    "The explanation includes semantic cues such as product features, brand names, organizational context, or market-oriented questions.",
+    "The reply_to_user is natural and flows with the conversation while the internal explanation justifies a logical and context-aware transition to a specialized agent.",
+    "The topic field is set to 'Product' or 'Company', and the explanation justifies this without ambiguity or hallucination."
     ],
     "anti_ideal_output": [
+    "The explanation field is missing or vague, e.g. contains generic phrases like 'just seemed appropriate' with no semantic link to the input.",
+    "The topic is misclassified as 'Product' or 'Company' when the user's message clearly refers to nature, preferences, or general inquiries.",
+    "The agent fails to distinguish between open-domain chatting and domain-specific needs, leading to hallucinated routing decisions.",
+    "The response lacks grounding in the user's actual message or uses unrelated keywords to justify the topic."
     ]
+  },
+  "s2_q": {
+    "ideal_output": [
+    "Asks exactly one concise, field-specific question targeting the next empty field in state['product'] (or product_ranking) based on the current state.",
+    "Explains internally why this field was selected now (e.g., 'next missing field after product_name') without evaluating the content.",
+    "Uses plain, unambiguous language and, if helpful, gives a short example or format hint (max one sentence) to guide the user.",
+    "Avoids topic drift and does not ask multiple fields at once; confirms previously filled fields only if necessary.",
+    "Keeps the user-facing message natural and conversational while the internal rationale remains strictly procedural.",
+    "Does not speculate or suggest values; it only requests the specific information needed to proceed."
+    ],
+    "anti_ideal_output": [
+    "Asks several questions at once or mixes multiple schema fields in a single prompt.",
+    "Chooses a field that is already filled or ignores the current state when deciding what to ask next.",
+    "Includes evaluation, brainstorming, or feature listing instead of a single targeted question.",
+    "Uses vague wording, unclear formats, or long instructions that overwhelm the user.",
+    "Drifts off-topic (e.g., changes the subject, proposes solutions, or routes to the wrong agent).",
+    "Pressures the user to provide information not requested or guesses values in the question itself."
+     ]
+  },
+  "s2_ex": {
+    "ideal_output": [
+    "Extracts only the value(s) for the field that was just asked, mapping them to the correct schema key as {'key': <field_name>, 'value': <raw_text_or_list>}.",
+    "Stays faithful to the user's wording (no paraphrasing or enrichment); performs only minimal cleaning (trim whitespace, collapse duplicates).",
+    "If the user answered multiple fields, splits them into separate key–value pairs for allowed keys; ignores unrelated content.",
+    "Does not overwrite previously stored fields unless the user clearly updates them in the latest message.",
+    "Represents lists as lists and simple values as strings; preserves units, numbers, and constraints as provided.",
+    "If the answer is missing or ambiguous, returns an explicit empty/unknown value for the targeted key instead of hallucinating."
+      ],
+    "anti_ideal_output": [
+    "Maps content to the wrong key or merges several unrelated fields into one value.",
+    "Hallucinates values, infers unstated facts, or paraphrases instead of extracting verbatim.",
+    "Overwrites existing fields without a clear user signal or edits past turns while extracting the current one.",
+    "Returns free-form commentary or analysis instead of a strict key–value structure.",
+    "Forces everything into a single string when a list structure is appropriate, or drops important units/quantities.",
+    "Extracts keys that were not requested in this turn or invents new schema keys."
+      ]
+  },
+  "s2_ref": {
+    "ideal_output": [
+    "Rephrases only the keys listed in state['ref_keys_just_extracted'] into clear, compact English suitable for storage in state['product'].",
+    "Preserves meaning exactly while removing redundancy, normalizing units and formats, and fixing minor grammar.",
+    "Keeps the style consistent (concise, neutral, domain-appropriate) and respects any length or format constraints of the field.",
+    "Performs light structuring (e.g., short bullets or comma-separated phrases) only when it improves clarity for downstream scoring.",
+    "Does not introduce new facts, claims, or assumptions; if source content is ambiguous, reflects that ambiguity faithfully.",
+    "Leaves previously stored fields untouched and does not process keys beyond the newly extracted set."
+      ],
+    "anti_ideal_output": [
+    "Changes the meaning, adds missing details from imagination, or removes critical qualifiers.",
+    "Translates or paraphrases content into a different language than specified (e.g., not in English) or adopts a subjective tone.",
+    "Rewrites fields that were not newly extracted or modifies historical content without instruction.",
+    "Expands into long narratives, marketing copy, or evaluations instead of concise factual reformulation.",
+    "Alters numbers, units, or domain terms, or collapses structured information into an unhelpful blob.",
+    "Emits malformed output (wrong keys, missing fields, or extra metadata) that cannot be stored as-is."
+      ]
   }
 }

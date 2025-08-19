@@ -32,7 +32,7 @@ class State(TypedDict):
     agent_scores: List[int]
     product_ranking : dict
     process_id: int
-    explanation: List #optional explanation for the state // pitää ehkä olla lista.
+    explanation: List # optional explanation for the state // pitää ehkä olla lista.
     product : dict
     first_turn : bool
     extraction_turn : bool
@@ -106,8 +106,9 @@ def s1_node(state: State) -> State:
     print("(Type 'exit' to quit)\n")
     state["transition"].append(2)
     state["timestamps"].append(datetime.datetime.now())
-    
+    index = 0
     while True:
+        index += 1
         user_input = input("You: ")
         if user_input.lower().strip() == "exit":
             print("Exiting chatbot.\n")
@@ -116,19 +117,20 @@ def s1_node(state: State) -> State:
         result = s1_agent.invoke(state) #result sisältää mielenkiintoista dataa keskustelusta 
         print("\n--- Result from s1 Agent ---")
         response = result.get("structured_response", {})
-        explanation = response.get("explanation", "[No explanation]") # tallennetaan selitys tilaan
-        state["explanation"].append({
-    "key": "first_step_explanation",
-    "text": "Ensimmäisessä vaiheessa käyttäjältä kysytään tuotteen nimi, jotta voidaan aloittaa arviointi."
-})
         state["messages"] = result["messages"]
         if response.get("topic") in ["Product", "Company"]:
+            #-- Kun agentti päättää siirtää käyttäjän, lisätään selitys listaan "explanation"
+            explanation_s1_move = response.get("explanation", "[No explanation]") # tallennetaan selitys tilaan
+            state["explanation"].append({
+    "key": f"s1_move{index}",
+    "text": explanation_s1_move
+})
+            conf1 = spa_activation(state, f"s1_move{index}") # kutsutaan funktiota, joka laskee aktivointipisteen
+            #state["agent_scores"].append(conf1) # kutsutaan funktiota, joka laskee aktivointipisteen
+            #-- Kun agentti päättää siirtää käyttäjän, lisätään selitys listaan "explanation"
             print(f"TRYING: Routing to {response['topic']} node...")
             state["topic"]= response["topic"] # topic tunnistettu
-            #agentti ei palauta state tilaa, ellei fca täyty, tai @tag ole mainittu
-            #.........#
-            #fca kutsu #----- tarkistetaan, että topic on tunnistettu oikein
-            if spa_activation(state) >= 50: #funktio palauttaa arvon 0-100, joka kertoo kuinka hyvin topic on tunnistettu
+            if conf1 >= 50: #funktio palauttaa arvon 0-100, joka kertoo kuinka hyvin topic on tunnistettu
                 state["next_node"] = 3 #ehdottaa seuraavaa tilaa
             else: 
                 print("Topic not recognized correctly, staying in s1 node.")
@@ -136,6 +138,14 @@ def s1_node(state: State) -> State:
             return state
         elif response.get("topic") == "General Question":
             print("Bot_S1:", response.get("reply_to_user", "[No reply]"))
+            #-- Kun agentti päättää jäädä samaan tilaan
+            explanation_s1_stay = response.get("explanation", "[No explanation]") # tallennetaan selitys tilaan
+            state["explanation"].append({
+    "key": f"s1_stay{index}",
+    "text": explanation_s1_stay
+})
+            conf2 = spa_activation(state, f"s1_stay{index}") # kutsutaan funktiota, joka laskee aktivointipisteen
+            #state["agent_scores"].append(conf2)
     return state
 # --- Node 3: s2 Node (Product/Company Questioning and Referencing) ---
 def s2_node(state: State) -> State:
@@ -145,6 +155,7 @@ def s2_node(state: State) -> State:
     define_product_topic(state)  # Määritellään tuotteen aihe tilan perusteella
     product = state["product"].copy() #vain kontekstiksi promptteihin
     ref_project = state["product"].copy() # referointia varten
+    index = 0
     while True: #Kysymys --> extraction --> Referointi looppi
         pending = remaining_keys(state)  # tarkistetaan, onko vielä kenttiä, jotka pitää täyttää (ALUSSA KAIKKI KENTÄT)
         if state["first_turn"] or state["question_turn"]:
@@ -203,6 +214,13 @@ Important:
             print("Question Agent:", question_agent_answer.get("question"))
             state["messages"] = result["messages"] # tallennetaan agentin vastaus tilaan
             # palataan loopin alkuun, jossa kysytään käyttäjältä vastaus
+            explanation_s2_q = question_agent_answer.get("explanation", "[No explanation]") # tallennetaan selitys tilaan
+            state["explanation"].append({
+                "key": f"s2_q{index}",
+                "text": explanation_s2_q
+            })
+            conf = spa_activation(state, f"s2_q{index}")
+            #state["agent_scores"].append(conf)  # tallennetaan aktivointipisteet    
             continue
         elif state["extraction_turn"]: 
             
@@ -284,6 +302,13 @@ Rules:
             
             # tallennetaan agentin vastaus tilaan
             state["messages"] = result["messages"]
+            extraction_explanation = extraction_agent_answer.get("explanation", "[No explanation]")
+            state["explanation"].append({
+                "key": f"s2_ex{index}",
+                "text": extraction_explanation
+            })
+            conf = spa_activation(state, f"s2_ex{index}")
+            #state["agent_scores"].append(conf)
             # tarkistetaan, että jos agentti löysi informaatiota, se on halutussa muodossa eli avain-arvo pareina:
             key_value_pairs = extraction_agent_answer.get("key_value_pairs", []) 
             if not key_value_pairs: # jos avain-arvo pareja ei löydy, jatketaan kysymään seuraavaa
@@ -408,16 +433,18 @@ explanation: str  # justification of why this rephrasing is appropriate and what
                 structured = result.get("structured_response", {}) # saadaan agentin vastaus
                 agent_key = structured.get("key")   # avain, joka on referoitu
                 referated = structured.get("referated_version_english") # referoitu vastaus
-                explanation = structured.get("explanation") # selitys, miksi referointi on tehty
+                ref_explanation = structured.get("explanation", "[No explanation]")
+                state["explanation"].append({
+                    "key": f"s2_ref{index}",
+                    "text": ref_explanation
+                })
+                conf = spa_activation(state, f"s2_ref{index}")
+                #state["agent_scores"].append(conf)  # kutsutaan funktiota, joka laskee aktivointipisteen
                 
                 ###------------------ LOHKO 3.3.2 ------------------###
                 
                 #state["messages"] = result["messages"]
                 state["product"][ref_key] = referated # lisätään referoitu vastaus product sanakirjaan
-                state["explanation"].append({
-                    "key": agent_key,
-                    "explanation": explanation
-                })
             
                 ###------------------ LOHKO 3.3.3 ------------------###
                 
@@ -511,6 +538,7 @@ def s4_node(state: State) -> State:
     state["timestamps"].append(datetime.datetime.now())
     state["finished"] = True
     #--- Finalization ---# 
+    print("AGENTIN SELITYKSET ref", state["explanation"])
     try:
         sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../..")))
         from src.agentic_system_1.database import save_state_to_aiven as save_to_aiven
@@ -562,21 +590,25 @@ def decide_routing(state: State) -> str:
         #print(f"Staying in {target}")
         return target
 # --- Semantic Projection Axis Activation Function ---
-def spa_activation(state: State) -> float:
-    current_node = state["transition"][-1]
-
-    # hae explanation turvallisesti
+def spa_activation(state: State, explanation_flag: str) -> float:
+    """
+    Tämä funktio laskee semanttisen projektion akselin aktivointipisteen
+    Args:
+        state (State): Nykyinen tila, joka sisältää siirtymät ja sel
+        explanation_flag (str): Selityksen avain, jota etsitään.
+    Returns:
+        float: Aktivointipiste, joka on välillä 0-100.
+    """
     explanation = None
-    if current_node == 2:
-        for item in state["explanation"]:
-            if item.get("key") == "first_step_explanation":
-                explanation = item.get("text")
-                break
+    for item in state["explanation"]:
+        if item.get("key") == explanation_flag:
+            explanation = item.get("text")
+            break
 
     # fallback
     if not explanation:
-        state["agent_scores"].append(0.2)
-        return 0.2
+        state["agent_scores"].append(0.1)
+        return 0.1
 
     model = SentenceTransformer("all-mpnet-base-v2")
     #--- UUSI OSA LISÄTTY 16.8.2025 ---
@@ -587,9 +619,9 @@ def spa_activation(state: State) -> float:
         axis_json = json.load(f)
     
     #--- UUSI OSA LISÄTTY 16.8.2025 ---
-    key = f"s{current_node-1}_s{current_node}_transition"
-    average_ideal = axis_json[key]["avg_ideal"]
-    semantic_axis_vector = axis_json[key]["semantic_axis_vector"]
+    explanation_flagkey = explanation_flag[:-1] if explanation_flag else explanation_flag
+    average_ideal = axis_json[explanation_flagkey]["avg_ideal"]
+    semantic_axis_vector = axis_json[explanation_flagkey]["semantic_axis_vector"]
 
     test_vec = model.encode(explanation)
     axis_length = np.linalg.norm(semantic_axis_vector)
@@ -598,8 +630,15 @@ def spa_activation(state: State) -> float:
     scaled_axis_length = axis_length / 2
     raw_score = 1 - (projection / scaled_axis_length)
     score = max(0.0, min(raw_score * 100, 100.0))
-    state["agent_scores"].append(round(score, 2))
-    print(f"----- Semantic Projection Axis Activation Score TRANSITION {current_node}->{current_node + 1} = {round(score, 2)} -----")
+    #state["agent_scores"].append(round(score, 2))
+    print(f"----- Semantic Projection Axis Activation Score TRANSITION = {round(score, 2)} -----")
+    #tarkistetaan, onko score jo lisätty state["product_ranking"] listaan
+    state["agent_scores"].append({
+            "key": explanation_flag,
+            "score": round(score, 2),
+        })
+
+    print(f"Score lisätty stateen: {state['agent_scores']}")
     return round(score, 2)
 # --- Define Product Topic ---
 def define_product_topic(state: State) -> dict:
@@ -738,6 +777,20 @@ def sanitize_and_validate_bmc(raw_bmc, topic: str):
         "final_keys": list(clean.keys()),
     }
     return clean, info
+
+def append_explanation(state: State, key: str, explanation: str):
+    """
+    Tämä funktio lisää agentin selityksen stateen.
+    Args:
+        key (str): Avain, johon selitys liittyy.
+        explanation (str): Selitys, joka lisätään.
+    Returns:
+        None
+    """
+    if not isinstance(key, str) or not isinstance(explanation, str):
+        raise ValueError("Key and explanation must be strings.")
+    explanation_list = state["explanation"] 
+
 # --- Build Graph ---
 graph = StateGraph(State)
 graph.add_node("start", start_node)
