@@ -123,6 +123,8 @@ class NodeRunner:
 RUNNER: NodeRunner | None = None   # holds thread + queues (not deepcopyable)
 CURRENT_STATE: Dict[str, Any] | None = None  # backend state dict (live)
 ACTIVE_NODE: str = "idle"          # label for UI
+CHAT_VERSION = 0
+LAST_CHAT_VERSION = -1
 
 # ---- Persistence for visualization (history + saving) ----------------------
 OUTPUT_DIR = os.environ.get("AITO_OUTPUT", os.path.join(PROJECT_ROOT, "outputs"))
@@ -517,7 +519,7 @@ with gr.Blocks(title="Agentic Runner (backend-driven)", theme=gr.themes.Soft()) 
     import threading
     SAVE_LOCK = threading.Lock()
     def route_if_finished(msgs: List[dict]):
-        global RUNNER, CURRENT_STATE, ACTIVE_NODE
+        global RUNNER, CURRENT_STATE, ACTIVE_NODE, CHAT_VERSION
         if RUNNER and (not RUNNER.running) and RUNNER.last_returned_state is not None:
             # nosta viimeisin state
             CURRENT_STATE = RUNNER.last_returned_state
@@ -540,6 +542,7 @@ with gr.Blocks(title="Agentic Runner (backend-driven)", theme=gr.themes.Soft()) 
                 extra = RUNNER.drain_logs()
                 for ans in parse_agent_replies(extra):
                     msgs.append({"role": "assistant", "content": ans})
+                    CHAT_VERSION += 1  
                 return msgs, extra
 
             # muussa tapauksessa käytä normaalia reititystä
@@ -561,54 +564,116 @@ with gr.Blocks(title="Agentic Runner (backend-driven)", theme=gr.themes.Soft()) 
         return msgs, ""
 
 
+    # def tick_fast(msgs: List[dict], console_accum: str):
+    #     """Fast loop: chat + console + routing only. Avoids touching metrics/plot to prevent flicker."""
+    #     global LAST_CHAT_LEN, LAST_ACTIVE_NODE
+
+    #     logs = RUNNER.drain_logs() if RUNNER else ""
+    #     for ans in parse_agent_replies(logs):
+    #         msgs.append({"role": "assistant", "content": ans})
+
+    #     msgs, extra = route_if_finished(msgs)
+    #     if extra:
+    #         logs += extra
+
+    #     if logs:
+    #         console_accum = console_accum + logs
+    #         console_out = console_accum
+    #     else:
+    #         console_out = gr.update()
+
+    #     # chat updates only if length changed
+    #     if len(msgs) != LAST_CHAT_LEN:
+    #         chat_out = msgs
+    #         chat_state_out = msgs
+    #         LAST_CHAT_LEN = len(msgs)
+    #     else:
+    #         chat_out = gr.update()
+    #         chat_state_out = gr.update()
+
+    #     active_val = f"Active node: {ACTIVE_NODE}"
+    #     if active_val != LAST_ACTIVE_NODE:
+    #         active_out = active_val
+    #         LAST_ACTIVE_NODE = active_val
+    #     else:
+    #         active_out = gr.update()
+
+    #     # Do not touch plot/metrics in fast loop → return no-op updates
+    #     noop = gr.update()
+    #     return (
+    #         chat_out,         # chatbot
+    #         chat_state_out,   # chat_msgs state
+    #         console_accum,    # console_state state (keep full buffer)
+    #         active_out,       # active_md
+    #         console_out,      # console textbox
+    #         noop,             # plot
+    #         noop,             # conf_md
+    #         noop,             # fill_md
+    #         noop,             # product_code
+    #         noop,             # scores_code
+    #         noop,             # raw_state
+    #     )
+    def reflect_chat(msgs: list[dict]):
+        return msgs
+
+    chat_msgs.change(
+        reflect_chat,
+        inputs=chat_msgs,
+        outputs=chatbot,
+)
+    
     def tick_fast(msgs: List[dict], console_accum: str):
-        """Fast loop: chat + console + routing only. Avoids touching metrics/plot to prevent flicker."""
-        global LAST_CHAT_LEN, LAST_ACTIVE_NODE
+        global LAST_ACTIVE_NODE, CHAT_VERSION, LAST_CHAT_VERSION
 
+        changed = False
         logs = RUNNER.drain_logs() if RUNNER else ""
-        for ans in parse_agent_replies(logs):
-            msgs.append({"role": "assistant", "content": ans})
 
+        # uudet agenttirepliikit
+        replies = parse_agent_replies(logs)
+        if replies:
+            for r in replies:
+                msgs.append({"role": "assistant", "content": r})
+            CHAT_VERSION += 1                 # ⬅️ vain kun oikeasti lisättiin viestejä
+            changed = True
+
+        # reititys ja mahdolliset synkroniset tulosteet
         msgs, extra = route_if_finished(msgs)
         if extra:
             logs += extra
+            # huom: route_if_finished jo appends msgs, joten versio nostetaan siellä tarvittaessa
 
+        # console päivittyy vain jos uutta tuli
         if logs:
             console_accum = console_accum + logs
             console_out = console_accum
         else:
             console_out = gr.update()
 
-        # chat updates only if length changed
-        if len(msgs) != LAST_CHAT_LEN:
+        # chat päivitys vain jos versio muuttui
+        if CHAT_VERSION != LAST_CHAT_VERSION:
             chat_out = msgs
             chat_state_out = msgs
-            LAST_CHAT_LEN = len(msgs)
+            LAST_CHAT_VERSION = CHAT_VERSION
         else:
             chat_out = gr.update()
             chat_state_out = gr.update()
 
         active_val = f"Active node: {ACTIVE_NODE}"
-        if active_val != LAST_ACTIVE_NODE:
-            active_out = active_val
-            LAST_ACTIVE_NODE = active_val
-        else:
-            active_out = gr.update()
+        active_out = active_val if active_val != LAST_ACTIVE_NODE else gr.update()
+        LAST_ACTIVE_NODE = active_val
 
-        # Do not touch plot/metrics in fast loop → return no-op updates
         noop = gr.update()
         return (
-            chat_out,         # chatbot
-            chat_state_out,   # chat_msgs state
-            console_accum,    # console_state state (keep full buffer)
-            active_out,       # active_md
-            console_out,      # console textbox
-            noop,             # plot
-            noop,             # conf_md
-            noop,             # fill_md
-            noop,             # product_code
-            noop,             # scores_code
-            noop,             # raw_state
+            msgs,            # chat_msgs (state)  ← vain tämä, ei Chatbotia
+            console_accum,   # console_state
+            active_out,      # active_md
+            console_out,     # console
+            noop,            # plot
+            noop,            # conf_md
+            noop,            # fill_md
+            noop,            # product_code
+            noop,            # scores_code
+            noop,            # raw_state
         )
 
     def tick_slow():
@@ -670,38 +735,37 @@ with gr.Blocks(title="Agentic Runner (backend-driven)", theme=gr.themes.Soft()) 
         # Return only the slow outputs, but need to align with full outputs list → return updates for others
         noop = gr.update()
         return (
-            noop,  # chatbot
-            noop,  # chat_msgs
-            noop,  # console_state
-            noop,  # active_md
-            noop,  # console
-            plot_out,
-            conf_out,
-            fill_out,
-            prod_out,
-            score_out,
-            raw_out,
+            gr.update(),  # console_state
+            gr.update(),  # active_md
+            gr.update(),  # console
+            plot_out,     # plot
+            conf_out,     # conf_md
+            fill_out,     # fill_md
+            prod_out,     # product_code
+            score_out,    # scores_code
+            raw_out,      # raw_state
         )
     # Two timers: fast for chat/console (low-latency), slow for metrics/plot (fewer rerenders)
     fast_timer = gr.Timer(0.4) #visible argumentti ei ole olemassa 
     fast_timer.tick(
         tick_fast,
         inputs=[chat_msgs, console_state],
-        outputs=[chatbot, chat_msgs, console_state, active_md, console, plot, conf_md, fill_md, product_code, scores_code, raw_state],
+        outputs=[chat_msgs, console_state, active_md, console, plot, conf_md, fill_md, product_code, scores_code, raw_state],
     )
 
     slow_timer = gr.Timer(1.8) #visible argumenttia ei ole olemassa
     slow_timer.tick(
         tick_slow,
         inputs=[],
-        outputs=[chatbot, chat_msgs, console_state, active_md, console, plot, conf_md, fill_md, product_code, scores_code, raw_state],
+        outputs=[console_state, active_md, console, plot, conf_md, fill_md, product_code, scores_code, raw_state],
     )
 
     def do_send(msg: str, msgs: List[dict]):
         """Append user's message and feed it to input(); clearing textbox. Logs handled by timer."""
-        global RUNNER
+        global RUNNER, CURRENT_STATE, ACTIVE_NODE, CHAT_VERSION
         if msg:
             msgs = msgs + [{"role": "user", "content": msg}]
+            CHAT_VERSION += 1
             if RUNNER and RUNNER.running:
                 RUNNER.send(msg)
         return msgs, msgs, ""
