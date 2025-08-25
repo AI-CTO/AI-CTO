@@ -1,4 +1,4 @@
-from typing import Annotated, Optional, List
+from typing import Annotated, Optional, List 
 from typing_extensions import TypedDict
 import datetime
 import uuid
@@ -6,7 +6,6 @@ from typing import Literal
 import ast
 import sys
 import os
-import pprint
 from langgraph.graph import StateGraph, END
 from langgraph.graph.message import add_messages
 from langchain_core.messages import HumanMessage, AIMessage
@@ -21,6 +20,7 @@ import difflib
 from copy import deepcopy
 import json
 import ast
+import re
 load_dotenv()
 # --- Define State ---
 class State(TypedDict):
@@ -97,19 +97,18 @@ def start_node(_: dict) -> State:
         "need_for_referation" : {},
         "finished": False  
     }
-    #pprint.(state["transition"])
     return state
 # --- Node 2: ReAct Chat Node (Interactive Terminal Chat) ---
 def s1_node(state: State) -> State:
     print("\n--- s1 Node Activated ---")
     print("\n--- Chatbot Activated (s1 Agent) ---")
-    print("(Type 'exit' to quit)\n")
+    #print("(Type 'exit' to quit)\n")
     state["transition"].append(2)
     state["timestamps"].append(datetime.datetime.now())
     index = 0
     while True:
         index += 1
-        user_input = input("You: ")
+        user_input = input("Waiting for user input...")  # Käyttäjä antaa syötteen
         if user_input.lower().strip() == "exit":
             print("Exiting chatbot.\n")
             break
@@ -128,12 +127,12 @@ def s1_node(state: State) -> State:
             conf1 = spa_activation(state, f"s1_move{index}") # kutsutaan funktiota, joka laskee aktivointipisteen
             #state["agent_scores"].append(conf1) # kutsutaan funktiota, joka laskee aktivointipisteen
             #-- Kun agentti päättää siirtää käyttäjän, lisätään selitys listaan "explanation"
-            print(f"TRYING: Routing to {response['topic']} node...")
+            print(f"Routing to {response['topic']} node...")
             state["topic"]= response["topic"] # topic tunnistettu
             if conf1 >= 50: #funktio palauttaa arvon 0-100, joka kertoo kuinka hyvin topic on tunnistettu
                 state["next_node"] = 3 #ehdottaa seuraavaa tilaa
             else: 
-                print("Topic not recognized correctly, staying in s1 node.")
+                print("Topic not recognized, staying in s1 node.")
                 state["next_node"] = 2 # tähän tulee lisätä promptfix
             return state
         elif response.get("topic") == "General Question":
@@ -161,7 +160,6 @@ def s2_node(state: State) -> State:
         if state["first_turn"] or state["question_turn"]:
             # Ensimmäinen vuoro, jossa kysytään kysymyksiä
             if state["first_turn"]:
-                #print("Current product fields to fill:\n", product)
                 state["first_turn"] = False #kumotaan ensimmäisen vuoro
                 state["extraction_turn"] = True # Valmiina eristämään vastauksen informaation
                 state["question_turn"] = False # Valmiina kysymään seuraavaa kysym
@@ -208,11 +206,12 @@ Important:
                 response_format=StructuredResponse_s2_question
             )
             # kutsutaan agenttia
-            result = s2_question_agent.invoke(state)
+            #result = s2_question_agent.invoke(state) Vanha
+            result = s2_question_agent.invoke({}) # Uusi
             question_agent_answer = result.get("structured_response", {})
             # tulostetaan agentin kysymys
             print("Question Agent:", question_agent_answer.get("question"))
-            state["messages"] = result["messages"] # tallennetaan agentin vastaus tilaan
+            #state["messages"] = result["messages"] # tallennetaan agentin vastaus tilaan
             # palataan loopin alkuun, jossa kysytään käyttäjältä vastaus
             explanation_s2_q = question_agent_answer.get("explanation", "[No explanation]") # tallennetaan selitys tilaan
             state["explanation"].append({
@@ -220,8 +219,9 @@ Important:
                 "text": explanation_s2_q
             })
             conf = spa_activation(state, f"s2_q{index}")
+            index += 1
             #state["agent_scores"].append(conf)  # tallennetaan aktivointipisteet    
-            continue
+            #continue
         elif state["extraction_turn"]: 
             
             ###------------------ LOHKO 2.1 ------------------###
@@ -229,7 +229,7 @@ Important:
         
             pending = remaining_keys(state) #funktio joka tekee tarkastuksen
             if not pending: #mikäli kaikki ovat täytetty eli state["product"] sanakirjassa ei ole enää kenttiä, jotka ovat None
-                print("All product fields are filled.", state["product"])
+                print("All product fields are filled.")
                 state["first_turn"] = False # kumotaan ensimmäisen vuoro
                 state["extraction_turn"] = False # Valmiina eristämään vastauksen informaation
                 state["question_turn"] = False # Valmiina kysymään seuraavaa kysym
@@ -242,7 +242,7 @@ Important:
             ###------------------ LOHKO 2.2 ------------------###
             
             #Mikäli None kenttiä on vielä jäljellä, jatketaan eristämistä
-            user_input = input("You: ")  # Käyttäjä antaa vastauksen kysymykseen
+            user_input = input("User turn, waiting for input...")  # Käyttäjä antaa vastauksen kysymykseen
             if user_input.lower().strip() == "exit": #mikäli käyttäjä haluaa lopettaa keskustelun tässä vaiheessa
                 break
             state["messages"].append(HumanMessage(content=user_input)) #listään staten viestihistoriaan edellinen viesti
@@ -303,17 +303,27 @@ Rules:
             # tallennetaan agentin vastaus tilaan
             state["messages"] = result["messages"]
             extraction_explanation = extraction_agent_answer.get("explanation", "[No explanation]")
+            #tämä on enkuksi
             state["explanation"].append({
                 "key": f"s2_ex{index}",
                 "text": extraction_explanation
             })
             conf = spa_activation(state, f"s2_ex{index}")
+            index += 1
             #state["agent_scores"].append(conf)
             # tarkistetaan, että jos agentti löysi informaatiota, se on halutussa muodossa eli avain-arvo pareina:
-            key_value_pairs = extraction_agent_answer.get("key_value_pairs", []) 
+            key_value_pairs = extraction_agent_answer.get("key_value_pairs", [])
+            if not isinstance(key_value_pairs, list):
+                key_value_pairs = []
+            else:
+                key_value_pairs = [p for p in key_value_pairs if isinstance(p, dict)]
             if not key_value_pairs: # jos avain-arvo pareja ei löydy, jatketaan kysymään seuraavaa
-                print("Warning: No key-value pairs found in the agent's response.")
+                print("No key-value pairs found in the agent's response.")
                 print("This may indicate that the agent did not find any relevant information in the user's response.")
+                state["first_turn"] = False # kumotaan ensimmäisen vuoro
+                state["extraction_turn"] = False # Valmiina eristämään vastauksen informaation
+                state["question_turn"] = True # Valmiina kysymään seuraavaa kysym
+                state["ref_turn"] = False # Valmiina referoimaan
                 continue  # Ei löydetty avain-arvo pareja, jatketaan kysymään seuraavaa
             #mikäli agentin vastaus sisältää avainarvo pareja, jatketaan niiden käsittelyä
             else:
@@ -323,16 +333,16 @@ Rules:
                     value = pair.get("value") # arvo, joka on eristetty
                     if key == "company_name" and state["topic"] == "Company":
                         state["product"]["company_name"] = pair.get("value") # jos avain on company_name, lisätään se product sanakirjaan
-                        continue # jatketaan seuraavaan avain-arvo pariin
+                        #continue # jatketaan seuraavaan avain-arvo pariin
                     if key == "product_name" and state["topic"] == "Product":
                         state["product"]["product_name"] = pair.get("value")
-                        continue # jatketaan seuraavaan avain-arvo pariin
+                        #continue # jatketaan seuraavaan avain-arvo pariin
                     if not isinstance(key, str) or not key.strip():
                         print(f"⚠️ Skipping invalid key: {key!r}")
-                        continue
+                        #continue
                     if key is None or (isinstance(key, str) and not key.strip()):
                         print(f"⚠️ Skipping key '{key}' because value is empty/None")
-                        continue
+                        #continue
                     value = pair.get("value") # arvo, joka on eristetty
                     if key in state["product"]: #jos löydetty avain on oikea ja se on todellakin "state productissa"
                         need_for_referation[key] = value # lisätään avain ja arvo sanakirjaan, joka tarvitsee referointia
@@ -346,48 +356,51 @@ Rules:
                             print(f"🔍 Possible typo detected: '{key}' → '{corrected_key}'")
                             need_for_referation[corrected_key] = value
                         else:
-                            print(f"❌ No close match found for '{key}' — skipping.")
+                            print(f"❌ No close match found for agent given key: '{key}' — skipping.")
                 state["need_for_referation"] = need_for_referation #päivitetään tilassa oleva sanakirja avaimista ja arvoista, jotka on juuri eristetty
-            
             ###------------------ LOHKO 2.4 ------------------###
-            
             state["first_turn"] = False # kumotaan ensimmäisen vuoro
             state["extraction_turn"] = False # Valmiina eristämään vastauksen informaation
             state["question_turn"] = False # Valmiina kysymään seuraavaa kysym
             state["ref_turn"] = True # Valmiina referoimaan
-            continue
+            #continue
             ###------------------ LOHKO 2 LOPPU------------------###
         elif state["ref_turn"]:
             # Kopioidaan extraction osuuden löytämä avaimet ja arvot sisältävä sanakirja
             ref_project = state["need_for_referation"].copy()
             if not ref_project:
                 print("No fields to refer, exiting ref_turn.")
-                break  # Ei kenttiä referoitavaksi, siirrytään kysymään seuraavaa
+                state["first_turn"] = False
+                state["extraction_turn"] = False
+                state["question_turn"] = True
+                state["ref_turn"] = False
+                state["next_node"] = 3
+                continue# Ei kenttiä referoitavaksi, siirrytään kysymään seuraavaa
             if None in ref_project:
-                print(f"⚠️ WARNING: None found as key BEFORE filtering: {ref_project[None]!r}")
-                continue
+                print(f"⚠️ WARNING: None found as key BEFORE filtering")
+            #loop käy kaikki ref_projectin avaimet läpi ja tarkistaa, että ne ovat validit, saattaa olla turha
             for key, value in list(ref_project.items()):
                 if key in ("company_name", "product_name"):
                     state["need_for_referation"].pop(key, None)
                     state["product"][key] = value  # Lisätään suoraan product sanakirjaan
-                    continue
+                    #continue
                 if key not in state["product"]:  # varmistetaan että avain on validi
                     state["need_for_referation"].pop(key, None)
-                    continue
+                    #continue
                 if not isinstance(value, str) or not value.strip():
                     state["need_for_referation"].pop(key, None)
-                    continue
+                    #continue
 
-            # ⚠️ Tarkistus jälkeen
+            # ⚠️ Tarkistus jälkeen 
             if None in state["need_for_referation"]:
-                print(f"⚠️ WARNING: None found as key AFTER filtering: {state['need_for_referation'][None]!r}")
+                print(f"⚠️ WARNING: None found as key AFTER filtering")
                 break
 
             # Päivitetään ref_project
             ref_project_ready = state["need_for_referation"].copy()  # päivitetään ref_project sanakirja, joka sisältää vain ne avaimet, jotka tarvitsevat referointia
             
             ###------------------ LOHKO 3.3 ------------------###
-
+            print("Referation in progress for found fields...") ; sys.stdout.flush()
             for ref_key, ref_value in ref_project_ready.items(): #referoidaan kaikkien löydettyjen avaimien arvo muuttujasta state["need_for_referation"] ja tallennetaan
                 ###------------------ LOHKO 3.3.1 ------------------###
                 # alustetaan agentti kutsu, luodaan promt ja react agentti
@@ -439,27 +452,46 @@ explanation: str  # justification of why this rephrasing is appropriate and what
                     "text": ref_explanation
                 })
                 conf = spa_activation(state, f"s2_ref{index}")
+                index += 1
                 #state["agent_scores"].append(conf)  # kutsutaan funktiota, joka laskee aktivointipisteen
                 
                 ###------------------ LOHKO 3.3.2 ------------------###
                 
                 #state["messages"] = result["messages"]
                 state["product"][ref_key] = referated # lisätään referoitu vastaus product sanakirjaan
-            
+                state["need_for_referation"].pop(ref_key, None)
                 ###------------------ LOHKO 3.3.3 ------------------###
                 
                 # mikäli agentin palauttama avain on eri kuin loop key, mutta se ei ole product sanakirjassa = agentti on hallusinoinut avaimen
                 if agent_key != ref_key and agent_key not in state["product"]:
-                    print(f"⚠️ Warning from REF: Key '{agent_key}' not found in product")
-                    print("LOOP RUN WAS IN KEY: ", ref_key, "AND VALUE:", ref_value, "AND WHOLE REF PROJECT:", ref_project)
+                    print(f"⚠️ Warning from ref-agent: Key '{agent_key}' not found in product")
+                    #print("LOOP RUN WAS IN KEY: ", ref_key, "AND VALUE:", ref_value, "AND WHOLE REF PROJECT:", ref_project)
                     # koska agentin löytämä avain, on jo ref_projectissa, mutta se on täysin väärä, se tulee poistaa kaikkialta
                     state["need_for_referation"].pop(agent_key, None)  # Poistetaan avain sanakirjasta, koska sitä ei taritse referoida
-                    continue  # Jatketaan, jos on vielä kenttiä referoitavana
+                    #continue  # Jatketaan, jos on vielä kenttiä referoitavana
                 # tehdyn lisäyksen jälkeen varmistetaan, että on kenttiä referoitavana
                 if state["need_for_referation"] == {}:
+                    if not remaining_keys(state):
+                        print("All product fields are filled, exiting loop.")
+                        state["next_node"] = 4
+                        state["first_turn"] = False # kumotaan ensimmäisen vuoro
+                        state["extraction_turn"] = False # Valmiina eristämään vastauksen informaation
+                        state["question_turn"] = False # Valmiina kysymään seuraavaa kysym
+                        state["ref_turn"] = False # Valmiina referoimaan
+                        # Päivitetään tila takaisin
+                        state["messages"].append(AIMessage(content="All product fields are filled."))
+                        state["need_for_referation"] = {}
+                        return state  # Siirrytään seuraavaan tilaan, koska kaikki kentät on täytetty
                     print("All fields have been referated, exiting ref_turn.")
-                    break
+                    state["first_turn"] = False # kumotaan ensimmäisen vuoro
+                    state["extraction_turn"] = False # Valmiina eristämään vastauksen informaation
+                    state["question_turn"] = True # Valmiina kysymään seuraavaa kysym
+                    state["ref_turn"] = False # Valmiina referoimaan
+                    state["need_for_referation"] = {}  # Tyhjennetään referointiin tarvittavat avaimet, koska ne on jo referoitu
+                    break # Ei enää kenttiä referoitavaksi, siirrytään kysymään seuraavaa
+                    
             ###------------------ LOHKO 3.3 ------------------###
+            print("Referation Done") ; sys.stdout.flush()
             #koska lisäyksiä tehtiin, tarkistetaan onko vielä kenttiä jotka pitää referoida
             if not remaining_keys(state):
                 print("All product fields are filled, exiting loop.")
@@ -473,7 +505,8 @@ explanation: str  # justification of why this rephrasing is appropriate and what
                 state["need_for_referation"] = {}
                 return state  # Siirrytään seuraavaan tilaan, koska kaikki kentät on täytetty
             else:
-                print("Some product fields are still empty.", remaining_keys(state))
+                print("Some product fields are still empty."); sys.stdout.flush()
+                print("Moving to question turn to ask about remaining fields..."); sys.stdout.flush()
                 state["first_turn"] = False # kumotaan ensimmäisen vuoro
                 state["extraction_turn"] = False # Valmiina eristämään vastauksen informaation
                 state["question_turn"] = True # Valmiina kysymään seuraavaa kysymys
@@ -482,10 +515,12 @@ explanation: str  # justification of why this rephrasing is appropriate and what
                 continue
 # --- Node 4: s3 Node (FCA WSA Score Calculation) ---
 def s3_node(state: State) -> State:
-    print("\n--- s3 Node Activated ---")
+    print("\n--- s3 Node Activated ---"); sys.stdout.flush()
+
     state["transition"].append(4)
     state["timestamps"].append(datetime.datetime.now())
     # 1) Puhdista ja validoi – palauttaa dictin
+    #print("[s3] sanitize start"); sys.stdout.flush()
     try:
         clean_bmc, info = sanitize_and_validate_bmc(state["product"], state["topic"])
     except ValueError as e:
@@ -495,7 +530,7 @@ def s3_node(state: State) -> State:
         state["next_node"] = 5
         print("\n--- s3 Node Deactivated (validation error) ---")
         return state
-
+    #print("[s3] sanitize ok"); sys.stdout.flush()
     # Diagnostiikkaa (valinnainen)
     if info.get("unknown_keys_dropped"):
         print("s3 dropped unknown keys:", info["unknown_keys_dropped"])
@@ -512,15 +547,24 @@ def s3_node(state: State) -> State:
         state["next_node"] = 5
         print("\n--- s3 Node Deactivated (import error) ---")
         return state
-
+    
+    #print("[s3] scoring start"); sys.stdout.flush()
+    print("Calculating business/customer novelty and impact scores..."); sys.stdout.flush()
     try:
         mcdm = MCDM()
+        #print("[s3] scoring 1"); sys.stdout.flush()
         fcp = fcp_score()
+        #print("[s3] scoring imports 2"); sys.stdout.flush()
         user_bmc_scores_dict = fcp.bmc_fcp_score_multi(bmc)
+        #print("[s3] scoring imports 3"); sys.stdout.flush()
         ranking = mcdm.calculate_single_ranking_wsa(user_bmc_scores_dict)
-        print("✅WSA-ranking laskettu", ranking)
+        #print("[s3] scoring imports 4"); sys.stdout.flush()
+        #print("✅WSA-ranking laskettu", ranking)
         state["messages"].append(AIMessage(content=f"WSA ranking: {ranking}"))
+        state["product_ranking"] = ranking
+        print("Product ranking updated in state.")
     except Exception as e:
+        #print("Jumittanut kohta meni except haaraan"); sys.stdout.flush()
         # Jos pisteytys epäonnistuu, älä palauta tuplea
         state["messages"].append(AIMessage(content=f"Scoring failed in s3: {e}"))
         state["next_node"] = 5
@@ -529,38 +573,40 @@ def s3_node(state: State) -> State:
 
     # 3) Siirtymä seuraavaan nodeen – ja AINA palauta dict (state)
     state["next_node"] = 5
+    print("Done Calculating scores"); sys.stdout.flush()
     print("\n--- s3 Node Deactivated ---")
     return state
 # --- Node 5: s4 Node (Finalization and Product Saving) ---
 def s4_node(state: State) -> State:
     print("\n--- s4 Node Activated ---")
+    print("Done with product scoring, moving user back to universal agent..."); sys.stdout.flush()
     state["transition"].append(5)
     state["timestamps"].append(datetime.datetime.now())
     state["finished"] = True
     #--- Finalization ---# 
-    print("AGENTIN SELITYKSET ref", state["explanation"])
+    #print("AGENTIN SELITYKSET ref", state["explanation"])
     try:
         sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../..")))
         from src.agentic_system_1.database import save_state_to_aiven as save_to_aiven
-        print("Module imported successfully.")
-        print("save_to_aiven type:", type(save_to_aiven))
+        #print("Module imported successfully.")
+        #print("save_to_aiven type:", type(save_to_aiven))
 
     except Exception as e:
         state["messages"].append(AIMessage(content=f"Import failed in s3: {e}"))
         state["next_node"] = 5
-        print("\n--- s3 Node Deactivated (DATABASE.py module import error) ---")
+        #print("\n--- s3 Node Deactivated (DATABASE.py module import error) ---")
         return state
-    print("Saving state to Aiven database...")
+    #print("Saving state to Aiven database...")
     try:
-        pprint("State to be saved:\n\n", state)
+        #pprint("State to be saved:\n\n", state)
         save_to_aiven(state)
-        print("State saved successfully.")
+        #print("State saved successfully.")
         state["messages"].append(AIMessage(content="State saved successfully."))
     except Exception as e:
-        print(f"Error saving state: {e}")
+        #print(f"Error saving state: {e}")
         state["messages"].append(AIMessage(content=f"Error saving state: {e}"))
         state["next_node"] = 5
-        print("\n--- s4 Node Deactivated (save error) ---")
+        #print("\n--- s4 Node Deactivated (save error) ---")
         return state
 # --- Tarkistetaan, että kaikki productin kentät on täytetty ---
 def remaining_keys(state):
@@ -619,7 +665,7 @@ def spa_activation(state: State, explanation_flag: str) -> float:
         axis_json = json.load(f)
     
     #--- UUSI OSA LISÄTTY 16.8.2025 ---
-    explanation_flagkey = explanation_flag[:-1] if explanation_flag else explanation_flag
+    explanation_flagkey = re.sub(r'\d+$', '', explanation_flag or '')
     average_ideal = axis_json[explanation_flagkey]["avg_ideal"]
     semantic_axis_vector = axis_json[explanation_flagkey]["semantic_axis_vector"]
 
@@ -631,14 +677,14 @@ def spa_activation(state: State, explanation_flag: str) -> float:
     raw_score = 1 - (projection / scaled_axis_length)
     score = max(0.0, min(raw_score * 100, 100.0))
     #state["agent_scores"].append(round(score, 2))
-    print(f"----- Semantic Projection Axis Activation Score TRANSITION = {round(score, 2)} -----")
+    #print(f"----- Semantic Projection Axis Activation Score TRANSITION = {round(score, 2)} -----")
     #tarkistetaan, onko score jo lisätty state["product_ranking"] listaan
     state["agent_scores"].append({
             "key": explanation_flag,
             "score": round(score, 2),
         })
 
-    print(f"Score lisätty stateen: {state['agent_scores']}")
+    #print(f"Score lisätty stateen: {state['agent_scores']}")
     return round(score, 2)
 # --- Define Product Topic ---
 def define_product_topic(state: State) -> dict:
